@@ -1,0 +1,48 @@
+{
+  "name": "@ohos/update_sys_installer",
+  "description": "A system ability started by the init process of OHOS to implement an update",
+  "version": "3.1",
+  "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "base/update/sys_installer"
+  },
+  "dirs": {},
+  "scripts": {},
+  "component": {
+    "name": "sys_installer",
+    "subsystem": "updater",
+    "syscap": [],
+    "features": [],
+    "adapted_system_type": [
+      "standard"
+    ],
+    "deps": {
+      "components": [
+        "utils_base",
+        "hiviewdfx_hilog_native",
+        "ipc",
+        "safwk",
+        "samgr_standard",
+        "napi",
+        "startup_l2"
+      ],
+      "third_party": [
+        "curl",
+        "libxml2",
+        "cJSON",
+        "bounds_checking_function"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//base/update/sys_installer/interfaces/innerkits/ipc_client:sys_installer_client",
+        "//base/update/sys_installer/frameworks/ipc_server:sys_installer",
+        "//base/update/sys_installer/frameworks/ipc_server/etc:sys_installer_sa.rc",
+        "//base/update/sys_installer/frameworks/ipc_server/sa_profile:sys_installer_sa_profile"
+      ],
+      "inner_kits": [],
+      "test": []
+    }
+  }
+}
