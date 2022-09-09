@@ -1,0 +1,82 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+ohos_static_library("libsysinstallerkits") {
+  defines = [
+    "SYS_INSTALLER_KITS",
+  ]
+  sources = [
+    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_load_callback.cpp",
+    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_kits_impl.cpp",
+    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_proxy.cpp",
+  ]
+
+  include_dirs = [
+    "//base/update/sys_installer/include",
+    "//base/update/sys_installer/interfaces/innerkits",
+    "//base/update/sys_installer/interfaces/inner_api/include",
+    "//base/update/sys_installer/interfaces/innerkits/ipc_client/include",
+    "//base/update/updater/services/include",
+    "//base/update/updater/utils/include",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//foundation/distributedschedule/safwk/services/safwk/include",
+    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
+    "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
+    "//third_party/bounds_checking_function/include",
+    "//utils/native/base/include",
+    "//utils/system/safwk/native/include",
+  ]
+
+  deps = [
+    "//base/update/updater/services/log:libupdaterlog",
+    "//base/update/updater/utils:libutils",
+    "//third_party/bounds_checking_function:libsec_static",
+    "//utils/native/base:utils",
+  ]
+
+  external_deps = [
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+
+  part_name = "sys_installer"
+}
+
+ohos_executable("sys_installer_client") {
+  sources = [
+    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_client.cpp",
+  ]
+
+  include_dirs = [
+    "//base/update/sys_installer/interfaces/innerkits/ipc_client/include",
+    "//base/update/sys_installer/interfaces/inner_api/include",
+  ]
+
+  deps = [
+   "//base/update/sys_installer/interfaces/innerkits/ipc_client:libsysinstallerkits",
+    "//third_party/bounds_checking_function:libsec_static",
+    "//utils/native/base:utils",
+  ]
+  external_deps = [
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  install_enable = true
+  part_name = "sys_installer"
+}
