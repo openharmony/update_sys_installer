@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 #include "sys_installer_load_callback.h"
+
+#include "sys_installer_kits_impl.h"
 #include "log/log.h"
 #include "system_ability_definition.h"
 
@@ -23,8 +25,7 @@ using namespace Updater;
 void SysInstallerLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
     const sptr<IRemoteObject> &remoteObject)
 {
-    // LOG(INFO)
-    std::cout << "OnLoadSystemAbilitySuccess systemAbilityId: " << systemAbilityId << " IRmoteObject result:" <<
+    LOG(INFO) << "OnLoadSystemAbilitySuccess systemAbilityId: " << systemAbilityId << " IRmoteObject result:" <<
         ((remoteObject != nullptr) ? "true" : "false");
     if (systemAbilityId != SYS_INSTALLER_DISTRIBUTED_SERVICE_ID) {
         LOG(ERROR) << "start aystemabilityId is not sinkSAId!";
@@ -34,16 +35,17 @@ void SysInstallerLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityI
         LOG(ERROR) << "remoteObject is null.";
         return;
     }
+    SysInstallerKitsImpl::GetInstance().LoadServiceSuccess();
 }
 
 void SysInstallerLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
-    // OG(INFO)
-    std::cout << "OnLoadSystemAbilityFail systemAbilityId:" << systemAbilityId;
+    LOG(INFO) << "OnLoadSystemAbilityFail systemAbilityId:" << systemAbilityId;
     if (systemAbilityId != SYS_INSTALLER_DISTRIBUTED_SERVICE_ID) {
         LOG(ERROR) << "start aystemabilityId is not sinkSAId!";
         return;
     }
+    SysInstallerKitsImpl::GetInstance().LoadServiceFail();
 }
 } // SysInstaller
 } // OHOS

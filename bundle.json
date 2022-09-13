@@ -36,7 +36,6 @@
     },
     "build": {
       "sub_component": [
-        "//base/update/sys_installer/interfaces/innerkits/ipc_client:sys_installer_client",
         "//base/update/sys_installer/frameworks/ipc_server:sys_installer",
         "//base/update/sys_installer/frameworks/ipc_server/etc:sys_installer_sa.rc",
         "//base/update/sys_installer/frameworks/ipc_server/sa_profile:sys_installer_sa_profile"

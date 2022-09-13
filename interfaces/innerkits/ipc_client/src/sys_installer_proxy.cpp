@@ -35,7 +35,7 @@ int32_t SysInstallerProxy::SysInstallerInit()
 
     MessageParcel data;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        return -1;
+        return ERR_FLATTEN_OBJECT;
     }
     MessageParcel reply;
     MessageOption option;
@@ -54,13 +54,13 @@ int32_t SysInstallerProxy::StartUpdatePackageZip(const std::string &pkgPath)
     auto remote = Remote();
     if (remote == nullptr) {
         LOG(ERROR) << "Can not get remote";
-        return false;
+        return ERR_FLATTEN_OBJECT;
     }
 
     MessageParcel data;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         LOG(ERROR) << "WriteInterfaceToken error";
-        return false;
+        return ERR_FLATTEN_OBJECT;
     }
     data.WriteString16(Str8ToStr16(pkgPath));
 
@@ -69,7 +69,7 @@ int32_t SysInstallerProxy::StartUpdatePackageZip(const std::string &pkgPath)
     int32_t ret = remote->SendRequest(UPDATE_PACKAGE, data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
-        return false;
+        return ERR_FLATTEN_OBJECT;
     }
 
     return reply.ReadInt32();
@@ -141,13 +141,13 @@ int32_t SysInstallerProxy::StartUpdateParaZip(const std::string &pkgPath,
     auto remote = Remote();
     if (remote == nullptr) {
         LOG(ERROR) << "Can not get remote";
-        return -1;
+        return ERR_FLATTEN_OBJECT;
     }
 
     MessageParcel data;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         LOG(ERROR) << "WriteInterfaceToken error";
-        return -1;
+        return ERR_FLATTEN_OBJECT;
     }
     data.WriteString16(Str8ToStr16(pkgPath));
     data.WriteString16(Str8ToStr16(location));
@@ -158,7 +158,7 @@ int32_t SysInstallerProxy::StartUpdateParaZip(const std::string &pkgPath,
     int32_t ret = remote->SendRequest(UPDATE_PARA_PACKAGE, data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
-        return -1;
+        return ERR_FLATTEN_OBJECT;
     }
 
     return reply.ReadInt32();

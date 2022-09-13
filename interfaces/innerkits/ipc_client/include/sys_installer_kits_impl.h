@@ -35,6 +35,9 @@ public:
     virtual void ResetService(const wptr<IRemoteObject> &remote);
     sptr<ISysInstaller> GetService();
 
+    void LoadServiceSuccess();
+    void LoadServiceFail();
+
 private:
     int32_t Init();
     SysInstallerKitsImpl() = default;
@@ -57,6 +60,9 @@ public:
     sptr<ISysInstaller> sysInstaller_ {};
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {};
     sptr<ISysInstallerCallback> updateCallBack_ {};
+
+    std::mutex getServiceMutex_;
+    std::condition_variable getServiceCv_;
 };
 } // namespace SysInstaller
 } // namespace OHOS

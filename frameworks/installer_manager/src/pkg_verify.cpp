@@ -59,15 +59,16 @@ int PkgVerify::UpdatePreCheck(const std::string &pkgPath)
         verifyInit_ = true;
     }
 
-    statusManager_->UpdateCallback(UPDATE_STATE_VERIFY_ON, 1); // 1 : 1%
+    statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 1); // 1 : 1%
     int ret = VerifyPackage(pkgPath.c_str(), CERT_NAME, "", nullptr, 0);
     if (ret != 0) {
         LOG(ERROR) << "VerifyPackage failed:" << ret;
-        statusManager_->UpdateCallback(UPDATE_STATE_VERIFY_FAIL, 1); // 1 : 1%
+        statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 1); // 1 : 1%
         return -1;
     }
 
-    statusManager_->UpdateCallback(UPDATE_STATE_VERIFY_SUCCESS, 5); // 5 : %5
+    statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 5); // 5 : %5
+    LOG(INFO) << "UpdatePreCheck successful";
     return 0;
 }
 } // namespace SysInstaller

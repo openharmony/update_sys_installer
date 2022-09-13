@@ -13,28 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef SYS_INSTALLER_COMMON_H
-#define SYS_INSTALLER_COMMON_H
+#ifndef SYS_INSTALLER_CALLBACK_STUB_H
+#define SYS_INSTALLER_CALLBACK_STUB_H
 
-#include <string>
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <iostream>
+#include "iremote_stub.h"
+#include "isys_installer_callback.h"
 
 namespace OHOS {
 namespace SysInstaller {
-constexpr const char *SYS_LOG_DIR = "/data/updater/log";
-constexpr const char *SYS_LOG_FILE = "/data/updater/log/sys_installer.log";
-constexpr const char *SYS_STAGE_FILE = "/data/updater/log/sys_installer_stage.log";
-constexpr const char *SYS_ERROR_FILE = "/data/updater/log/sys_installer_error_code.log";
-
-enum UpdateStatus {
-    UPDATE_STATE_INIT = 0,
-    UPDATE_STATE_ONGOING,
-    UPDATE_STATE_FAILED,
-    UPDATE_STATE_SUCCESSFUL
+class SysInstallerCallbackStub : public IRemoteStub<ISysInstallerCallback> {
+public:
+    int32_t OnRemoteRequest(uint32_t code,
+        MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 };
 } // namespace SysInstaller
 } // namespace OHOS
-#endif // SYS_INSTALLER_COMMON_H
+#endif // SYS_INSTALLER_CALLBACK_H
