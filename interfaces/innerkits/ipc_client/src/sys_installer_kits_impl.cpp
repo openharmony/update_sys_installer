@@ -18,7 +18,6 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "log/log.h"
-#include "out/rk3568/obj/third_party/musl/intermidiates/linux/musl_src_ported/include/unistd.h"
 #include "securec.h"
 #include "system_ability_definition.h"
 #include "utils.h"
@@ -32,6 +31,8 @@
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
+
+constexpr int LOAD_SA_TIMEOUT_MS = 3000;
 
 SysInstallerKitsImpl &SysInstallerKitsImpl::GetInstance()
 {
@@ -96,9 +97,10 @@ int32_t SysInstallerKitsImpl::Init()
 {
     std::lock_guard<std::mutex> lock(sysInstallerLock_);
     if (sysInstaller_ != nullptr) {
-        return -1;
+        LOG(INFO) << "already init";
+        return 0;
     }
-    (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0775); // 0775 : rwxrwxr-x
+    (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0777); // 0777 : rwxrwxrwx
     InitUpdaterLogger("SysInstallerClient", SYS_LOG_FILE, SYS_STAGE_FILE, SYS_ERROR_FILE);
 
     // 构造步骤1的SystemAbilityLoadCallbackStub子类的实例
@@ -115,25 +117,27 @@ int32_t SysInstallerKitsImpl::Init()
             " load failed, result code:" << result;
         return -1;
     }
+
+    std::unique_lock<std::mutex> callbackLock(getServiceMutex_);
+    getServiceCv_.wait_for(callbackLock, std::chrono::seconds(LOAD_SA_TIMEOUT_MS));
     return 0;
 }
 
 int32_t SysInstallerKitsImpl::SysInstallerInit()
 {
-    LOG(INFO) << "SysInstallerKitsImpl SysInstallerInit";
+    LOG(INFO) << "SysInstallerInit";
     int ret = Init();
     if (ret != 0) {
         LOG(ERROR) << "Init failed";
         return ret;
     }
 
-    sleep(3);
-    // auto updateService = GetService();
-    // if (updateService == nullptr) {
-    //     LOG(ERROR) << "Get updateService failed";
-    //     return -1;
-    // }
-    // updateService->SysInstallerInit();
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    updateService->SysInstallerInit();
     return 0;
 }
 
@@ -185,6 +189,16 @@ int32_t SysInstallerKitsImpl::StartUpdateParaZip(const std::string &pkgPath,
     int32_t ret = updateService->StartUpdateParaZip(pkgPath, location, cfgDir);
     LOG(INFO) << "StartUpdateParaZip ret:" << ret;
     return ret;
+}
+
+void SysInstallerKitsImpl::LoadServiceSuccess()
+{
+    getServiceCv_.notify_all();
+}
+
+void SysInstallerKitsImpl::LoadServiceFail()
+{
+    getServiceCv_.notify_all();
 }
 }
 } // namespace OHOS

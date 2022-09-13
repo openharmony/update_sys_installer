@@ -26,14 +26,14 @@ ohos_static_library("libabupdate") {
     "//base/update/sys_installer/interfaces/inner_api/include",
     "//base/update/sys_installer/frameworks/installer_manager/include",
     "//base/update/sys_installer/frameworks/status_manager/include",
-    "//base/update/sys_installer/include",
+    "//base/update/sys_installer/services/ab_update/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//utils/native/base/include",
-    "//base/update/sys_installer/services/ab_update/include",
+    "//third_party/bounds_checking_function/include",
   ]
 
   deps = [
-    "//base/update/updater/services/log:libupdaterlog",
+    "//base/update/updater/services:libupdater",
   ]
 
   part_name = "sys_installer"

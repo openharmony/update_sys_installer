@@ -64,7 +64,7 @@ void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent)
         return;
     }
 
-    if (updateStatus > UPDATE_STATE_UPDATE_SUCCESS) {
+    if (updateStatus > UPDATE_STATE_SUCCESSFUL) {
         LOG(INFO) << "status error:" << updateStatus;
         return;
     }
@@ -73,8 +73,8 @@ void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent)
     }
 
     updateStatus_ = updateStatus;
-    LOG(INFO) << "status:" << updateStatus << " percent:"  << percent_;
-    updateCallback_->OnUpgradeProgress(updateStatus, percent_);
+    LOG(INFO) << "status:" << updateStatus_ << " percent:"  << percent_;
+    updateCallback_->OnUpgradeProgress(updateStatus_, percent_);
 }
 } // namespace SysInstaller
 } // namespace OHOS

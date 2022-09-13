@@ -18,6 +18,7 @@ ohos_static_library("libsysinstallerkits") {
     "SYS_INSTALLER_KITS",
   ]
   sources = [
+    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_callback_stub.cpp",
     "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_load_callback.cpp",
     "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_kits_impl.cpp",
     "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_proxy.cpp",

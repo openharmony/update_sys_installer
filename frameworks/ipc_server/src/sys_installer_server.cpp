@@ -32,7 +32,6 @@
 
 #include "iservice_registry.h"
 #include "log/log.h"
-#include "parameters.h"
 #include "securec.h"
 #include "system_ability_definition.h"
 #include "utils.h"
@@ -56,13 +55,11 @@ int32_t SysInstaller::SysInstallerInit()
 {
     LOG(INFO) << "SysInstallerInit";
     if (!logInit_) {
-        (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0775); // 0775 : rwxrwxr-x
+        (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0777); // 0777 : rwxrwxrwx
         InitUpdaterLogger("SysInstaller", SYS_LOG_FILE, SYS_STAGE_FILE, SYS_ERROR_FILE);
         logInit_ = true;
     }
-    logInit_ = false;
 
-    std::cout << "SysInstallerInit end";
     InstallerManager::GetInstance().SysInstallerInit();
     return 0;
 }

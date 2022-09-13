@@ -31,7 +31,6 @@
 #include <vector>
 
 #include "log/log.h"
-#include "package/pkg_manager.h"
 #include "utils.h"
 
 #include "ab_update.h"
@@ -42,11 +41,10 @@ using namespace Updater;
 int32_t InstallerManagerHelper::SysInstallerInit()
 {
     LOG(INFO) << "SysInstallerInit";
-    std::cout << "InstallerManagerHelper SysInstallerInit";
+
     if (statusManager_ == nullptr) {
         statusManager_ = std::make_shared<StatusManager>();
     }
-    std::cout << "InstallerManagerHelper SysInstallerInit";
     statusManager_->Init();
     return 0;
 }
