@@ -62,15 +62,15 @@ int32_t ABUpdate::StartABUpdate(const std::string &pkgPath)
     STAGE(UPDATE_STAGE_BEGIN) << "StartABUpdate start";
     LOG(INFO) << "ABUpdate start, pkg updaterPath : " << pkgPath.c_str();
 
-    UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, pkgPath, 0, LIVE_HOTA_UPDATE);
+    UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, pkgPath, 0, HOTA_UPDATE);
     if (updateRet != UPDATE_SUCCESS) {
         LOG(INFO) << "Install package failed!";
         STAGE(UPDATE_STAGE_FAIL) << "Install package failed";
-        statusManager_->UpdateCallback(UPDATE_STATE_INSTALL_FAIL, 100); // 100 : success
+        statusManager_->UpdateCallback(UPDATE_STATE_FAILED, 100); // 100 : success
     } else {
         LOG(INFO) << "Update from SD Card successfully!";
         STAGE(UPDATE_STAGE_SUCCESS) << "UpdaterFromSdcard success";
-        statusManager_->UpdateCallback(UPDATE_STATE_INSTALL_SUCCESS, 100); // 100 : success
+        statusManager_->UpdateCallback(UPDATE_STATE_SUCCESSFUL, 100); // 100 : success
     }
 
     Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
