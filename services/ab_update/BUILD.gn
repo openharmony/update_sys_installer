@@ -30,10 +30,12 @@ ohos_static_library("libabupdate") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//utils/native/base/include",
     "//third_party/bounds_checking_function/include",
+    "//third_party/openssl/include",
   ]
 
   deps = [
     "//base/update/updater/services:libupdater",
+    "//third_party/openssl:ssl_source",
   ]
 
   part_name = "sys_installer"
