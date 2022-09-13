@@ -65,7 +65,6 @@ int32_t InstallerManagerHelper::StartUpdatePackageZip(const std::string &pkgPath
 
     ABUpdate abUpdate(statusManager_);
     return abUpdate.StartABUpdate(realPath);
-    return 0;
 }
 
 int32_t InstallerManagerHelper::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback)

@@ -42,7 +42,6 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Hpackage;
 using namespace Updater;
-// constexpr const char *CERT_NAME = "/updater/certificate/signing_cert.crt";
 
 int32_t ABUpdate::StartABUpdate(const std::string &pkgPath)
 {
@@ -66,13 +65,14 @@ int32_t ABUpdate::StartABUpdate(const std::string &pkgPath)
     if (updateRet != UPDATE_SUCCESS) {
         LOG(INFO) << "Install package failed!";
         STAGE(UPDATE_STAGE_FAIL) << "Install package failed";
-        statusManager_->UpdateCallback(UPDATE_STATE_FAILED, 100); // 100 : success
-    } else {
-        LOG(INFO) << "Update from SD Card successfully!";
-        STAGE(UPDATE_STAGE_SUCCESS) << "UpdaterFromSdcard success";
-        statusManager_->UpdateCallback(UPDATE_STATE_SUCCESSFUL, 100); // 100 : success
+        statusManager_->UpdateCallback(UPDATE_STATE_FAILED, 100); // 100 : failed
+        Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
+		return -1;
     }
-
+	
+    LOG(INFO) << "Install package successfully!";
+    STAGE(UPDATE_STAGE_SUCCESS) << "Install package success";
+    statusManager_->UpdateCallback(UPDATE_STATE_SUCCESSFUL, 100); // 100 : success
     Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
     return 0;
 }
