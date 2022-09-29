@@ -14,13 +14,11 @@
 import("//build/ohos.gni")
 
 ohos_static_library("libsysinstallerkits") {
-  defines = [
-    "SYS_INSTALLER_KITS",
-  ]
+  defines = [ "SYS_INSTALLER_KITS" ]
   sources = [
     "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_callback_stub.cpp",
-    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_load_callback.cpp",
     "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_kits_impl.cpp",
+    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_load_callback.cpp",
     "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_proxy.cpp",
   ]
 
@@ -36,7 +34,7 @@ ohos_static_library("libsysinstallerkits") {
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
     "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
     "//third_party/bounds_checking_function/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//utils/system/safwk/native/include",
   ]
 
@@ -44,10 +42,11 @@ ohos_static_library("libsysinstallerkits") {
     "//base/update/updater/services/log:libupdaterlog",
     "//base/update/updater/utils:libutils",
     "//third_party/bounds_checking_function:libsec_static",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
@@ -58,9 +57,7 @@ ohos_static_library("libsysinstallerkits") {
 }
 
 ohos_executable("sys_installer_client") {
-  sources = [
-    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_client.cpp",
-  ]
+  sources = [ "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_client.cpp" ]
 
   include_dirs = [
     "//base/update/sys_installer/interfaces/innerkits/ipc_client/include",
@@ -68,11 +65,12 @@ ohos_executable("sys_installer_client") {
   ]
 
   deps = [
-   "//base/update/sys_installer/interfaces/innerkits/ipc_client:libsysinstallerkits",
+    "//base/update/sys_installer/interfaces/innerkits/ipc_client:libsysinstallerkits",
     "//third_party/bounds_checking_function:libsec_static",
-    "//utils/native/base:utils",
   ]
   external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
