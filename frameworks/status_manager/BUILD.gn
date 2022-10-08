@@ -14,9 +14,7 @@
 import("//build/ohos.gni")
 
 ohos_static_library("libstatusmanager") {
-  sources = [
-    "//base/update/sys_installer/frameworks/status_manager/src/status_manager.cpp",
-  ]
+  sources = [ "//base/update/sys_installer/frameworks/status_manager/src/status_manager.cpp" ]
 
   include_dirs = [
     "//base/update/updater/utils/include",
@@ -26,12 +24,10 @@ ohos_static_library("libstatusmanager") {
     "//base/update/sys_installer/include",
     "//base/update/updater/services/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//utils/native/base/include",
   ]
 
-  deps = [
-    "//base/update/updater/services/log:libupdaterlog",
-  ]
+  deps = [ "//base/update/updater/services/log:libupdaterlog" ]
 
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   part_name = "sys_installer"
 }
