@@ -60,6 +60,7 @@ int32_t ABUpdate::StartABUpdate(const std::string &pkgPath)
 
     STAGE(UPDATE_STAGE_BEGIN) << "StartABUpdate start";
     LOG(INFO) << "ABUpdate start, pkg updaterPath : " << pkgPath.c_str();
+    statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 10); // 10 : start install
 
     UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, pkgPath, 0, HOTA_UPDATE);
     if (updateRet != UPDATE_SUCCESS) {
@@ -67,13 +68,14 @@ int32_t ABUpdate::StartABUpdate(const std::string &pkgPath)
         STAGE(UPDATE_STAGE_FAIL) << "Install package failed";
         statusManager_->UpdateCallback(UPDATE_STATE_FAILED, 100); // 100 : failed
         Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
-		return -1;
+        return -1;
     }
-	
+
     LOG(INFO) << "Install package successfully!";
     STAGE(UPDATE_STAGE_SUCCESS) << "Install package success";
     statusManager_->UpdateCallback(UPDATE_STATE_SUCCESSFUL, 100); // 100 : success
     Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
+    PostUpdater(false);
     return 0;
 }
 
