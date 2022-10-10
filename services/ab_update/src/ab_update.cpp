@@ -75,7 +75,9 @@ int32_t ABUpdate::StartABUpdate(const std::string &pkgPath)
     STAGE(UPDATE_STAGE_SUCCESS) << "Install package success";
     statusManager_->UpdateCallback(UPDATE_STATE_SUCCESSFUL, 100); // 100 : success
     Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
-    PostUpdater(false);
+    if (!DeleteUpdaterPath(GetWorkPath())) {
+        LOG(WARNING) << "Delete Updater Path fail.";
+    }
     return 0;
 }
 
