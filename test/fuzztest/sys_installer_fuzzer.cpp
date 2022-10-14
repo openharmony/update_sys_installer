@@ -150,15 +150,15 @@ bool FuzzStartUpdaterProc(const uint8_t *data, size_t size)
         return -1;
     }
 
-    fwrite(data, 1, size, pFile);
-    fclose(pFile);
+    (void)fwrite(data, 1, size, pFile);
+    (void)fclose(pFile);
     CreatePackageZip(fstabFile);
 
     SysInstallerKitsImpl::GetInstance().SysInstallerInit();
     SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(TEST_PATH_TO + "test_package.zip");
 
-    remove("updater.txt");
-    remove("test_package.zip");
+    (void)remove("updater.txt");
+    (void)remove("test_package.zip");
 
     return 0;
 }

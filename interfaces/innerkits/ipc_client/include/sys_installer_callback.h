@@ -39,7 +39,6 @@ public:
 private:
     sptr<ISysInstallerCallbackFunc> callback_;
 };
-
 } // namespace SysInstaller
 } // namespace OHOS
 #endif // SYS_INSTALLER_CALLBACK_H
