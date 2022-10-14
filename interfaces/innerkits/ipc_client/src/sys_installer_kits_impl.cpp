@@ -15,7 +15,7 @@
 
 #include "sys_installer_kits_impl.h"
 
-#include < sys/stat.h>
+#include <sys/stat.h>
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "log/log.h"
