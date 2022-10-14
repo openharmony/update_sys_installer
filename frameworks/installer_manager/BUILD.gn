@@ -38,11 +38,11 @@ ohos_static_library("libinstallermanager") {
   ]
 
   deps = [
-    "//base/update/updater/interfaces/kits/packages:libpackageExt",
-    "//base/update/sys_installer/frameworks/actions/verify_action:libverifyaction",
     "//base/update/sys_installer/frameworks/action_processer:libactionprocesser",
-    "//base/update/updater/services/package:libupdaterpackage",
+    "//base/update/sys_installer/frameworks/actions/verify_action:libverifyaction",
+    "//base/update/updater/interfaces/kits/packages:libpackageExt",
     "//base/update/updater/services/log:libupdaterlog",
+    "//base/update/updater/services/package:libupdaterpackage",
     "//third_party/openssl:ssl_source",
   ]
 

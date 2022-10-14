@@ -14,9 +14,7 @@
 import("//build/ohos.gni")
 
 ohos_static_library("libverifyaction") {
-  sources = [
-    "//base/update/sys_installer/frameworks/actions/verify_action/src/pkg_verify.cpp",
-  ]
+  sources = [ "//base/update/sys_installer/frameworks/actions/verify_action/src/pkg_verify.cpp" ]
 
   include_dirs = [
     "//base/update/updater/utils/include",
