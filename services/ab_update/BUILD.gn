@@ -14,26 +14,28 @@
 import("//build/ohos.gni")
 
 ohos_static_library("libabupdate") {
-  sources =
-      [ "//base/update/sys_installer/services/ab_update/src/ab_update.cpp" ]
+  sources = [
+    "//base/update/sys_installer/services/ab_update/src/ab_update.cpp",
+  ]
 
   include_dirs = [
     "//base/update/updater/interfaces/kits/include",
     "//base/update/updater/services/include",
     "//base/update/updater/utils/include",
+    "//base/update/sys_installer/common/include",
     "//base/update/sys_installer/interfaces/innerkits",
     "//base/update/sys_installer/interfaces/inner_api/include",
+    "//base/update/sys_installer/frameworks/actions/include",
     "//base/update/sys_installer/frameworks/installer_manager/include",
     "//base/update/sys_installer/frameworks/status_manager/include",
-    "//base/update/sys_installer/services/ab_update/include",
+    "//base/update/sys_installer/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//third_party/bounds_checking_function/include",
-    "//third_party/openssl/include",
+    "//utils/native/base/include",
+    "//base/update/sys_installer/services/ab_update/include",
   ]
 
   deps = [
     "//base/update/updater/services:libupdater",
-    "//third_party/openssl:ssl_source",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]

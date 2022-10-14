@@ -31,25 +31,21 @@
 #include <vector>
 
 #include "log/log.h"
-#include "package/cert_verify.h"
 #include "package/package.h"
 #include "package/pkg_manager.h"
-#include "pkg_verify.h"
-#include "updater/updater.h"
+#include "scope_guard.h"
 #include "utils.h"
 
 namespace OHOS {
 namespace SysInstaller {
-using namespace Hpackage;
 using namespace Updater;
 
-int32_t ABUpdate::StartABUpdate(const std::string &pkgPath)
+UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
 {
     LOG(INFO) << "StartABUpdate start";
-    CertVerify::GetInstance().RegisterCertHelper(std::make_unique<SingleCertHelper>());
     if (statusManager_ == nullptr) {
         LOG(ERROR) << "statusManager_ nullptr";
-        return -1;
+        return UPDATE_ERROR;
     }
 
     Hpackage::PkgManager::PkgManagerPtr pkgManager = Hpackage::PkgManager::GetPackageInstance();
@@ -60,26 +56,37 @@ int32_t ABUpdate::StartABUpdate(const std::string &pkgPath)
 
     STAGE(UPDATE_STAGE_BEGIN) << "StartABUpdate start";
     LOG(INFO) << "ABUpdate start, pkg updaterPath : " << pkgPath.c_str();
-    statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 10); // 10 : start install
 
     UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, pkgPath, 0, HOTA_UPDATE);
-    if (updateRet != UPDATE_SUCCESS) {
+    if (updateRet != UpdaterStatus::UPDATE_SUCCESS) {
         LOG(INFO) << "Install package failed!";
         STAGE(UPDATE_STAGE_FAIL) << "Install package failed";
-        statusManager_->UpdateCallback(UPDATE_STATE_FAILED, 100); // 100 : failed
-        Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
-        return -1;
+    } else {
+        LOG(INFO) << "Update from SD Card successfully!";
+        STAGE(UPDATE_STAGE_SUCCESS) << "UpdaterFromSdcard success";
     }
 
-    LOG(INFO) << "Install package successfully!";
-    STAGE(UPDATE_STAGE_SUCCESS) << "Install package success";
-    statusManager_->UpdateCallback(UPDATE_STATE_SUCCESSFUL, 100); // 100 : success
     Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
-    if (!DeleteUpdaterPath(GetWorkPath())) {
-        LOG(WARNING) << "Delete Updater Path fail.";
-    }
-    return 0;
+    return updateRet;
 }
 
+void ABUpdate::PerformAction()
+{
+    InstallerErrCode errCode = SYS_UPDATE_SUCCESS;
+    std::string errStr = "";
+    UpdaterStatus updateRet = UpdaterStatus::UPDATE_SUCCESS;
+    Detail::ScopeGuard guard([&] {
+        LOG(INFO) << "PerformAction ret:" << updateRet;
+        if (updateRet != UpdaterStatus::UPDATE_SUCCESS) {
+            errCode = SYS_INSTALL_PARA_FAIL;
+            errStr = std::to_string(updateRet);
+        }
+        if (actionCallBack_ != nullptr) {
+            actionCallBack_(errCode, errStr);
+        }
+    });
+
+    updateRet = StartABUpdate(pkgPath_);
+}
 } // namespace SysInstaller
 } // namespace OHOS

@@ -15,6 +15,8 @@
 
 #include "sys_installer_kits_impl.h"
 
+#include <unistd.h>
+
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "log/log.h"
@@ -24,6 +26,7 @@
 
 #include "isys_installer.h"
 #include "isys_installer_callback.h"
+#include "sys_installer_callback.h"
 #include "sys_installer_common.h"
 #include "sys_installer_load_callback.h"
 #include "sys_installer_proxy.h"
@@ -31,7 +34,7 @@
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
-
+constexpr int GROUP_UPDATE_AUTHORITY = 6666;
 constexpr int LOAD_SA_TIMEOUT_MS = 3000;
 
 SysInstallerKitsImpl &SysInstallerKitsImpl::GetInstance()
@@ -102,6 +105,9 @@ int32_t SysInstallerKitsImpl::Init()
     }
     (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0777); // 0777 : rwxrwxrwx
     InitUpdaterLogger("SysInstallerClient", SYS_LOG_FILE, SYS_STAGE_FILE, SYS_ERROR_FILE);
+    (void)chown(SYS_LOG_FILE, GROUP_UPDATE_AUTHORITY, GROUP_UPDATE_AUTHORITY);
+    (void)chown(SYS_STAGE_FILE, GROUP_UPDATE_AUTHORITY, GROUP_UPDATE_AUTHORITY);
+    (void)chown(SYS_ERROR_FILE, GROUP_UPDATE_AUTHORITY, GROUP_UPDATE_AUTHORITY);
 
     // 构造步骤1的SystemAbilityLoadCallbackStub子类的实例
     sptr<SysInstallerLoadCallback> loadCallback_ = new SysInstallerLoadCallback();
@@ -118,8 +124,8 @@ int32_t SysInstallerKitsImpl::Init()
         return -1;
     }
 
-    std::unique_lock<std::mutex> callbackLock(getServiceMutex_);
-    getServiceCv_.wait_for(callbackLock, std::chrono::seconds(LOAD_SA_TIMEOUT_MS));
+    std::unique_lock<std::mutex> callbackLock(serviceMutex_);
+    serviceCv_.wait_for(callbackLock, std::chrono::seconds(LOAD_SA_TIMEOUT_MS));
     return 0;
 }
 
@@ -154,16 +160,29 @@ int32_t SysInstallerKitsImpl::StartUpdatePackageZip(const std::string &pkgPath)
     return ret;
 }
 
-int32_t SysInstallerKitsImpl::SetUpdateCallback(const sptr<ISysInstallerCallback> &cb)
+int32_t SysInstallerKitsImpl::SetUpdateCallback(sptr<ISysInstallerCallbackFunc> callback)
 {
     LOG(INFO) << "SetUpdateCallback";
+    if (callback == nullptr) {
+        LOG(ERROR) << "callback null";
+        return -1;
+    }
+
     auto updateService = GetService();
     if (updateService == nullptr) {
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    updateCallBack_ = cb;
-    return updateService->SetUpdateCallback(cb);
+
+    if (updateCallBack_ == nullptr) {
+        updateCallBack_ = new SysInstallerCallback;
+        if (updateCallBack_ == nullptr) {
+            LOG(ERROR) << "updateCallBack_ null";
+            return -1;
+        }
+    }
+    static_cast<SysInstallerCallback *>(updateCallBack_.GetRefPtr())->RegisterCallback(callback);
+    return updateService->SetUpdateCallback(updateCallBack_);
 }
 
 int32_t SysInstallerKitsImpl::GetUpdateStatus()
@@ -193,12 +212,12 @@ int32_t SysInstallerKitsImpl::StartUpdateParaZip(const std::string &pkgPath,
 
 void SysInstallerKitsImpl::LoadServiceSuccess()
 {
-    getServiceCv_.notify_all();
+    serviceCv_.notify_all();
 }
 
 void SysInstallerKitsImpl::LoadServiceFail()
 {
-    getServiceCv_.notify_all();
+    serviceCv_.notify_all();
 }
 }
 } // namespace OHOS

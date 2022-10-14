@@ -51,10 +51,12 @@ InstallerManager &InstallerManager::GetInstance()
 
 int32_t InstallerManager::SysInstallerInit()
 {
-    SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_PRE_INIT_EVENT);
-
     if (helper_ == nullptr) {
-        RegisterDump(std::make_unique<InstallerManagerHelper>());
+        SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_PRE_INIT_EVENT);
+
+        if (helper_ == nullptr) {
+            RegisterDump(std::make_unique<InstallerManagerHelper>());
+        }
     }
     return helper_->SysInstallerInit();
 }

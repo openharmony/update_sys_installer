@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "sys_installer_callback_stub.h"
+#include "sys_installer_callback.h"
 
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
@@ -39,7 +39,7 @@ int32_t SysInstallerCallbackStub::OnRemoteRequest(uint32_t code,
         case UPDATE_RESULT: {
             int updateStatus = data.ReadInt32();
             int percent  = data.ReadInt32();
-            OnUpgradeProgress(updateStatus, percent);
+            OnUpgradeProgress(static_cast<UpdateStatus>(updateStatus), percent);
             break;
         }
         default: {
@@ -47,6 +47,19 @@ int32_t SysInstallerCallbackStub::OnRemoteRequest(uint32_t code,
         }
     }
     return 0;
+}
+
+void SysInstallerCallback::OnUpgradeProgress(UpdateStatus updateStatus, int percent)
+{
+    LOG(INFO) << "progress: " << updateStatus << " percent:" << percent;
+    if (callback_ != nullptr) {
+        callback_->OnUpgradeProgress(updateStatus, percent);
+    }
+}
+
+void SysInstallerCallback::RegisterCallback(sptr<ISysInstallerCallbackFunc> callback)
+{
+    callback_ = callback;
 }
 }
 } // namespace OHOS

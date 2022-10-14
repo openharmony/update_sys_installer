@@ -27,7 +27,7 @@ public:
 
     virtual ~SysInstallerCallbackProxy() = default;
 
-    void OnUpgradeProgress(int updateStatus, int percent) override;
+    void OnUpgradeProgress(UpdateStatus updateStatus, int percent) override;
 
 private:
     static inline BrokerDelegator<SysInstallerCallbackProxy> delegator_;

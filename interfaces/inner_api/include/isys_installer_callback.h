@@ -22,6 +22,14 @@
 
 namespace OHOS {
 namespace SysInstaller {
+enum UpdateStatus {
+    UPDATE_STATE_INIT = 0,
+    UPDATE_STATE_ONGOING,
+    UPDATE_STATE_FAILED,
+    UPDATE_STATE_SUCCESSFUL,
+    UPDATE_STATE_MAX
+};
+
 class ISysInstallerCallback : public OHOS::IRemoteBroker {
 public:
     virtual ~ISysInstallerCallback() = default;
@@ -31,7 +39,7 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Update.ISysInstallerCallback");
 public:
-    virtual void OnUpgradeProgress(int updateStatus, int percent) = 0;
+    virtual void OnUpgradeProgress(UpdateStatus updateStatus, int percent) = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS

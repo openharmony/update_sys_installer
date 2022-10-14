@@ -30,14 +30,19 @@
 #include <unistd.h>
 #include <vector>
 
+#include "action_processer.h"
 #include "log/log.h"
+#include "package/cert_verify.h"
+#include "package/pkg_manager.h"
 #include "utils.h"
 
 #include "ab_update.h"
 
 namespace OHOS {
 namespace SysInstaller {
+using namespace Hpackage;
 using namespace Updater;
+
 int32_t InstallerManagerHelper::SysInstallerInit()
 {
     LOG(INFO) << "SysInstallerInit";
@@ -46,25 +51,20 @@ int32_t InstallerManagerHelper::SysInstallerInit()
         statusManager_ = std::make_shared<StatusManager>();
     }
     statusManager_->Init();
+    ActionProcesser::GetInstance().SetStatusManager(statusManager_);
     return 0;
 }
 
 int32_t InstallerManagerHelper::StartUpdatePackageZip(const std::string &pkgPath)
 {
     LOG(INFO) << "StartUpdatePackageZip start";
-    if (statusManager_ == nullptr) {
-        LOG(ERROR) << "statusManager_ nullptr";
+    if (ActionProcesser::GetInstance().IsRunning()) {
+        LOG(ERROR) << "ActionProcesser IsRunning";
         return -1;
     }
-
-    std::string realPath {};
-    if (!Utils::PathToRealPath(pkgPath, realPath)) {
-        LOG(ERROR) << "get real path failed";
-        return -1;
-    }
-
-    ABUpdate abUpdate(statusManager_);
-    return abUpdate.StartABUpdate(realPath);
+    ActionProcesser::GetInstance().AddAction(std::make_unique<ABUpdate>(statusManager_, pkgPath));
+    ActionProcesser::GetInstance().Start();
+    return 0;
 }
 
 int32_t InstallerManagerHelper::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback)

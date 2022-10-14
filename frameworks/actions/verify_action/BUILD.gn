@@ -13,10 +13,9 @@
 
 import("//build/ohos.gni")
 
-ohos_static_library("libinstallermanager") {
+ohos_static_library("libverifyaction") {
   sources = [
-    "//base/update/sys_installer/frameworks/installer_manager/src/installer_manager.cpp",
-    "//base/update/sys_installer/frameworks/installer_manager/src/installer_manager_helper.cpp",
+    "//base/update/sys_installer/frameworks/actions/verify_action/src/pkg_verify.cpp",
   ]
 
   include_dirs = [
@@ -28,9 +27,7 @@ ohos_static_library("libinstallermanager") {
     "//base/update/sys_installer/frameworks/actions/include",
     "//base/update/sys_installer/frameworks/actions/verify_action/include",
     "//base/update/sys_installer/frameworks/action_processer/include",
-    "//base/update/sys_installer/frameworks/installer_manager/include",
     "//base/update/sys_installer/frameworks/status_manager/include",
-    "//base/update/sys_installer/services/ab_update/include",
     "//base/update/updater/services/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//third_party/openssl/include",
@@ -38,10 +35,6 @@ ohos_static_library("libinstallermanager") {
   ]
 
   deps = [
-    "//base/update/updater/interfaces/kits/packages:libpackageExt",
-    "//base/update/sys_installer/frameworks/actions/verify_action:libverifyaction",
-    "//base/update/sys_installer/frameworks/action_processer:libactionprocesser",
-    "//base/update/updater/services/package:libupdaterpackage",
     "//base/update/updater/services/log:libupdaterlog",
     "//third_party/openssl:ssl_source",
   ]

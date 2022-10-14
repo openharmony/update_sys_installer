@@ -11,10 +11,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/update/updater/updater_default_cfg.gni")
 import("//build/ohos.gni")
 
-ohos_prebuilt_etc("sys_installer_sa.rc") {
-  source = "sys_installer_sa.cfg"
-  relative_install_dir = "init"
-  part_name = "sys_installer"
+group("fuzztest") {
+  testonly = true
+  deps = []
+}
+
+group("unittest") {
+  testonly = true
+  deps = [
+    "test/unittest:sys_installer_unittest",
+  ]
 }

@@ -12,18 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef SYS_INSTALLER_LOAD_CALLBACK_H
-#define SYS_INSTALLER_LOAD_CALLBACK_H
 
-#include "system_ability_load_callback_stub.h"
+#ifndef SYS_INSTALLER_FUZZER_H
+#define SYS_INSTALLER_FUZZER_H
 
-namespace OHOS {
-namespace SysInstaller {
-class SysInstallerLoadCallback : public SystemAbilityLoadCallbackStub {
-public:
-    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject) override;
-    void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
-};
-}
-}
-#endif // SYS_INSTALLER_LOAD_CALLBACK_H
+#define FUZZ_PROJECT_NAME "sysinstaller_fuzzer"
+
+#endif
