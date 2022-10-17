@@ -80,7 +80,7 @@ ohos_executable("sys_installer_client_test") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "startup_l2:syspara",
+    "init:libbegetutil",
   ]
   install_enable = true
   part_name = "sys_installer"
