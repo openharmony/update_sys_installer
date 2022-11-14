@@ -62,7 +62,10 @@ int32_t ABUpdate::StartABUpdate(const std::string &pkgPath)
     LOG(INFO) << "ABUpdate start, pkg updaterPath : " << pkgPath.c_str();
     statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 10); // 10 : start install
 
-    UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, pkgPath, 0, HOTA_UPDATE);
+    UpdaterParams upParams {
+        false, false, 0, 0, 0, 0, {pkgPath}
+    };
+    UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, upParams, HOTA_UPDATE);
     if (updateRet != UPDATE_SUCCESS) {
         LOG(INFO) << "Install package failed!";
         STAGE(UPDATE_STAGE_FAIL) << "Install package failed";
