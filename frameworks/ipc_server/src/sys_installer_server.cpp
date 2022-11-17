@@ -15,21 +15,6 @@
 
 #include "sys_installer_server.h"
 
-#include <arpa/inet.h>
-#include <cerrno>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <sys/reboot.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <vector>
-
 #include "iservice_registry.h"
 #include "log/log.h"
 #include "securec.h"
