@@ -65,6 +65,5 @@ int32_t ABUpdate::StartABUpdate(const std::string &pkgPath)
     }
     return 0;
 }
-
 } // namespace SysInstaller
 } // namespace OHOS
