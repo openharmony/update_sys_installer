@@ -175,10 +175,6 @@ int32_t SysInstallerKitsImpl::SetUpdateCallback(sptr<ISysInstallerCallbackFunc> 
 
     if (updateCallBack_ == nullptr) {
         updateCallBack_ = new SysInstallerCallback;
-        if (updateCallBack_ == nullptr) {
-            LOG(ERROR) << "updateCallBack_ null";
-            return -1;
-        }
     }
     static_cast<SysInstallerCallback *>(updateCallBack_.GetRefPtr())->RegisterCallback(callback);
     return updateService->SetUpdateCallback(updateCallBack_);
