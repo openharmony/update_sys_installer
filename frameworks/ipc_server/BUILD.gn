@@ -54,7 +54,6 @@ ohos_shared_library("sys_installer") {
     "//third_party/cJSON:cjson_static",
     "//third_party/curl:curl",
     "//third_party/lz4:liblz4_static",
-    "//third_party/lz4:liblz4_static",
   ]
 
   if (defined(sys_installer_custom_lib)) {
