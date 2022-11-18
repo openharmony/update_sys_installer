@@ -49,7 +49,6 @@ ohos_shared_library("sys_installer") {
     "//base/update/updater/services/fs_manager:libfsmanager",
     "//base/update/updater/services/log:libupdaterlog",
     "//base/update/updater/services/package:libupdaterpackage",
-    "//base/update/updater/services/package:libupdaterpackage",
     "//base/update/updater/utils:libutils",
     "//third_party/bounds_checking_function:libsec_static",
     "//third_party/cJSON:cjson_static",
