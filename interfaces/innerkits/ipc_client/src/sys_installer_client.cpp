@@ -47,6 +47,6 @@ int main(int argc, char **argv)
 
     SysInstallerKitsImpl::GetInstance().SysInstallerInit();
     SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(
-        "/data/ota_package/update_para.zip", "system", "/taboo");
+        "/data/ota_package/update_para.zip", "System", "/taboo");
     return 0;
 }
