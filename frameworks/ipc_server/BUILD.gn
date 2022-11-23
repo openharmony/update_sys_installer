@@ -60,7 +60,7 @@ ohos_shared_library("sys_installer") {
     deps += sys_installer_custom_lib
   }
 
-  external_deps += [
+  external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "init:libbegetutil",

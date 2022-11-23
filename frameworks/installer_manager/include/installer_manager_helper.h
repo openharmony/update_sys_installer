@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace SysInstaller {
-
 class IInstallerManagerHelper {
 public:
     virtual ~IInstallerManagerHelper() {}
