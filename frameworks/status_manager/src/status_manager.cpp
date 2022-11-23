@@ -15,21 +15,6 @@
 
 #include "status_manager.h"
 
-#include <arpa/inet.h>
-#include <cerrno>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <sys/reboot.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <vector>
-
 #include "sys_installer_common.h"
 #include "log/log.h"
 #include "utils.h"

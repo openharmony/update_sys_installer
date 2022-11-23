@@ -28,7 +28,6 @@ using namespace std;
 
 namespace OHOS {
 namespace SysInstaller {
-
 void SysInstallerIpcUnitTest::SetUpTestCase()
 {
     cout << "SysInstallerIpcUnitTest SetUpTestCase" << std::endl;
