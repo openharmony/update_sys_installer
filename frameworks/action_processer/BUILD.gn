@@ -14,9 +14,7 @@
 import("//build/ohos.gni")
 
 ohos_static_library("libactionprocesser") {
-  sources = [
-    "//base/update/sys_installer/frameworks/action_processer/src/action_processer.cpp",
-  ]
+  sources = [ "//base/update/sys_installer/frameworks/action_processer/src/action_processer.cpp" ]
 
   include_dirs = [
     "//base/update/updater/utils/include",
@@ -32,9 +30,7 @@ ohos_static_library("libactionprocesser") {
     "//utils/native/base/include",
   ]
 
-  deps = [
-    "//base/update/updater/services/log:libupdaterlog",
-  ]
+  deps = [ "//base/update/updater/services/log:libupdaterlog" ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   part_name = "sys_installer"
