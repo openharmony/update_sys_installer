@@ -52,7 +52,7 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
         STAGE(UPDATE_STAGE_FAIL) << "Install package failed";
         statusManager_->UpdateCallback(UPDATE_STATE_FAILED, 100); // 100 : failed
         Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
-        return -1;
+        return updateRet;
     }
     LOG(INFO) << "Install package successfully!";
     STAGE(UPDATE_STAGE_SUCCESS) << "Install package success";
@@ -61,7 +61,7 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
     if (!DeleteUpdaterPath(GetWorkPath())) {
         LOG(WARNING) << "Delete Updater Path fail.";
     }
-    return 0;
+    return updateRet;
 }
 
 void ABUpdate::PerformAction()
