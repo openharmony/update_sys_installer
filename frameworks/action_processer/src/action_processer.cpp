@@ -15,6 +15,13 @@
 
 #include "action_processer.h"
 
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
 #include "log/log.h"
 
 namespace OHOS {

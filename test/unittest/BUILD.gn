@@ -31,7 +31,9 @@ config("utest_config") {
 ohos_unittest("sys_installer_unittest") {
   testonly = true
   module_out_path = module_output_path
-  sources = [ "ipc_test/sys_installer_ipc_test.cpp" ]
+  sources = [
+    "ipc_test/sys_installer_ipc_test.cpp",
+  ]
 
   include_dirs = [
     "//base/update/sys_installer/interfaces/inner_api/include",
@@ -40,7 +42,9 @@ ohos_unittest("sys_installer_unittest") {
     "//third_party/googletest/googletest/include",
     "//third_party/googletest/googlemock/include",
   ]
-  deps = [ "//base/update/sys_installer/interfaces/innerkits/ipc_client:libsysinstallerkits" ]
+  deps = [
+    "//base/update/sys_installer/interfaces/innerkits/ipc_client:libsysinstallerkits",
+  ]
 
   deps += [
     "//base/update/sys_installer/test/unittest:sys_installer_client_test",

@@ -69,9 +69,11 @@ static int32_t BuildFileDigest(uint8_t &digest, size_t size, const std::string &
     size_t readLen = 0;
     while (offset < fileLen) {
         ret = stream->Read(buff, offset, buffSize, readLen);
-        PKG_CHECK(ret == PKG_SUCCESS,
-            packageManager->ClosePkgStream(stream); return ret,
-            "read buffer fail %s", stream->GetFileName().c_str());
+        if (ret != PKG_SUCCESS) {
+            PKG_LOGE("read buffer fail %s", stream->GetFileName().c_str());
+            packageManager->ClosePkgStream(stream);
+            return ret;
+        }
         algorithm->Update(buff, readLen);
 
         offset += readLen;
