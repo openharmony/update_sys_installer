@@ -35,7 +35,7 @@ bool ActionProcesser::IsRunning()
 void ActionProcesser::AddAction(std::unique_ptr<IAction> action)
 {
     if (isRunning_ || action == nullptr) {
-        LOG(ERROR) << "Action running or action empty";
+        LOG(ERROR) << "action running or action empty";
         return;
     }
 
