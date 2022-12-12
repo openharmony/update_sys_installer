@@ -23,9 +23,8 @@
 namespace OHOS {
 namespace SysInstaller {
 class InstallerManager {
+    DISALLOW_COPY_MOVE(InstallerManager);
 public:
-    InstallerManager() = default;
-    virtual ~InstallerManager() = default;
     void RegisterDump(std::unique_ptr<IInstallerManagerHelper> ptr);
     static InstallerManager &GetInstance();
 
@@ -38,6 +37,10 @@ public:
 
 protected:
     std::unique_ptr<IInstallerManagerHelper> helper_ {};
+
+private:
+    InstallerManager() = default;
+    ~InstallerManager() = default;
 };
 
 enum SysInstallerInitEvent {

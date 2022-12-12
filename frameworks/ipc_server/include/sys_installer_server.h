@@ -29,12 +29,12 @@
 
 namespace OHOS {
 namespace SysInstaller {
-class SysInstaller : public SystemAbility, public SysInstallerStub {
+class SysInstallerServer : public SystemAbility, public SysInstallerStub {
 public:
-    DECLARE_SYSTEM_ABILITY(SysInstaller);
-    DISALLOW_COPY_AND_MOVE(SysInstaller);
-    SysInstaller(int32_t systemAbilityId, bool runOnCreate = false);
-    ~SysInstaller() override;
+    DECLARE_SYSTEM_ABILITY(SysInstallerServer);
+    DISALLOW_COPY_AND_MOVE(SysInstallerServer);
+    SysInstallerServer(int32_t systemAbilityId, bool runOnCreate = false);
+    ~SysInstallerServer() override;
 
     int32_t SysInstallerInit() override;
     int32_t StartUpdatePackageZip(const std::string &pkgPath) override;

@@ -13,33 +13,39 @@
  * limitations under the License.
  */
 
-#ifndef SYS_INSTALLER_STATUS_MANAGER_H
-#define SYS_INSTALLER_STATUS_MANAGER_H
+#ifndef SYS_INSTALLER_I_ACTION_H
+#define SYS_INSTALLER_I_ACTION_H
 
-#include "isys_installer.h"
-#include "isys_installer_callback.h"
-#include "refbase.h"
+#include <cstdio>
+#include "error_code.h"
 #include "sys_installer_common.h"
 
 namespace OHOS {
 namespace SysInstaller {
-class StatusManager {
+using ActionCallbackFun = std::function<void (InstallerErrCode, const std::string &)>;
+
+class IAction {
 public:
-    StatusManager() = default;
-    virtual ~StatusManager() = default;
+    IAction() = default;
+    virtual ~IAction() = default;
 
-    virtual void Init();
-    virtual int GetUpdateStatus();
-    virtual int SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback);
-    virtual void UpdateCallback(UpdateStatus updateStatus, int percent);
-
-    void SetUpdatePercent(int percent);
+    virtual void SetCallback(ActionCallbackFun actionCallBack)
+    {
+        actionCallBack_ = actionCallBack;
+    }
+    virtual void PerformAction() = 0;
+    virtual std::string GetActionName() = 0;
+    virtual void TerminateAction() {};
+    virtual void SuspendAction() {}
+    virtual void ResumeAction() {}
+    virtual std::string GetErrorStr()
+    {
+        return "";
+    }
 
 protected:
-    UpdateStatus updateStatus_ = UPDATE_STATE_INIT;
-    int percent_ = 0;
-    sptr<ISysInstallerCallback> updateCallback_ {};
+    ActionCallbackFun actionCallBack_;
 };
 } // SysInstaller
 } // namespace OHOS
-#endif // SYS_INSTALLER_STATUS_MANAGER_H
+#endif // SYS_INSTALLER_I_ACTION_H

@@ -13,11 +13,12 @@
  * limitations under the License.
  */
 
-#ifndef SYS_INSTALLER_CALLBACK_STUB_H
-#define SYS_INSTALLER_CALLBACK_STUB_H
+#ifndef SYS_INSTALLER_CALLBACK_H
+#define SYS_INSTALLER_CALLBACK_H
 
 #include "iremote_stub.h"
 #include "isys_installer_callback.h"
+#include "isys_installer_callback_func.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -25,6 +26,18 @@ class SysInstallerCallbackStub : public IRemoteStub<ISysInstallerCallback> {
 public:
     int32_t OnRemoteRequest(uint32_t code,
         MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+};
+
+class SysInstallerCallback : public SysInstallerCallbackStub {
+public:
+    SysInstallerCallback() = default;
+    ~SysInstallerCallback() = default;
+
+    void OnUpgradeProgress(UpdateStatus updateStatus, int percent) override;
+    void RegisterCallback(sptr<ISysInstallerCallbackFunc> callback);
+
+private:
+    sptr<ISysInstallerCallbackFunc> callback_;
 };
 } // namespace SysInstaller
 } // namespace OHOS

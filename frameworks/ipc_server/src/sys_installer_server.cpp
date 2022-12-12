@@ -23,20 +23,20 @@
 
 namespace OHOS {
 namespace SysInstaller {
-REGISTER_SYSTEM_ABILITY_BY_ID(SysInstaller, SYS_INSTALLER_DISTRIBUTED_SERVICE_ID, false)
+REGISTER_SYSTEM_ABILITY_BY_ID(SysInstallerServer, SYS_INSTALLER_DISTRIBUTED_SERVICE_ID, false)
 
 using namespace Updater;
 
-SysInstaller::SysInstaller(int32_t systemAbilityId, bool runOnCreate)
+SysInstallerServer::SysInstallerServer(int32_t systemAbilityId, bool runOnCreate)
     : SystemAbility(systemAbilityId, runOnCreate)
 {
 }
 
-SysInstaller::~SysInstaller()
+SysInstallerServer::~SysInstallerServer()
 {
 }
 
-int32_t SysInstaller::SysInstallerInit()
+int32_t SysInstallerServer::SysInstallerInit()
 {
     LOG(INFO) << "SysInstallerInit";
     if (!logInit_) {
@@ -49,43 +49,43 @@ int32_t SysInstaller::SysInstallerInit()
     return 0;
 }
 
-int32_t SysInstaller::StartUpdatePackageZip(const std::string &pkgPath)
+int32_t SysInstallerServer::StartUpdatePackageZip(const std::string &pkgPath)
 {
     LOG(INFO) << "StartUpdatePackageZip";
     return InstallerManager::GetInstance().StartUpdatePackageZip(pkgPath);
 }
 
-int32_t SysInstaller::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback)
+int32_t SysInstallerServer::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback)
 {
     LOG(INFO) << "SetUpdateCallback";
     return InstallerManager::GetInstance().SetUpdateCallback(updateCallback);
 }
 
-int32_t SysInstaller::GetUpdateStatus()
+int32_t SysInstallerServer::GetUpdateStatus()
 {
     LOG(INFO) << "GetUpdateStatus";
     return InstallerManager::GetInstance().GetUpdateStatus();
 }
 
-int32_t SysInstaller::StartUpdateParaZip(const std::string &pkgPath,
+int32_t SysInstallerServer::StartUpdateParaZip(const std::string &pkgPath,
     const std::string &location, const std::string &cfgDir)
 {
     LOG(INFO) << "StartUpdateParaZip";
     return InstallerManager::GetInstance().StartUpdateParaZip(pkgPath, location, cfgDir);
 }
 
-void SysInstaller::OnStart()
+void SysInstallerServer::OnStart()
 {
     LOG(INFO) << "OnStart";
     bool res = Publish(this);
     if (!res) {
-        LOG(ERROR) << "SysInstaller OnStart failed";
+        LOG(ERROR) << "OnStart failed";
     }
 
     return;
 }
 
-void SysInstaller::OnStop()
+void SysInstallerServer::OnStop()
 {
     LOG(INFO) << "OnStop";
 }

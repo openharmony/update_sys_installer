@@ -16,19 +16,30 @@
 #ifndef SYS_INSTALLER_AB_UPDATE_H
 #define SYS_INSTALLER_AB_UPDATE_H
 
+#include "iaction.h"
 #include "installer_manager.h"
+#include "updater/updater.h"
 
 namespace OHOS {
 namespace SysInstaller {
-class ABUpdate {
+class ABUpdate : public IAction {
 public:
-    explicit ABUpdate(std::shared_ptr<StatusManager> statusManager) : statusManager_(statusManager) {}
+    ABUpdate(std::shared_ptr<StatusManager> statusManager,
+        const std::string &pkgPath) : statusManager_(statusManager), pkgPath_(pkgPath) {}
     ~ABUpdate() = default;
 
-    int32_t StartABUpdate(const std::string &pkgPath);
+    void PerformAction() override;
+    std::string GetActionName() override
+    {
+        return "ab_update";
+    }
+
+private:
+    Updater::UpdaterStatus StartABUpdate(const std::string &pkgPath);
 
 private:
     std::shared_ptr<StatusManager> statusManager_ {};
+    std::string pkgPath_;
 };
 } // SysInstaller
 } // namespace OHOS

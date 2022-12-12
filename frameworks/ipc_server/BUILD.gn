@@ -25,6 +25,7 @@ ohos_shared_library("sys_installer") {
 
   include_dirs = [
     "//base/update/updater/utils/include",
+    "//base/update/sys_installer/common/include",
     "//base/update/sys_installer/frameworks/ipc_server/include",
     "//base/update/sys_installer/frameworks/installer_manager/include",
     "//base/update/sys_installer/frameworks/status_manager/include",

@@ -17,23 +17,31 @@
 #define SYS_INSTALLER_PKG_VERIFY_H
 
 #include <iostream>
+#include "iaction.h"
 #include "status_manager.h"
 
 namespace OHOS {
 namespace SysInstaller {
-class PkgVerify {
+class PkgVerify : public IAction {
 public:
-    explicit PkgVerify(std::shared_ptr<StatusManager> statusManager) : statusManager_(statusManager) {}
+    PkgVerify(std::shared_ptr<StatusManager> statusManager,
+        const std::string &pkgPath) : statusManager_(statusManager), pkgPath_(pkgPath) {}
     virtual ~PkgVerify() = default;
 
-    virtual int UpdatePreCheck(const std::string &pkgPath);
+    void PerformAction() override;
+    std::string GetActionName() override
+    {
+        return "verify";
+    };
 
 protected:
     virtual void Init();
+    virtual int Verify(const std::string &pkgPath);
 
 protected:
     bool verifyInit_ = false;
     std::shared_ptr<StatusManager> statusManager_ {};
+    std::string pkgPath_;
 };
 } // SysInstaller
 } // namespace OHOS

@@ -18,12 +18,14 @@ ohos_static_library("libstatusmanager") {
 
   include_dirs = [
     "//base/update/updater/utils/include",
+    "//base/update/sys_installer/common/include",
     "//base/update/sys_installer/interfaces/innerkits",
     "//base/update/sys_installer/interfaces/inner_api/include",
     "//base/update/sys_installer/frameworks/status_manager/include",
     "//base/update/sys_installer/include",
     "//base/update/updater/services/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//commonlibrary/c_utils/base/include",
   ]
 
   deps = [ "//base/update/updater/services/log:libupdaterlog" ]

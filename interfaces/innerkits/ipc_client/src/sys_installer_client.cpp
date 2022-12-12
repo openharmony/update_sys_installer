@@ -13,21 +13,21 @@
  * limitations under the License.
  */
 
-#include "sys_installer_callback_stub.h"
+#include "sys_installer_callback.h"
 #include "sys_installer_kits_impl.h"
+#include "isys_installer_callback_func.h"
 
 using namespace OHOS;
 using namespace std;
 using namespace OHOS::SysInstaller;
 
-class SysInstallerCallback : public SysInstallerCallbackStub {
+class ProcessCallback : public ISysInstallerCallbackFunc {
 public:
-    SysInstallerCallback() = default;
-    ~SysInstallerCallback() = default;
-
-    void OnUpgradeProgress(int updateStatus, int percent)
+    ProcessCallback() = default;
+    ~ProcessCallback() = default;
+    void OnUpgradeProgress(UpdateStatus updateStatus, int percent) override
     {
-        printf("SysInstallerCallback OnUpgradeProgress progress %d percent %d\n", updateStatus, percent);
+        printf("ProgressCallback progress %d percent %d\n", updateStatus, percent);
     }
 };
 
@@ -35,11 +35,18 @@ int main(int argc, char **argv)
 {
     int32_t ret = SysInstallerKitsImpl::GetInstance().SysInstallerInit();
     printf("SysInstallerInit ret:%d\n", ret);
-    sptr<ISysInstallerCallback> cb = new SysInstallerCallback;
-    SysInstallerKitsImpl::GetInstance().SetUpdateCallback(cb);
+
+    sptr<ISysInstallerCallbackFunc> callback = new ProcessCallback;
+    if (callback == nullptr) {
+        printf("callback new failed\n");
+        return -1;
+    }
+    SysInstallerKitsImpl::GetInstance().SetUpdateCallback(callback);
     SysInstallerKitsImpl::GetInstance().GetUpdateStatus();
     SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip("/data/ota_package/update.zip");
+
+    SysInstallerKitsImpl::GetInstance().SysInstallerInit();
     SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(
-        "/data/ota_package/update_para.zip", "/data/cota/para", "/taboo");
+        "/data/ota_package/update_para.zip", "System", "/taboo");
     return 0;
 }

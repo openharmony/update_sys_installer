@@ -22,7 +22,7 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 
-void SysInstallerCallbackProxy::OnUpgradeProgress(int updateStatus, int percent)
+void SysInstallerCallbackProxy::OnUpgradeProgress(UpdateStatus updateStatus, int percent)
 {
     LOG(INFO) << "OnUpgradeProgress";
     MessageParcel data;

@@ -41,7 +41,9 @@
         "//base/update/sys_installer/frameworks/ipc_server/sa_profile:sys_installer_sa_profile"
       ],
       "inner_kits": [],
-      "test": []
+      "test": [
+        "//base/update/sys_installer:unittest"
+      ]
     }
   }
 }

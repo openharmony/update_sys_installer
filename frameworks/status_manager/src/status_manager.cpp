@@ -15,6 +15,7 @@
 
 #include "status_manager.h"
 
+#include "sys_installer_common.h"
 #include "log/log.h"
 #include "utils.h"
 
@@ -34,6 +35,7 @@ int StatusManager::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCa
         LOG(ERROR) << "para error";
         return -1;
     }
+
     updateCallback_ = updateCallback;
     return 0;
 }
@@ -46,20 +48,26 @@ int StatusManager::GetUpdateStatus()
 void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent)
 {
     if (updateCallback_ == nullptr) {
+        LOG(ERROR) << "updateCallback_ null";
         return;
     }
 
-    if (updateStatus > UPDATE_STATE_SUCCESSFUL) {
+    if (updateStatus > UPDATE_STATE_MAX) {
         LOG(INFO) << "status error:" << updateStatus;
         return;
     }
-    if (percent >=0 && percent <= 100 && percent >= percent_) { // 100 : max percent
+    if (percent >= 0 && percent <= 100 && percent >= percent_) { // 100 : max percent
         percent_ = percent;
     }
 
     updateStatus_ = updateStatus;
     LOG(INFO) << "status:" << updateStatus_ << " percent:"  << percent_;
     updateCallback_->OnUpgradeProgress(updateStatus_, percent_);
+}
+
+void StatusManager::SetUpdatePercent(int percent)
+{
+    UpdateCallback(updateStatus_, percent);
 }
 } // namespace SysInstaller
 } // namespace OHOS

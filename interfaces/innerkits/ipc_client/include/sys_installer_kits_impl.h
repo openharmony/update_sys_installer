@@ -19,6 +19,7 @@
 #include "singleton.h"
 #include "isys_installer.h"
 #include "isys_installer_callback.h"
+#include "isys_installer_callback_func.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -28,7 +29,7 @@ public:
     static SysInstallerKitsImpl &GetInstance();
     virtual int32_t SysInstallerInit();
     virtual int32_t StartUpdatePackageZip(const std::string &pkgPath);
-    virtual int32_t SetUpdateCallback(const sptr<ISysInstallerCallback> &cb);
+    virtual int32_t SetUpdateCallback(sptr<ISysInstallerCallbackFunc> callback);
     virtual int32_t GetUpdateStatus();
     virtual int32_t StartUpdateParaZip(const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir);
@@ -61,8 +62,8 @@ public:
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {};
     sptr<ISysInstallerCallback> updateCallBack_ {};
 
-    std::mutex getServiceMutex_;
-    std::condition_variable getServiceCv_;
+    std::mutex serviceMutex_;
+    std::condition_variable serviceCv_;
 };
 } // namespace SysInstaller
 } // namespace OHOS
