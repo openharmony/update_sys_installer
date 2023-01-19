@@ -34,7 +34,6 @@ ohos_static_library("libinstallermanager") {
     "//base/update/sys_installer/services/ab_update/include",
     "//base/update/updater/services/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//third_party/openssl/include",
     "//utils/native/base/include",
   ]
 
@@ -45,7 +44,8 @@ ohos_static_library("libinstallermanager") {
     "//base/update/updater/interfaces/kits/packages:libpackageExt",
     "//base/update/updater/services/log:libupdaterlog",
     "//base/update/updater/services/package:libupdaterpackage",
-    "//third_party/openssl:ssl_source",
+    "//third_party/openssl:libcrypto_shared",
+    "//third_party/openssl:libssl_shared",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]

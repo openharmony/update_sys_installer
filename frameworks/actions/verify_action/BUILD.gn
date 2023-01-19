@@ -28,13 +28,13 @@ ohos_static_library("libverifyaction") {
     "//base/update/sys_installer/frameworks/status_manager/include",
     "//base/update/updater/services/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//third_party/openssl/include",
     "//utils/native/base/include",
   ]
 
   deps = [
     "//base/update/updater/services/log:libupdaterlog",
-    "//third_party/openssl:ssl_source",
+    "//third_party/openssl:libcrypto_shared",
+    "//third_party/openssl:libssl_shared",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
