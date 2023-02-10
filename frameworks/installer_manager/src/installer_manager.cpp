@@ -18,6 +18,7 @@
 #include "log/log.h"
 #include "package/pkg_manager.h"
 #include "utils.h"
+#include "updater_main.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -38,7 +39,8 @@ int32_t InstallerManager::SysInstallerInit()
 {
     if (helper_ == nullptr) {
         SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_PRE_INIT_EVENT);
-
+        UpdaterInit::GetInstance().InvokeEvent(UPDATER_PRE_INIT_EVENT);
+        UpdaterInit::GetInstance().InvokeEvent(UPDATER_INIT_EVENT);
         if (helper_ == nullptr) {
             RegisterDump(std::make_unique<InstallerManagerHelper>());
         }
