@@ -20,6 +20,7 @@ ohos_static_library("libinstallermanager") {
   ]
 
   include_dirs = [
+    "../../../updater/services",
     "//base/update/updater/utils/include",
     "//base/update/updater/interfaces/kits/include",
     "//base/update/sys_installer/common/include",
@@ -31,7 +32,6 @@ ohos_static_library("libinstallermanager") {
     "//base/update/sys_installer/frameworks/installer_manager/include",
     "//base/update/sys_installer/frameworks/status_manager/include",
     "//base/update/sys_installer/services/ab_update/include",
-    "//base/update/updater/services",
     "//base/update/updater/services/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//third_party/openssl/include",
