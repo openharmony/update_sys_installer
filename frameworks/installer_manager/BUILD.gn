@@ -20,6 +20,7 @@ ohos_static_library("libinstallermanager") {
   ]
 
   include_dirs = [
+    "../../../updater/services",
     "//base/update/updater/utils/include",
     "//base/update/updater/interfaces/kits/include",
     "//base/update/sys_installer/common/include",
