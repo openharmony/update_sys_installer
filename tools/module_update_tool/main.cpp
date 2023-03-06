@@ -1,15 +1,16 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+/*
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific lan
+ * guage governing permissions and
+ * limitations under the License.
+ */
 
 #include <cstring>
 
@@ -19,7 +20,7 @@
 static const int32_t MIN_PARAM_NUM = 2;
 static const int32_t MAX_PARAM_NUM = 3;
 
-static const std::string HELP_MSG = 
+static const std::string HELP_MSG =
     "usage: module_update_tool\n"
     "example: ./module_update_tool install /data/tmp/xxx.hmp \n"
     "command list:\n"
@@ -30,22 +31,19 @@ static const std::string HELP_MSG =
 static const std::string INSTALL_PARAM = "install";
 static const std::string UNINSTALL_PARAM = "uninstall";
 static const std::string SHOW_INFO = "show";
+static const int32_t RET_FAILED = -1;
 
-enum ModuleUpdateToolRet {
-    RET_FAILED = -1,
-    RET_SUCCESS = 0,
-};
-
-bool CheckParam(int argc)
+static bool CheckParam(int argc)
 {
     if (argc < MIN_PARAM_NUM || argc > MAX_PARAM_NUM) {
-        printf("Invalid module update command");
+        printf("Invalid module update command\n");
+        printf("%s", HELP_MSG.c_str());
         return false;
     }
     return true;
 }
 
-std::string GetFailReasonByErrCode(int32_t err)
+static std::string GetFailReasonByErrCode(int32_t err)
 {
     switch (err) {
         case 0:
@@ -69,13 +67,13 @@ std::string GetFailReasonByErrCode(int32_t err)
     }
 }
 
-void PrintErrMsg(std::string errMsg)
+static void PrintErrMsg(std::string errMsg)
 {
     printf("%s", errMsg.c_str());
     printf("\n");
 }
 
-void PrintUpgradeInfo(std::list<OHOS::SysInstaller::ModulePackageInfo> &modulePackageInfos)
+static void PrintUpgradeInfo(std::list<OHOS::SysInstaller::ModulePackageInfo> &modulePackageInfos)
 {
     std::list<OHOS::SysInstaller::ModulePackageInfo>::iterator it;
     for (it = modulePackageInfos.begin(); it != modulePackageInfos.end(); it++) {
@@ -104,23 +102,26 @@ int main(int argc, char **argv)
         return ret;
     }
 
-    if (INSTALL_PARAM.compare(argv[1] == 0) && argc == MAX_PARAM_NUM) {
+    if (INSTALL_PARAM.compare(argv[1]) == 0 && argc == MAX_PARAM_NUM) {
         printf("try to update a mudule\n");
-        ret = moduleUpdateKits.InstallModulePackage(argv[2]);
+        ret = moduleUpdateKits.InstallModulePackage(argv[MIN_PARAM_NUM]);
         PrintErrMsg(GetFailReasonByErrCode(ret));
         return ret;
-    } 
-    if (UNINSTALL_PARAM.compare(argv[1] == 0) && argc == MAX_PARAM_NUM) {
+    }
+    if (UNINSTALL_PARAM.compare(argv[1]) == 0 && argc == MAX_PARAM_NUM) {
         printf("try to uninstall an upgrade package\n");
-        ret = moduleUpdateKits.UninstallModulePackage(argv[2]);
+        ret = moduleUpdateKits.UninstallModulePackage(argv[MIN_PARAM_NUM]);
         PrintErrMsg(GetFailReasonByErrCode(ret));
         return ret;
-    } 
-    if (SHOW_INFO.compare(argv[1] == 0) {
+    }
+    if (SHOW_INFO.compare(argv[1]) == 0) {
         printf("try to show module update info\n");
         std::list<OHOS::SysInstaller::ModulePackageInfo> modulePackageInfos;
         std::string hmpStr;
-        const std::string &hmpName = (argc == MIN_PARAM_NUM ? NULL : hmpStr = argv[2]);
+        if (argc != MIN_PARAM_NUM) {
+            hmpStr = argv[MIN_PARAM_NUM];
+        }
+        const std::string &hmpName = (argc == MIN_PARAM_NUM ? NULL : hmpStr);
         ret = moduleUpdateKits.GetModulePackageInfo(hmpName, modulePackageInfos);
         PrintUpgradeInfo(modulePackageInfos);
         PrintErrMsg(GetFailReasonByErrCode(ret));
@@ -128,5 +129,6 @@ int main(int argc, char **argv)
     }
     
     printf("invalid command. \n");
+    printf("%s", HELP_MSG.c_str());
     return ret;
 }
