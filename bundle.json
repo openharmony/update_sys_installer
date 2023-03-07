@@ -38,8 +38,7 @@
       "sub_component": [
         "//base/update/sys_installer/frameworks/ipc_server:sys_installer",
         "//base/update/sys_installer/frameworks/ipc_server/etc:sys_installer_sa.rc",
-        "//base/update/sys_installer/frameworks/ipc_server/sa_profile:sys_installer_sa_profile",
-        "//base/update/sys_installer/tools/module_update_tool:module_update_tool"
+        "//base/update/sys_installer/frameworks/ipc_server/sa_profile:sys_installer_sa_profile"
       ],
       "inner_kits": [],
       "test": [
