@@ -91,3 +91,40 @@ ohos_shared_library("module_update") {
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
+
+config("exported_header_files") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "../../../services/module_update/util/include",
+    "../../inner_api/include",
+    "./include",
+  ]
+}
+
+ohos_static_library("module_update_client") {
+  sources = [
+    "../../../services/module_update/util/src/module_ipc_helper.cpp",
+    "./src/module_update_kits_impl.cpp",
+    "./src/module_update_proxy.cpp",
+  ]
+
+  include_dirs = [
+    "../../../../updater/services/include",
+    "../../../../updater/utils/include",
+    "//third_party/bounds_checking_function/include",
+  ]
+
+  public_configs = [ ":exported_header_files" ]
+
+  deps = [ "../../../../updater/services/log:libupdaterlog" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  part_name = "sys_installer"
+  subsystem_name = "updater"
+}

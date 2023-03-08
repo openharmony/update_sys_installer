@@ -127,14 +127,19 @@ bool ConfigureReadAhead(const string &devicePath)
     string path(devicePath);
     string deviceName = basename(&path[0]);
     string sysfsDevice = SYSTEM_BLOCK_PATH + deviceName + READ_AHEAD_NAME;
-    UniqueFd sysfsFd(open(sysfsDevice.c_str(), O_RDWR | O_CLOEXEC));
+    string realPath = GetRealPath(sysfsDevice);
+    if (realPath.empty()) {
+        LOG(ERROR) << "invalid device path " << sysfsDevice;
+        return false;
+    }
+    UniqueFd sysfsFd(open(realPath.c_str(), O_RDWR | O_CLOEXEC));
     if (sysfsFd.Get() == -1) {
-        LOG(ERROR) << "Failed to open " << sysfsDevice;
+        LOG(ERROR) << "Failed to open " << realPath;
         return false;
     }
     int writeBytes = write(sysfsFd.Get(), READ_AHEAD_KB, strlen(READ_AHEAD_KB) + 1);
     if (writeBytes < 0) {
-        LOG(ERROR) << "Failed to write to " << sysfsDevice;
+        LOG(ERROR) << "Failed to write to " << realPath;
         return false;
     }
     return true;
@@ -202,22 +207,27 @@ bool SetUpLoopDevice(const int deviceFd, const string &target, const uint32_t im
 {
     static bool useLoopConfigure = CheckIfSupportLoopConfigure(deviceFd);
     bool useBufferedIo = false;
-    UniqueFd targetFd(open(target.c_str(), O_RDONLY | O_CLOEXEC | O_DIRECT));
+    string realPath = GetRealPath(target);
+    if (realPath.empty()) {
+        LOG(ERROR) << "invalid target " << target;
+        return false;
+    }
+    UniqueFd targetFd(open(realPath.c_str(), O_RDONLY | O_CLOEXEC | O_DIRECT));
     if (targetFd.Get() == -1) {
         struct statfs stbuf;
         int savedErrno = errno;
-        if (statfs(target.c_str(), &stbuf) != 0 ||
+        if (statfs(realPath.c_str(), &stbuf) != 0 ||
             (stbuf.f_type != EROFS_SUPER_MAGIC_V1 &&
              stbuf.f_type != SQUASHFS_MAGIC &&
              stbuf.f_type != OVERLAYFS_SUPER_MAGIC)) {
-            LOG(ERROR) << "Failed to open " << target << " errno=" << savedErrno;
+            LOG(ERROR) << "Failed to open " << realPath << " errno=" << savedErrno;
             return false;
         }
-        LOG(WARNING) << "Fallback to buffered I/O for " << target;
+        LOG(WARNING) << "Fallback to buffered I/O for " << realPath;
         useBufferedIo = true;
-        targetFd = UniqueFd(open(target.c_str(), O_RDONLY | O_CLOEXEC));
+        targetFd = UniqueFd(open(realPath.c_str(), O_RDONLY | O_CLOEXEC));
         if (targetFd.Get() == -1) {
-            LOG(ERROR) << "Failed to open " << target;
+            LOG(ERROR) << "Failed to open " << realPath;
             return false;
         }
     }
@@ -247,9 +257,13 @@ std::unique_ptr<LoopbackDeviceUniqueFd> WaitForDevice(const int num)
     UniqueFd sysfsFd;
     for (size_t i = 0; i < LOOP_DEVICE_RETRY_ATTEMPTS; ++i) {
         for (const auto &device : candidateDevices) {
-            sysfsFd = UniqueFd(open(device.c_str(), O_RDWR | O_CLOEXEC));
+            string realPath = GetRealPath(device);
+            if (realPath.empty()) {
+                continue;
+            }
+            sysfsFd = UniqueFd(open(realPath.c_str(), O_RDWR | O_CLOEXEC));
             if (sysfsFd.Get() != -1) {
-                return std::make_unique<LoopbackDeviceUniqueFd>(std::move(sysfsFd), device);
+                return std::make_unique<LoopbackDeviceUniqueFd>(std::move(sysfsFd), realPath);
             }
         }
         LOG(WARNING) << "Loopback device " << num << " not ready. Waiting 50ms...";

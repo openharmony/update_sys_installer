@@ -33,6 +33,7 @@ bool StartsWith(const std::string &str, const std::string &prefix);
 bool ReadFullyAtOffset(int fd, uint8_t *data, size_t count, off_t offset);
 uint16_t ReadLE16(const uint8_t *buff);
 uint32_t ReadLE32(const uint8_t *buff);
+std::string GetRealPath(const std::string &path);
 
 class Timer {
 public:
