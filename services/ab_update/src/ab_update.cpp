@@ -43,9 +43,8 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
     LOG(INFO) << "ABUpdate start, pkg updaterPath : " << pkgPath.c_str();
     statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 10); // 10 : start install
 
-    UpdaterParams upParams {
-        false, false, false, 0, 0, 0, 0, {pkgPath}
-    };
+    UpdaterParams upParams;
+    upParams.updatePackage = {pkgPath};
     UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, upParams, HOTA_UPDATE);
     if (updateRet != UPDATE_SUCCESS) {
         LOG(INFO) << "Install package failed!";
