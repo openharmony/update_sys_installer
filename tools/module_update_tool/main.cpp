@@ -69,8 +69,7 @@ static std::string GetFailReasonByErrCode(int32_t err)
 
 static void PrintErrMsg(std::string errMsg)
 {
-    printf("%s", errMsg.c_str());
-    printf("\n");
+    printf("%s\n", errMsg.c_str());
 }
 
 static void PrintUpgradeInfo(std::list<OHOS::SysInstaller::ModulePackageInfo> &modulePackageInfos)
@@ -94,7 +93,7 @@ int main(int argc, char **argv)
         return RET_FAILED;
     }
 
-    int32_t ret = 0;
+    int ret = 0;
     OHOS::SysInstaller::ModuleUpdateKits& moduleUpdateKits = OHOS::SysInstaller::ModuleUpdateKits::GetInstance();
     ret = moduleUpdateKits.InitModuleUpdate();
     if (ret != 0) {
