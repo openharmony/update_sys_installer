@@ -56,7 +56,9 @@ void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent)
         LOG(INFO) << "status error:" << updateStatus;
         return;
     }
-    if (percent >= 0 && percent <= 100 && percent >= percent_) { // 100 : max percent
+    if (updateStatus == UPDATE_STATE_SUCCESSFUL || updateStatus == UPDATE_STATE_FAILED) {
+        percent_ = 100; // 100 : max percent
+    } else if (percent >= 0 && percent <= 100 && percent >= percent_) { // 100 : max percent
         percent_ = percent;
     }
 

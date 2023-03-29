@@ -65,7 +65,7 @@ int32_t SysInstallerProxy::StartUpdatePackageZip(const std::string &pkgPath)
     data.WriteString16(Str8ToStr16(pkgPath));
 
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option { MessageOption::TF_ASYNC };
     int32_t ret = remote->SendRequest(UPDATE_PACKAGE, data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";

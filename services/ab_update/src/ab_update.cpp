@@ -41,21 +41,19 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
 
     STAGE(UPDATE_STAGE_BEGIN) << "StartABUpdate start";
     LOG(INFO) << "ABUpdate start, pkg updaterPath : " << pkgPath.c_str();
-    statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 10); // 10 : start install
 
     UpdaterParams upParams;
     upParams.updatePackage = {pkgPath};
+    upParams.CallbackProgress = std::bind(&ABUpdate::SetProgress, this, std::placeholders::_1);
     UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, upParams, HOTA_UPDATE);
     if (updateRet != UPDATE_SUCCESS) {
         LOG(INFO) << "Install package failed!";
         STAGE(UPDATE_STAGE_FAIL) << "Install package failed";
-        statusManager_->UpdateCallback(UPDATE_STATE_FAILED, 100); // 100 : failed
         Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
         return updateRet;
     }
     LOG(INFO) << "Install package successfully!";
     STAGE(UPDATE_STAGE_SUCCESS) << "Install package success";
-    statusManager_->UpdateCallback(UPDATE_STATE_SUCCESSFUL, 100); // 100 : success
     Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
     if (!DeleteUpdaterPath(GetWorkPath())) {
         LOG(WARNING) << "Delete Updater Path fail.";
@@ -80,6 +78,11 @@ void ABUpdate::PerformAction()
     });
 
     updateRet = StartABUpdate(pkgPath_);
+}
+
+void ABUpdate::SetProgress(float value)
+{
+    statusManager_->SetUpdatePercent(static_cast<int>(float));
 }
 } // namespace SysInstaller
 } // namespace OHOS

@@ -34,6 +34,8 @@ public:
         return "ab_update";
     }
 
+    void SetProgress(float value);
+
 private:
     Updater::UpdaterStatus StartABUpdate(const std::string &pkgPath);
 
