@@ -82,7 +82,7 @@ void ABUpdate::PerformAction()
 
 void ABUpdate::SetProgress(float value)
 {
-    statusManager_->SetUpdatePercent(static_cast<int>(float));
+    statusManager_->SetUpdatePercent(static_cast<int>(value));
 }
 } // namespace SysInstaller
 } // namespace OHOS
