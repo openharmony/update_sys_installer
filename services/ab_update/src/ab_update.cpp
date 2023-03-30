@@ -84,7 +84,7 @@ void ABUpdate::SetProgress(float value)
 {
     if (statusManager_ == nullptr) {
         LOG(ERROR) << "statusManager_ nullptr";
-        return UPDATE_ERROR;
+        return;
     }
     statusManager_->SetUpdatePercent(static_cast<int>(value));
 }
