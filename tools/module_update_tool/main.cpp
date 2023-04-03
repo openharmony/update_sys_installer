@@ -75,7 +75,7 @@ static void PrintErrMsg(std::string errMsg)
 static void PrintUpgradeInfo(std::list<OHOS::SysInstaller::ModulePackageInfo> &modulePackageInfos)
 {
     std::list<OHOS::SysInstaller::ModulePackageInfo>::iterator it;
-    printf("Got %u upgraded modules info\n", modulePackageInfos.size());
+    printf("Got %zu upgraded modules info\n", modulePackageInfos.size());
     for (it = modulePackageInfos.begin(); it != modulePackageInfos.end(); it++) {
         OHOS::SysInstaller::ModulePackageInfo moduleInfo = *it;
         printf("%s\n", moduleInfo.hmpName.c_str());
