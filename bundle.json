@@ -41,7 +41,8 @@
         "//base/update/sys_installer/frameworks/ipc_server/etc:sys_installer_sa.rc",
         "//base/update/sys_installer/frameworks/ipc_server/sa_profile:sys_installer_sa_profile",
         "//base/update/sys_installer/interfaces/innerkits/ipc_client:module_update",
-        "//base/update/sys_installer/services/module_update/service:module_update_service"
+        "//base/update/sys_installer/services/module_update/service:module_update_service",
+        "//base/update/sys_installer/tools/module_update_tool:module_update_tool"
       ],
       "inner_kits": [],
       "test": [

@@ -24,9 +24,9 @@ static const std::string HELP_MSG =
     "usage: module_update_tool\n"
     "example: ./module_update_tool install /data/tmp/xxx.hmp \n"
     "command list:\n"
-    "  install        : upgrade some SA via hmp package"
-    "  uninstall      : degrade some SA via hmp name"
-    "  show hmpname   : show upgrade sa info, if hmap name is null, show all";
+    "  install        : upgrade some SA via hmp package\n"
+    "  uninstall      : degrade some SA via hmp name\n"
+    "  show hmpname   : show upgrade sa info, if hmap name is null, show all\n";
 
 static const std::string INSTALL_PARAM = "install";
 static const std::string UNINSTALL_PARAM = "uninstall";
@@ -75,6 +75,7 @@ static void PrintErrMsg(std::string errMsg)
 static void PrintUpgradeInfo(std::list<OHOS::SysInstaller::ModulePackageInfo> &modulePackageInfos)
 {
     std::list<OHOS::SysInstaller::ModulePackageInfo>::iterator it;
+    printf("Got %zu upgraded modules info\n", modulePackageInfos.size());
     for (it = modulePackageInfos.begin(); it != modulePackageInfos.end(); it++) {
         OHOS::SysInstaller::ModulePackageInfo moduleInfo = *it;
         printf("%s\n", moduleInfo.hmpName.c_str());
@@ -119,9 +120,10 @@ int main(int argc, char **argv)
         std::string hmpStr;
         if (argc != MIN_PARAM_NUM) {
             hmpStr = argv[MIN_PARAM_NUM];
+        } else {
+            hmpStr = "";
         }
-        const std::string &hmpName = (argc == MIN_PARAM_NUM ? NULL : hmpStr);
-        ret = moduleUpdateKits.GetModulePackageInfo(hmpName, modulePackageInfos);
+        ret = moduleUpdateKits.GetModulePackageInfo(hmpStr, modulePackageInfos);
         PrintUpgradeInfo(modulePackageInfos);
         PrintErrMsg(GetFailReasonByErrCode(ret));
         return ret;
