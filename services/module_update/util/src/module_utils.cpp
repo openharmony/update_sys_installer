@@ -144,7 +144,7 @@ bool ReadFullyAtOffset(int fd, uint8_t *data, size_t count, off_t offset)
             return false;
         }
         data += readSize;
-        count -= readSize;
+        count -= static_cast<size_t>(readSize);
         offset += readSize;
     }
     return true;
@@ -177,6 +177,21 @@ std::ostream &operator<<(std::ostream &os, const Timer &timer)
 {
     os << timer.duration().count() << "ms";
     return os;
+}
+
+std::string GetRealPath(const std::string &filePath)
+{
+    char path[PATH_MAX] = {'\0'};
+    if (realpath(filePath.c_str(), path) == nullptr) {
+        LOG(ERROR) << "get real path fail " << filePath;
+        return "";
+    }
+    if (!CheckPathExists(path)) {
+        LOG(ERROR) << "path " << path << " doesn't exist";
+        return "";
+    }
+    std::string realPath(path);
+    return realPath;
 }
 } // namespace SysInstaller
 } // namespace OHOS

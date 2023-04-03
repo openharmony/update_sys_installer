@@ -152,7 +152,12 @@ bool ModuleZipHelper::GetFileOffset(uint32_t &offset)
 
 bool ModuleZipHelper::GetFileEntryOffset(uint32_t &offset, uint32_t centralDirOffset) const
 {
-    UniqueFd fd(open(zipPath_.c_str(), O_RDONLY | O_CLOEXEC));
+    std::string realPath = GetRealPath(zipPath_);
+    if (realPath.empty()) {
+        LOG(ERROR) << "Invalid path " << zipPath_;
+        return false;
+    }
+    UniqueFd fd(open(realPath.c_str(), O_RDONLY | O_CLOEXEC));
     if (fd.Get() == -1) {
         LOG(ERROR) << "Cannot open package " << zipPath_;
         return false;

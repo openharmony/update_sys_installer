@@ -24,8 +24,10 @@
 #include "log/log.h"
 #include "module_constants.h"
 #include "module_dm.h"
+#include "module_error_code.h"
 #include "module_file_repository.h"
 #include "module_loop.h"
+#include "module_update_kits.h"
 #include "module_utils.h"
 #include "parse_util.h"
 #include "scope_guard.h"
@@ -40,6 +42,8 @@ using std::string;
 namespace {
 constexpr mode_t MOUNT_POINT_MODE = 0755;
 constexpr int32_t LOOP_DEVICE_SETUP_ATTEMPTS = 3;
+constexpr int32_t RETRY_TIMES_FOR_MODULE_UPDATE_SERVICE = 10;
+constexpr std::chrono::milliseconds MILLISECONDS_WAITING_MODULE_UPDATE_SERVICE(100);
 
 bool CreateLoopDevice(const string &path, const ImageStat &imageStat, Loop::LoopbackDeviceUniqueFd &loopbackDevice)
 {
@@ -248,7 +252,22 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
 
 void ModuleUpdate::ReportMountStatus(const ModuleUpdateStatus &status) const
 {
-    // report mount status to module_update_service
+    int32_t times = RETRY_TIMES_FOR_MODULE_UPDATE_SERVICE;
+    constexpr int32_t duration = std::chrono::microseconds(MILLISECONDS_WAITING_MODULE_UPDATE_SERVICE).count();
+    while (times > 0) {
+        times--;
+        int32_t ret = ModuleUpdateKits::GetInstance().ReportModuleUpdateStatus(status);
+        if (ret == ModuleErrorCode::ERR_SERVICE_NOT_FOUND) {
+            LOG(INFO) << "retry to report mount failed";
+            usleep(duration);
+        } else {
+            if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
+                LOG(ERROR) << "Failed to report mount failed";
+            }
+            return;
+        }
+    }
+    LOG(ERROR) << "Report mount failed timeout";
 }
 } // namespace SysInstaller
 } // namespace OHOS

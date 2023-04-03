@@ -61,7 +61,10 @@ ohos_static_library("module_update_static") {
 
   public_configs = [ ":module_update_exported_header" ]
 
-  public_deps = [ ":module_update_utils" ]
+  public_deps = [
+    ":module_update_utils",
+    "../../interfaces/innerkits/ipc_client:module_update_client",
+  ]
 
   external_deps = [ "samgr:samgr_common" ]
 

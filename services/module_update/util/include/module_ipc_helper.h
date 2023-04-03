@@ -16,8 +16,10 @@
 #ifndef SYS_INSTALLER_MODULE_IPC_HELPER_H
 #define SYS_INSTALLER_MODULE_IPC_HELPER_H
 
+#include <functional>
 #include <list>
 
+#include "message_parcel.h"
 #include "module_file.h"
 
 namespace OHOS {
@@ -42,6 +44,36 @@ struct SaInfo {
 struct ModulePackageInfo {
     std::string hmpName;
     std::list<SaInfo> saInfoList;
+};
+
+class ModuleIpcHelper {
+public:
+    static int32_t ReadModulePackageInfos(MessageParcel &reply, std::list<ModulePackageInfo> &infos);
+    static int32_t WriteModulePackageInfos(MessageParcel &data, const std::list<ModulePackageInfo> &infos);
+    static int32_t ReadModuleUpdateStatus(MessageParcel &reply, ModuleUpdateStatus &status);
+    static int32_t WriteModuleUpdateStatus(MessageParcel &data, const ModuleUpdateStatus &status);
+
+    template<typename T>
+    static void ReadList(MessageParcel &reply, std::list<T> &list,
+        const std::function<void(MessageParcel &, T &)> &read)
+    {
+        int32_t size = reply.ReadInt32();
+        for (int32_t i = 0; i < size; ++i) {
+            T item;
+            read(reply, item);
+            list.emplace_back(std::move(item));
+        }
+    }
+
+    template<typename T>
+    static void WriteList(MessageParcel &data, const std::list<T> &list,
+        const std::function<void(MessageParcel &, const T &)> &write)
+    {
+        data.WriteInt32(static_cast<int32_t>(list.size()));
+        for (auto &iter : list) {
+            write(data, iter);
+        }
+    }
 };
 } // namespace SysInstaller
 } // namespace OHOS
