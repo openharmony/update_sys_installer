@@ -20,6 +20,9 @@
 #include <optional>
 #include <string>
 
+#ifdef SUPPORT_HVB
+#include "hvb.h"
+#endif
 namespace OHOS {
 namespace SysInstaller {
 namespace {
@@ -94,8 +97,15 @@ public:
     {
         modulePath_ = path;
     }
-    bool VerifyModuleVerity(const std::string &publicKey) const;
-    void ClearVerifiedData() const;
+    bool VerifyModuleVerity(const std::string &publicKey);
+    void ClearVerifiedData();
+#ifdef SUPPORT_HVB
+    struct hvb_verified_data *GetVerifiedData() const
+    {
+        return vd_;
+    }
+#endif
+
 private:
     std::string modulePath_;
     std::string saName_;
@@ -103,6 +113,10 @@ private:
     ModuleVersion versionInfo_;
     std::string modulePubkey_;
     std::optional<ImageStat> imageStat_;
+
+#ifdef SUPPORT_HVB
+    struct hvb_verified_data *vd_ = nullptr;
+#endif
 };
 } // namespace SysInstaller
 } // namespace OHOS
