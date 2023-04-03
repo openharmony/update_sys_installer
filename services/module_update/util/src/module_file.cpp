@@ -86,7 +86,12 @@ bool ParseImageStat(ModuleZipHelper &helper, const string &path, ImageStat &imag
         return false;
     }
 
-    UniqueFd fd(open(path.c_str(), O_RDONLY | O_CLOEXEC));
+    string realPath = GetRealPath(path);
+    if (realPath.empty()) {
+        LOG(ERROR) << "Invalid path " << path;
+        return false;
+    }
+    UniqueFd fd(open(realPath.c_str(), O_RDONLY | O_CLOEXEC));
     if (fd.Get() == -1) {
         LOG(ERROR) << "Failed to open package " << path << ": I/O error";
         return false;
