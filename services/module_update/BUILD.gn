@@ -42,6 +42,14 @@ ohos_static_library("module_update_utils") {
     "updater:libpackageExt",
   ]
 
+  if (defined(global_parts_info.startup_hvb)) {
+    sources += [ "./util/src/module_hvb_ops.cpp" ]
+
+    defines = [ "SUPPORT_HVB" ]
+
+    external_deps += [ "init:libfsmanager_static" ]
+  }
+
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
@@ -67,6 +75,12 @@ ohos_static_library("module_update_static") {
   ]
 
   external_deps = [ "samgr:samgr_common" ]
+
+  if (defined(global_parts_info.startup_hvb)) {
+    defines = [ "SUPPORT_HVB" ]
+
+    external_deps += [ "init:libfsmanager_static" ]
+  }
 
   part_name = "sys_installer"
   subsystem_name = "updater"

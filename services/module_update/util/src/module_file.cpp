@@ -31,6 +31,12 @@
 #include "unique_fd.h"
 #include "utils.h"
 
+#ifdef SUPPORT_HVB
+#include "hvb.h"
+#include "hvb_footer.h"
+#include "module_hvb_ops.h"
+#endif
+
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
@@ -197,6 +203,17 @@ std::unique_ptr<ModuleFile> ModuleFile::Open(const string &path)
     }
 
     string modulePubkey = "";
+#ifdef SUPPORT_HVB
+    if (!ExtractZipFile(helper, PUBLIC_KEY_NAME, modulePubkey)) {
+        LOG(ERROR) << "Failed to extract pubkey from package " << path;
+        return nullptr;
+    }
+    if (modulePubkey.empty()) {
+        LOG(ERROR) << "Public key is empty in " << path;
+        return nullptr;
+    }
+#endif
+
     return std::make_unique<ModuleFile>(path, saName, saId, versionInfo, modulePubkey, imageStat);
 }
 
@@ -213,15 +230,44 @@ bool ModuleFile::CompareVersion(const ModuleFile &file1, const ModuleFile &file2
     return version1.patchVersion >= version2.patchVersion;
 }
 
-bool ModuleFile::VerifyModuleVerity(const string &publicKey) const
+bool ModuleFile::VerifyModuleVerity(const string &publicKey)
 {
+#ifdef SUPPORT_HVB
+    if (vd_ != nullptr) {
+        LOG(INFO) << "already verified verity";
+        return true;
+    }
+    struct hvb_buf pubkey;
+    vd_ = hvb_init_verified_data();
+    if (vd_ == nullptr) {
+        LOG(ERROR) << "init verified data failed";
+        return false;
+    }
+    ON_SCOPE_EXIT(clear) {
+        ClearVerifiedData();
+    };
+    enum hvb_errno ret = footer_init_desc(ModuleHvbGetOps(), GetPath().c_str(), nullptr, &pubkey, vd_);
+    if (ret != HVB_OK) {
+        LOG(ERROR) << "hvb verify failed err=" << ret;
+        return false;
+    }
+
+    CANCEL_SCOPE_EXIT_GUARD(clear);
+    return true;
+#else
     LOG(INFO) << "do not support hvb";
     return true;
+#endif
 }
 
-void ModuleFile::ClearVerifiedData() const
+void ModuleFile::ClearVerifiedData()
 {
-    // using hvb_chain_verify_data_free to clear data
+#ifdef SUPPORT_HVB
+    if (vd_ != nullptr) {
+        hvb_chain_verify_data_free(vd_);
+        vd_ = nullptr;
+    }
+#endif
 }
 } // namespace SysInstaller
 } // namespace OHOS
