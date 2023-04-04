@@ -46,7 +46,7 @@ static bool ParseReadParam(const std::string &path, const int64_t offset, const 
     }
     int64_t imageOffset = static_cast<int64_t>(file->GetImageStat().value().imageOffset);
     int64_t imageSize = static_cast<int64_t>(file->GetImageStat().value().imageSize);
-    off_t outOffset = offset + imageOffset;
+    outOffset = offset + imageOffset;
     if (offset < 0) {
         outOffset += imageSize;
     }
@@ -54,7 +54,7 @@ static bool ParseReadParam(const std::string &path, const int64_t offset, const 
         LOG(ERROR) << "invalid offset " << offset;
         return false;
     }
-    size_t outCount = imageOffset + imageSize - outOffset;
+    outCount = imageOffset + imageSize - outOffset;
     if (outCount > numBytes) {
         outCount = numBytes;
     }
