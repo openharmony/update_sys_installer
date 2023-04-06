@@ -65,7 +65,7 @@ int32_t SysInstallerProxy::StartUpdatePackageZip(const std::string &pkgPath)
     data.WriteString16(Str8ToStr16(pkgPath));
 
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option { MessageOption::TF_ASYNC};
     int32_t ret = remote->SendRequest(UPDATE_PACKAGE, data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
@@ -101,7 +101,7 @@ int32_t SysInstallerProxy::SetUpdateCallback(const sptr<ISysInstallerCallback> &
         return ERR_FLATTEN_OBJECT;
     }
     MessageParcel reply;
-    MessageOption option { MessageOption::TF_SYNC };
+    MessageOption option { MessageOption::TF_ASYNC};
     int32_t res = remote->SendRequest(SET_UPDATE_CALLBACK, data, reply, option);
     if (res != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
@@ -124,7 +124,7 @@ int32_t SysInstallerProxy::GetUpdateStatus()
         return -1;
     }
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option { MessageOption::TF_ASYNC};
     int32_t ret = remote->SendRequest(GET_UPDATE_STATUS, data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";

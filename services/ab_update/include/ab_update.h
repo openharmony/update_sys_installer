@@ -36,6 +36,7 @@ public:
 
 private:
     Updater::UpdaterStatus StartABUpdate(const std::string &pkgPath);
+    void SetProgress(float value);
 
 private:
     std::shared_ptr<StatusManager> statusManager_ {};
