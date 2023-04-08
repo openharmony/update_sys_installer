@@ -101,5 +101,14 @@ HWTEST_F(SysInstallerIpcUnitTest, UpdateParaPackageTest001, TestSize.Level1)
         "/data/ota_package/update_para.zip", "/data/service/el1/pulbic/update", "/taboo");
     cout << " UpdateParaPackageTest001 ret " << ret << std::endl;
 }
+
+// delete para package
+HWTEST_F(SysInstallerIpcUnitTest, DeleteParaPackageTest001, TestSize.Level1)
+{
+    cout << " DeleteParaPackageTest001 start " << std::endl;
+    auto ret = SysInstallerKitsImpl::GetInstance().DeleteUpdateParaZip(
+        "/data/service/el1/pulbic/update", "/taboo");
+    cout << " DeleteParaPackageTest001 ret " << ret << std::endl;
+}
 } // SysInstaller
 } // OHOS
