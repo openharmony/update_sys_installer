@@ -21,6 +21,7 @@
 #include "ipc_skeleton.h"
 #include "log/log.h"
 #include "securec.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -40,6 +41,8 @@ SysInstallerStub::SysInstallerStub()
         bind(&SysInstallerStub::GetUpdateStatusStub, this, _1, _2, _3, _4));
     requestFuncMap_.emplace(ISysInstaller::UPDATE_PARA_PACKAGE,
         bind(&SysInstallerStub::StartUpdateParaZipStub, this, _1, _2, _3, _4));
+    requestFuncMap_.emplace(ISysInstaller::DELETE_PARA_PACKAGE,
+        bind(&SysInstallerStub::StartDeleteParaZipStub, this, _1, _2, _3, _4));
 }
 
 SysInstallerStub::~SysInstallerStub()
@@ -118,6 +121,30 @@ int32_t SysInstallerStub::StartUpdateParaZipStub(SysInstallerStub *service,
     return 0;
 }
 
+int32_t SysInstallerStub::StartDeleteParaZipStub(SysInstallerStub *service,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (service == nullptr) {
+        LOG(ERROR) << "Invalid param";
+        return -1;
+    }
+    string location = Str16ToStr8(data.ReadString16());
+    string cfgDir = Str16ToStr8(data.ReadString16());
+    LOG(INFO) << "StartDeleteParaZipStub location:" << location << " cfgDir:" << cfgDir;
+
+    int32_t ret = service->StartDeleteParaZip(location, cfgDir);
+    reply.WriteInt32(ret);
+    return 0;
+}
+
+bool SysInstallerStub::CheckCallingPerm(void)
+{
+    int32_t callingUid = OHOS::IPCSkeleton::GetCallingUid();
+    LOG(INFO) << "CheckCallingPerm callingUid:" << callingUid;
+    return callingUid == Updater::Utils::USER_UPDATE_AUTHORITY ||
+        callingUid == 0;
+}
+
 int32_t SysInstallerStub::OnRemoteRequest(uint32_t code,
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -129,6 +156,10 @@ int32_t SysInstallerStub::OnRemoteRequest(uint32_t code,
     LOG(INFO) << "OnRemoteRequest func code " << code;
     auto inter = requestFuncMap_.find(code);
     if (inter != requestFuncMap_.end()) {
+        if (!CheckCallingPerm()) {
+            LOG(ERROR) << "SysInstallerStub CheckCallingPerm fail";
+            return -1;
+        }
         return inter->second(this, data, reply, option);
     }
 

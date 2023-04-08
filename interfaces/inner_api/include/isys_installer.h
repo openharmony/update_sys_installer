@@ -30,7 +30,8 @@ public:
         UPDATE_PACKAGE,
         SET_UPDATE_CALLBACK,
         GET_UPDATE_STATUS,
-        UPDATE_PARA_PACKAGE
+        UPDATE_PARA_PACKAGE,
+        DELETE_PARA_PACKAGE,
     };
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Updater.ISysInstaller");
@@ -42,6 +43,7 @@ public:
     virtual int32_t GetUpdateStatus() = 0;
     virtual int32_t StartUpdateParaZip(const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir) = 0;
+    virtual int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir) = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS

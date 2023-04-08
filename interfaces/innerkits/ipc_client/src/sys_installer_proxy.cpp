@@ -163,5 +163,33 @@ int32_t SysInstallerProxy::StartUpdateParaZip(const std::string &pkgPath,
 
     return reply.ReadInt32();
 }
+
+int32_t SysInstallerProxy::StartDeleteParaZip(const std::string &location, const std::string &cfgDir)
+{
+    LOG(INFO) << "StartDeleteParaZip";
+    auto remote = Remote();
+    if (remote == nullptr) {
+        LOG(ERROR) << "Can not get remote";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOG(ERROR) << "WriteInterfaceToken error";
+        return ERR_FLATTEN_OBJECT;
+    }
+    data.WriteString16(Str8ToStr16(location));
+    data.WriteString16(Str8ToStr16(cfgDir));
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(DELETE_PARA_PACKAGE, data, reply, option);
+    if (ret != ERR_OK) {
+        LOG(ERROR) << "SendRequest error";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    return reply.ReadInt32();
+}
 }
 } // namespace OHOS

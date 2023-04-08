@@ -206,6 +206,19 @@ int32_t SysInstallerKitsImpl::StartUpdateParaZip(const std::string &pkgPath,
     return ret;
 }
 
+int32_t SysInstallerKitsImpl::StartDeleteParaZip(const std::string &location, const std::string &cfgDir)
+{
+    LOG(INFO) << "StartDeleteParaZip";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return false;
+    }
+    int32_t ret = updateService->StartDeleteParaZip(location, cfgDir);
+    LOG(INFO) << "StartDeleteParaZip ret:" << ret;
+    return ret;
+}
+
 void SysInstallerKitsImpl::LoadServiceSuccess()
 {
     serviceCv_.notify_all();

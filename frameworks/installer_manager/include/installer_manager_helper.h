@@ -30,6 +30,7 @@ public:
     virtual int32_t GetUpdateStatus() = 0;
     virtual int32_t StartUpdateParaZip(const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir) = 0;
+    virtual int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir) = 0;
 };
 
 class InstallerManagerHelper : public IInstallerManagerHelper {
@@ -43,6 +44,7 @@ public:
     virtual int32_t GetUpdateStatus();
     virtual int32_t StartUpdateParaZip(const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir);
+    virtual int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir);
 
 protected:
     std::shared_ptr<StatusManager> statusManager_ {};
