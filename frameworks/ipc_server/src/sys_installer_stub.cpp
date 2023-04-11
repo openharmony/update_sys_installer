@@ -137,12 +137,27 @@ int32_t SysInstallerStub::StartDeleteParaZipStub(SysInstallerStub *service,
     return 0;
 }
 
+bool SysInstallerStub::IsPermissionGranted(void)
+{
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    std::string permission = "ohos.permission.UPDATE_SYSTEM";
+
+    int verifyResult = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permission);
+    bool isPermissionGranted = (verifyResult == Security::AccessToken::PERMISSION_GRANTED);
+    if (!isPermissionGranted) {
+        LOG(ERROR) << "not granted " << permission.c_str();
+    }
+    return isPermissionGranted;
+}
+
 bool SysInstallerStub::CheckCallingPerm(void)
 {
     int32_t callingUid = OHOS::IPCSkeleton::GetCallingUid();
     LOG(INFO) << "CheckCallingPerm callingUid:" << callingUid;
-    return callingUid == Updater::Utils::USER_UPDATE_AUTHORITY ||
-        callingUid == 0;
+    if (callingUid == 0) {
+        return true;
+    }
+    return callingUid == Updater::Utils::USER_UPDATE_AUTHORITY && IsPermissionGranted();
 }
 
 int32_t SysInstallerStub::OnRemoteRequest(uint32_t code,
