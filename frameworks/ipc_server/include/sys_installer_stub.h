@@ -50,6 +50,7 @@ private:
     int32_t StartDeleteParaZipStub(SysInstallerStub *service,
         MessageParcel &data, MessageParcel &reply, MessageOption &option);
     bool CheckCallingPerm(void);
+    bool IsPermissionGranted(void);
 
 private:
     std::unordered_map<uint32_t, RequestFuncType> requestFuncMap_ {};
