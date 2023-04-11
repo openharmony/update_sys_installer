@@ -106,7 +106,7 @@ HWTEST_F(SysInstallerIpcUnitTest, UpdateParaPackageTest001, TestSize.Level1)
 HWTEST_F(SysInstallerIpcUnitTest, DeleteParaPackageTest001, TestSize.Level1)
 {
     cout << " DeleteParaPackageTest001 start " << std::endl;
-    auto ret = SysInstallerKitsImpl::GetInstance().DeleteUpdateParaZip(
+    auto ret = SysInstallerKitsImpl::GetInstance().StartDeleteParaZip(
         "/data/service/el1/pulbic/update", "/taboo");
     cout << " DeleteParaPackageTest001 ret " << ret << std::endl;
 }
