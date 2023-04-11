@@ -17,6 +17,7 @@
 
 #include <string_ex.h>
 
+#include "accesstoken_kit.h"
 #include "hap_token_info.h"
 #include "ipc_skeleton.h"
 #include "log/log.h"
