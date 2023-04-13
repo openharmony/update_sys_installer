@@ -153,7 +153,7 @@ int32_t SysInstallerKitsImpl::StartUpdatePackageZip(const std::string &pkgPath)
     auto updateService = GetService();
     if (updateService == nullptr) {
         LOG(ERROR) << "Get updateService failed";
-        return false;
+        return -1;
     }
     int32_t ret = updateService->StartUpdatePackageZip(pkgPath);
     LOG(INFO) << "StartUpdatePackageZip ret:" << ret;
@@ -199,7 +199,7 @@ int32_t SysInstallerKitsImpl::StartUpdateParaZip(const std::string &pkgPath,
     auto updateService = GetService();
     if (updateService == nullptr) {
         LOG(ERROR) << "Get updateService failed";
-        return false;
+        return -1;
     }
     int32_t ret = updateService->StartUpdateParaZip(pkgPath, location, cfgDir);
     LOG(INFO) << "StartUpdateParaZip ret:" << ret;
@@ -212,7 +212,7 @@ int32_t SysInstallerKitsImpl::StartDeleteParaZip(const std::string &location, co
     auto updateService = GetService();
     if (updateService == nullptr) {
         LOG(ERROR) << "Get updateService failed";
-        return false;
+        return -1;
     }
     int32_t ret = updateService->StartDeleteParaZip(location, cfgDir);
     LOG(INFO) << "StartDeleteParaZip ret:" << ret;
