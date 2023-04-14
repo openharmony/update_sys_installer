@@ -84,5 +84,14 @@ int32_t InstallerManager::StartUpdateParaZip(const std::string &pkgPath,
     }
     return helper_->StartUpdateParaZip(pkgPath, location, cfgDir);
 }
+
+int32_t InstallerManager::StartDeleteParaZip(const std::string &location, const std::string &cfgDir)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->StartDeleteParaZip(location, cfgDir);
+}
 } // namespace SysInstaller
 } // namespace OHOS

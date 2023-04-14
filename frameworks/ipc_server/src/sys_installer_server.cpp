@@ -74,6 +74,12 @@ int32_t SysInstallerServer::StartUpdateParaZip(const std::string &pkgPath,
     return InstallerManager::GetInstance().StartUpdateParaZip(pkgPath, location, cfgDir);
 }
 
+int32_t SysInstallerServer::StartDeleteParaZip(const std::string &location, const std::string &cfgDir)
+{
+    LOG(INFO) << "StartDeleteParaZip";
+    return InstallerManager::GetInstance().StartDeleteParaZip(location, cfgDir);
+}
+
 void SysInstallerServer::OnStart()
 {
     LOG(INFO) << "OnStart";

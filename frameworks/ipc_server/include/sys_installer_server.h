@@ -42,6 +42,7 @@ public:
     int32_t GetUpdateStatus() override;
     int32_t StartUpdateParaZip(const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir) override;
+    int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir) override;
 
 #ifndef UPDATER_UT
 private:

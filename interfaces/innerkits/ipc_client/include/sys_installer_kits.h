@@ -42,6 +42,7 @@ public:
     virtual int32_t GetUpdateStatus() = 0;
     virtual int32_t StartUpdateParaZip(const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir) = 0;
+    virtual int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir) = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS

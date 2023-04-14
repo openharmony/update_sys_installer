@@ -33,6 +33,11 @@ public:
 
 int main(int argc, char **argv)
 {
+    if (argc != 2) { // 2: max para
+        printf("argc para error\n");
+        return -1;
+    }
+
     int32_t ret = SysInstallerKitsImpl::GetInstance().SysInstallerInit();
     printf("SysInstallerInit ret:%d\n", ret);
 
@@ -42,11 +47,25 @@ int main(int argc, char **argv)
         return -1;
     }
     SysInstallerKitsImpl::GetInstance().SetUpdateCallback(callback);
-    SysInstallerKitsImpl::GetInstance().GetUpdateStatus();
-    SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip("/data/ota_package/update.zip");
 
-    SysInstallerKitsImpl::GetInstance().SysInstallerInit();
-    SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(
-        "/data/ota_package/update_para.zip", "System", "/taboo");
-    return 0;
+    printf("argv[1]:%d\n", atoi(argv[1]));
+    switch (atoi(argv[1])) {
+        case ISysInstaller::UPDATE_PACKAGE:
+            ret = SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip("/data/ota_package/update.zip");
+            break;
+        case ISysInstaller::GET_UPDATE_STATUS:
+            ret = SysInstallerKitsImpl::GetInstance().GetUpdateStatus();
+            break;
+        case ISysInstaller::UPDATE_PARA_PACKAGE:
+            ret = SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(
+                "/data/ota_package/update_para.zip", "System", "/taboo");
+            break;
+        case ISysInstaller::DELETE_PARA_PACKAGE:
+            ret = SysInstallerKitsImpl::GetInstance().StartDeleteParaZip("System", "/taboo");
+            break;
+        default:
+            break;
+    }
+
+    return ret;
 }

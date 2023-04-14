@@ -33,6 +33,7 @@ public:
     virtual int32_t GetUpdateStatus();
     virtual int32_t StartUpdateParaZip(const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir);
+    virtual int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir);
     virtual void ResetService(const wptr<IRemoteObject> &remote);
     sptr<ISysInstaller> GetService();
 
