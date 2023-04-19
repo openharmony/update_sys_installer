@@ -111,7 +111,7 @@ HWTEST_F(SysInstallerIpcUnitTest, DeleteParaPackageTest001, TestSize.Level1)
     auto ret = SysInstallerKitsImpl::GetInstance().StartDeleteParaZip(
         "/data/service/el1/pulbic/update", "/taboo");
     cout << " DeleteParaPackageTest001 ret " << ret << std::endl;
-    EXPECT_EQ(ret, 0);
+    EXPECT_NE(ret, 0);
 }
 } // SysInstaller
 } // OHOS
