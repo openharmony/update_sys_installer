@@ -38,8 +38,8 @@ int32_t SysInstallerCallbackStub::OnRemoteRequest(uint32_t code,
     switch (code) {
         case UPDATE_RESULT: {
             int updateStatus = data.ReadInt32();
-            int percent  = data.ReadInt32();
-            OnUpgradeProgress(static_cast<UpdateStatus>(updateStatus), percent);
+            int percent = data.ReadInt32();
+            OnUpgradeProgress(static_cast<UpdateStatus>(updateStatus), percent, data.ReadString());
             break;
         }
         default: {
@@ -49,11 +49,11 @@ int32_t SysInstallerCallbackStub::OnRemoteRequest(uint32_t code,
     return 0;
 }
 
-void SysInstallerCallback::OnUpgradeProgress(UpdateStatus updateStatus, int percent)
+void SysInstallerCallback::OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg)
 {
-    LOG(INFO) << "progress: " << updateStatus << " percent:" << percent;
+    LOG(INFO) << "progress: " << updateStatus << " percent:" << percent << " msg:" << resultMsg;
     if (callback_ != nullptr) {
-        callback_->OnUpgradeProgress(updateStatus, percent);
+        callback_->OnUpgradeProgress(updateStatus, percent, resultMsg);
     }
 }
 

@@ -31,7 +31,7 @@ public:
     virtual void Init();
     virtual int GetUpdateStatus();
     virtual int SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback);
-    virtual void UpdateCallback(UpdateStatus updateStatus, int percent);
+    virtual void UpdateCallback(UpdateStatus updateStatus, int percent, const std::string &resultMsg);
 
     void SetUpdatePercent(int percent);
 

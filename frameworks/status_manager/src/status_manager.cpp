@@ -45,7 +45,7 @@ int StatusManager::GetUpdateStatus()
     return updateStatus_;
 }
 
-void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent)
+void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent, const std::string &resultMsg)
 {
     if (updateCallback_ == nullptr) {
         LOG(ERROR) << "updateCallback_ null";
@@ -63,13 +63,13 @@ void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent)
     }
 
     updateStatus_ = updateStatus;
-    LOG(INFO) << "status:" << updateStatus_ << " percent:"  << percent_;
-    updateCallback_->OnUpgradeProgress(updateStatus_, percent_);
+    LOG(INFO) << "status:" << updateStatus_ << " percent:"  << percent_ << " msg:"  << resultMsg;
+    updateCallback_->OnUpgradeProgress(updateStatus_, percent_, resultMsg);
 }
 
 void StatusManager::SetUpdatePercent(int percent)
 {
-    UpdateCallback(updateStatus_, percent);
+    UpdateCallback(updateStatus_, percent, "");
 }
 } // namespace SysInstaller
 } // namespace OHOS

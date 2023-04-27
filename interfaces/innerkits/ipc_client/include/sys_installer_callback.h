@@ -33,7 +33,7 @@ public:
     SysInstallerCallback() = default;
     ~SysInstallerCallback() = default;
 
-    void OnUpgradeProgress(UpdateStatus updateStatus, int percent) override;
+    void OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) override;
     void RegisterCallback(sptr<ISysInstallerCallbackFunc> callback);
 
 private:

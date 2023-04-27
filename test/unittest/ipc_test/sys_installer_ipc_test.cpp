@@ -61,9 +61,9 @@ class ProcessCallbackTest : public ISysInstallerCallbackFunc {
 public:
     ProcessCallbackTest() = default;
     ~ProcessCallbackTest() = default;
-    void OnUpgradeProgress(UpdateStatus updateStatus, int percent) override
+    void OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) override
     {
-        printf("ProgressCallback progress %d percent %d\n", updateStatus, percent);
+        printf("ProgressCallback progress %d percent %d msg %s\n", updateStatus, percent, resultMsg.c_str());
     }
 };
 
