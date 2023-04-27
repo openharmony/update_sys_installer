@@ -56,7 +56,7 @@ void ActionProcesser::Start()
 
     isRunning_ = true;
     isSuspend_ = false;
-    statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 0, "action start");
+    statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 0, "");
     curAction_ = std::move(actionQue_.front());
     actionQue_.pop_front();
     LOG(INFO) << "Start " << curAction_->GetActionName();
@@ -142,7 +142,7 @@ void ActionProcesser::StartNextAction()
         LOG(INFO) << "Action queue empty, successful";
         isRunning_ = false;
         isSuspend_ = false;
-        statusManager_->UpdateCallback(UPDATE_STATE_SUCCESSFUL, 100, "action completed"); // 100 : action completed
+        statusManager_->UpdateCallback(UPDATE_STATE_SUCCESSFUL, 100, ""); // 100 : action completed
         return;
     }
 
