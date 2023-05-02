@@ -385,7 +385,7 @@ bool ModuleUpdateService::RevertAndReboot() const
     }
 
     LOG(INFO) << "Rebooting";
-    Utils::DoReboot("");
+    Utils::UpdaterDoReboot("");
     return true;
 }
 
