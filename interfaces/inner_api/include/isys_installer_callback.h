@@ -17,6 +17,7 @@
 #define ISYS_INSTALLER_CALLBACK_H
 
 #include <iostream>
+#include <string>
 #include "iremote_broker.h"
 #include "iremote_proxy.h"
 
@@ -39,7 +40,7 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Update.ISysInstallerCallback");
 public:
-    virtual void OnUpgradeProgress(UpdateStatus updateStatus, int percent) = 0;
+    virtual void OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS

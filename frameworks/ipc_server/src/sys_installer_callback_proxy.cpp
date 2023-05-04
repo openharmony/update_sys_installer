@@ -22,7 +22,7 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 
-void SysInstallerCallbackProxy::OnUpgradeProgress(UpdateStatus updateStatus, int percent)
+void SysInstallerCallbackProxy::OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg)
 {
     LOG(INFO) << "OnUpgradeProgress";
     MessageParcel data;
@@ -42,6 +42,7 @@ void SysInstallerCallbackProxy::OnUpgradeProgress(UpdateStatus updateStatus, int
 
     data.WriteInt32(updateStatus);
     data.WriteInt32(percent);
+    data.WriteString(resultMsg);
     int32_t result = remote->SendRequest(UPDATE_RESULT, data, reply, option);
     if (result != ERR_OK) {
         LOG(ERROR) << "Can not SendRequest " << result;
