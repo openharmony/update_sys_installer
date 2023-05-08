@@ -16,9 +16,7 @@ import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 ohos_static_library("libactionprocesser") {
-  sources = [
-    "${sys_installer_path}/frameworks/action_processer/src/action_processer.cpp",
-  ]
+  sources = [ "${sys_installer_path}/frameworks/action_processer/src/action_processer.cpp" ]
 
   include_dirs = [
     "//base/update/updater/utils/include",
