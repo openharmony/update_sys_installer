@@ -70,8 +70,8 @@ bool StageUpdateModulePackage(const string &updatePath, const string &stagePath)
         }
     }
     string path = ExtractFilePath(stagePath);
-    if (!CheckPathExists(path) && !ForceCreateDirectory(path)) {
-        LOG(ERROR) << "Failed to create path " << path;
+    if (!CheckPathExists(path)) {
+        LOG(ERROR) << path << " doesn't exist.";
         return false;
     }
     ret = link(updatePath.c_str(), stagePath.c_str());

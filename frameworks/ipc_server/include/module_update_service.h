@@ -58,7 +58,6 @@ private:
     std::unordered_set<std::string> hmpSet_;
     std::unordered_map<int32_t, std::string> saIdHmpMap_;
     std::unordered_map<std::string, std::unordered_set<std::string>> processHmpMap_;
-    bool needRevert_ = false;
 };
 } // namespace SysInstaller
 } // namespace OHOS
