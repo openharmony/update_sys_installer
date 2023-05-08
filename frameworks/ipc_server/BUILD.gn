@@ -11,27 +11,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//base/update/updater/updater_default_cfg.gni")
 import("//build/ohos.gni")
 
+sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 ohos_shared_library("sys_installer") {
   defines = [ "SYS_INSTALLER_SERVICE" ]
 
   sources = [
-    "//base/update/sys_installer/frameworks/ipc_server/src/sys_installer_callback_proxy.cpp",
-    "//base/update/sys_installer/frameworks/ipc_server/src/sys_installer_server.cpp",
-    "//base/update/sys_installer/frameworks/ipc_server/src/sys_installer_stub.cpp",
+    "${sys_installer_path}/frameworks/ipc_server/src/sys_installer_callback_proxy.cpp",
+    "${sys_installer_path}/frameworks/ipc_server/src/sys_installer_server.cpp",
+    "${sys_installer_path}/frameworks/ipc_server/src/sys_installer_stub.cpp",
   ]
 
   include_dirs = [
     "//base/update/updater/utils/include",
-    "//base/update/sys_installer/common/include",
-    "//base/update/sys_installer/frameworks/ipc_server/include",
-    "//base/update/sys_installer/frameworks/installer_manager/include",
-    "//base/update/sys_installer/frameworks/status_manager/include",
-    "//base/update/sys_installer/include",
-    "//base/update/sys_installer/interfaces/innerkits",
-    "//base/update/sys_installer/interfaces/inner_api/include",
+    "${sys_installer_path}/common/include",
+    "${sys_installer_path}/frameworks/ipc_server/include",
+    "${sys_installer_path}/frameworks/installer_manager/include",
+    "${sys_installer_path}/frameworks/status_manager/include",
+    "${sys_installer_path}/interfaces/innerkits",
+    "${sys_installer_path}/interfaces/inner_api/include",
     "//base/update/updater/services/include",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
     "//foundation/distributedschedule/safwk/services/safwk/include",
@@ -43,8 +44,8 @@ ohos_shared_library("sys_installer") {
   ]
 
   deps = [
-    "//base/update/sys_installer/frameworks/installer_manager:libinstallermanager",
-    "//base/update/sys_installer/frameworks/status_manager:libstatusmanager",
+    "${sys_installer_path}/frameworks/installer_manager:libinstallermanager",
+    "${sys_installer_path}/frameworks/status_manager:libstatusmanager",
     "//base/update/updater/interfaces/kits/misc_info:libmiscinfo",
     "//base/update/updater/services/fs_manager:libfsmanager",
     "//base/update/updater/services/log:libupdaterlog",

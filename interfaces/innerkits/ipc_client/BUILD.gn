@@ -11,23 +11,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
 
+sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 ohos_static_library("libsysinstallerkits") {
   defines = [ "SYS_INSTALLER_KITS" ]
   sources = [
-    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_callback.cpp",
-    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_kits_impl.cpp",
-    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_load_callback.cpp",
-    "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_proxy.cpp",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_callback.cpp",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_kits_impl.cpp",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_load_callback.cpp",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_proxy.cpp",
   ]
 
   include_dirs = [
-    "//base/update/sys_installer/common/include",
-    "//base/update/sys_installer/include",
-    "//base/update/sys_installer/interfaces/innerkits",
-    "//base/update/sys_installer/interfaces/inner_api/include",
-    "//base/update/sys_installer/interfaces/innerkits/ipc_client/include",
+    "${sys_installer_path}/common/include",
+    "${sys_installer_path}/include",
+    "${sys_installer_path}/interfaces/innerkits",
+    "${sys_installer_path}/interfaces/inner_api/include",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
     "//base/update/updater/services/include",
     "//base/update/updater/utils/include",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
@@ -58,15 +60,15 @@ ohos_static_library("libsysinstallerkits") {
 }
 
 ohos_executable("sys_installer_client") {
-  sources = [ "//base/update/sys_installer/interfaces/innerkits/ipc_client/src/sys_installer_client.cpp" ]
+  sources = [ "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_client.cpp" ]
 
   include_dirs = [
-    "//base/update/sys_installer/interfaces/innerkits/ipc_client/include",
-    "//base/update/sys_installer/interfaces/inner_api/include",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
+    "${sys_installer_path}/interfaces/inner_api/include",
   ]
 
   deps = [
-    "//base/update/sys_installer/interfaces/innerkits/ipc_client:libsysinstallerkits",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits",
     "//third_party/bounds_checking_function:libsec_static",
   ]
   external_deps = [
@@ -86,7 +88,7 @@ ohos_shared_library("module_update") {
 
   include_dirs = [ "./include" ]
 
-  deps = [ "../../../services/module_update:module_update_static" ]
+  deps = [ "${sys_installer_path}/services/module_update:module_update_static" ]
 
   part_name = "sys_installer"
   subsystem_name = "updater"
@@ -95,17 +97,17 @@ ohos_shared_library("module_update") {
 config("exported_header_files") {
   visibility = [ ":*" ]
   include_dirs = [
-    "../../../services/module_update/util/include",
-    "../../inner_api/include",
-    "./include",
+    "${sys_installer_path}/services/module_update/util/include",
+    "${sys_installer_path}/interfaces/inner_api/include",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
   ]
 }
 
 ohos_static_library("module_update_client") {
   sources = [
-    "../../../services/module_update/util/src/module_ipc_helper.cpp",
-    "./src/module_update_kits_impl.cpp",
-    "./src/module_update_proxy.cpp",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_kits_impl.cpp",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_proxy.cpp",
+    "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
   ]
 
   include_dirs = [

@@ -10,16 +10,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
 
+sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 ohos_executable("module_update_tool") {
   sources = [ "main.cpp" ]
 
-  include_dirs = [ "../../interfaces/innerkits/ipc_client/include" ]
+  include_dirs =
+      [ "${sys_installer_path}/interfaces/innerkits/ipc_client/include" ]
 
   deps = [
-    "../../interfaces/innerkits/ipc_client:module_update_client",
-    "../../services/module_update:module_update_utils",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update_client",
+    "${sys_installer_path}/services/module_update:module_update_utils",
   ]
 
   external_deps = [
