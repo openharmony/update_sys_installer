@@ -42,7 +42,9 @@ ohos_unittest("sys_installer_unittest") {
     "//third_party/googletest/googletest/include",
     "//third_party/googletest/googlemock/include",
   ]
-  deps = [ "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits" ]
+  deps = [
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits",
+  ]
 
   deps += [
     "${sys_installer_path}/test/unittest:sys_installer_client_test",
