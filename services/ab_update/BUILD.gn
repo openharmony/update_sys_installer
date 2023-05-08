@@ -16,9 +16,7 @@ import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 ohos_static_library("libabupdate") {
-  sources = [
-    "${sys_installer_path}/services/ab_update/src/ab_update.cpp",
-  ]
+  sources = [ "${sys_installer_path}/services/ab_update/src/ab_update.cpp" ]
 
   include_dirs = [
     "//base/update/updater/interfaces/kits/include",
