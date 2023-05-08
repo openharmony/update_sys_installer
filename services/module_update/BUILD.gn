@@ -45,7 +45,7 @@ ohos_static_library("module_update_utils") {
   ]
 
   if (defined(global_parts_info.startup_hvb)) {
-    sources += [ "./util/src/module_hvb_ops.cpp" ]
+    sources += [ "${sys_installer_path}/services/module_update/util/src/module_hvb_ops.cpp" ]
 
     defines = [ "SUPPORT_HVB" ]
 
@@ -58,7 +58,7 @@ ohos_static_library("module_update_utils") {
 
 config("module_update_exported_header") {
   visibility = [ ":*" ]
-  include_dirs = [ "./include" ]
+  include_dirs = [ "${sys_installer_path}/services/module_update/include" ]
 }
 
 ohos_static_library("module_update_static") {
