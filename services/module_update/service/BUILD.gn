@@ -21,11 +21,11 @@ ohos_executable("module_update_service") {
   sources = [
     "${sys_installer_path}/frameworks/ipc_server/src/module_update_service.cpp",
     "${sys_installer_path}/frameworks/ipc_server/src/module_update_stub.cpp",
-    "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
     "${sys_installer_path}/services/module_update/service/main.cpp",
     "${sys_installer_path}/services/module_update/service/src/crash_sys_event_listener.cpp",
     "${sys_installer_path}/services/module_update/service/src/module_update_main.cpp",
     "${sys_installer_path}/services/module_update/service/src/sys_event_service_listener.cpp",
+    "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
   ]
 
   include_dirs = [
