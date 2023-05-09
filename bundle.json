@@ -19,17 +19,18 @@
     ],
     "deps": {
       "components": [
-        "utils_base",
+        "c_utils",
         "hiviewdfx_hilog_native",
         "ipc",
         "safwk",
         "samgr_standard",
-        "napi",
-        "startup_l2"
+        "updater",
+        "access_token",
+        "hisysevent_native"
       ],
       "third_party": [
         "curl",
-        "libxml2",
+        "zlib",
         "cJSON",
         "bounds_checking_function"
       ]
