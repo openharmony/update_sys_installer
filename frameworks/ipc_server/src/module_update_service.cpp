@@ -33,6 +33,32 @@ using namespace Updater;
 namespace {
 constexpr mode_t DIR_MODE = 0750;
 constexpr mode_t ALL_PERMISSIONS = 0777;
+
+int32_t CreateModuleDirs(const std::string &hmpName)
+{
+    if (!CreateDirIfNeeded(UPDATE_INSTALL_DIR, DIR_MODE)) {
+        LOG(ERROR) << "Failed to create install dir";
+        return ModuleErrorCode::ERR_INSTALL_FAIL;
+    }
+    std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
+    if (!CreateDirIfNeeded(hmpInstallDir, DIR_MODE)) {
+        LOG(ERROR) << "Failed to create hmp install dir " << hmpInstallDir;
+        return ModuleErrorCode::ERR_INSTALL_FAIL;
+    }
+    std::string hmpActiveDir = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
+    if (!CreateDirIfNeeded(hmpActiveDir, DIR_MODE)) {
+        LOG(ERROR) << "Failed to create hmp active dir " << hmpActiveDir;
+        return ModuleErrorCode::ERR_INSTALL_FAIL;
+    }
+    return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
+}
+
+bool ClearModuleDirs(const std::string &hmpName)
+{
+    std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
+    std::string hmpActiveDir = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
+    return ForceRemoveDirectory(hmpInstallDir) && ForceRemoveDirectory(hmpActiveDir);
+}
 }
 
 ModuleUpdateService::ModuleUpdateService() : SystemAbility(MODULE_UPDATE_SERVICE_ID, true)
@@ -62,22 +88,19 @@ int32_t ModuleUpdateService::InstallModulePackage(const std::string &pkgPath)
         LOG(ERROR) << "Failed to install hmp without preInstall";
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
-    std::string hmpDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
-    if (!CreateDirIfNeeded(UPDATE_INSTALL_DIR, DIR_MODE)) {
-        LOG(ERROR) << "Failed to create install dir";
-        return ModuleErrorCode::ERR_INSTALL_FAIL;
-    }
-    if (!CreateDirIfNeeded(hmpDir, DIR_MODE)) {
-        LOG(ERROR) << "Failed to create hmp dir " << hmpDir;
-        return ModuleErrorCode::ERR_INSTALL_FAIL;
+    int32_t ret = CreateModuleDirs(hmpName);
+    if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
+        ClearModuleDirs(hmpName);
+        return ret;
     }
     ON_SCOPE_EXIT(rmdir) {
-        if (!ForceRemoveDirectory(hmpDir)) {
-            LOG(WARNING) << "Failed to remove " << hmpDir;
+        if (!ClearModuleDirs(hmpName)) {
+            LOG(WARNING) << "Failed to remove " << hmpName;
         }
     };
+    std::string hmpDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
     std::string outPath = hmpDir + "/";
-    int32_t ret = ExtraPackageDir(realPath.c_str(), nullptr, nullptr, outPath.c_str());
+    ret = ExtraPackageDir(realPath.c_str(), nullptr, nullptr, outPath.c_str());
     if (ret != 0) {
         LOG(ERROR) << "Failed to unpack hmp package " << realPath;
         return ModuleErrorCode::ERR_INSTALL_FAIL;
@@ -158,15 +181,20 @@ int32_t ModuleUpdateService::UninstallModulePackage(const std::string &hmpName)
     }
     std::vector<std::string> uninstallDir {UPDATE_INSTALL_DIR, UPDATE_ACTIVE_DIR, UPDATE_BACKUP_DIR};
     std::string hmpDir = "/" + hmpName;
+    bool hmpIsValid = false;
     for (auto &iter : uninstallDir) {
         std::string dir = iter + hmpDir;
         if (!CheckPathExists(dir)) {
             continue;
         }
+        hmpIsValid = true;
         if (!ForceRemoveDirectory(dir)) {
             LOG(ERROR) << "Failed to remove " << dir;
             ret = ModuleErrorCode::ERR_UNINSTALL_FAIL;
         }
+    }
+    if (!hmpIsValid) {
+        ret = ModuleErrorCode::ERR_INVALID_PATH;
     }
     return ret;
 }
@@ -274,15 +302,11 @@ void ModuleUpdateService::OnProcessCrash(const std::string &processName)
 
 void ModuleUpdateService::OnBootCompleted()
 {
-    if (needRevert_) {
-        RevertAndReboot();
-    } else {
-        LOG(INFO) << "Deleting " << UPDATE_INSTALL_DIR;
-        if (!ForceRemoveDirectory(UPDATE_INSTALL_DIR)) {
-            LOG(ERROR) << "Failed to remove " << UPDATE_INSTALL_DIR << " err=" << errno;
-        }
-        ExitModuleUpdate();
+    LOG(INFO) << "Deleting " << UPDATE_INSTALL_DIR;
+    if (!ForceRemoveDirectory(UPDATE_INSTALL_DIR)) {
+        LOG(ERROR) << "Failed to remove " << UPDATE_INSTALL_DIR << " err=" << errno;
     }
+    ExitModuleUpdate();
 }
 
 void ModuleUpdateService::OnHmpError(const std::string &hmpName)
@@ -297,7 +321,7 @@ void ModuleUpdateService::OnHmpError(const std::string &hmpName)
         LOG(ERROR) << "Failed to remove " << errPath;
         return;
     }
-    needRevert_ = true;
+    RevertAndReboot();
 }
 
 bool ModuleUpdateService::BackupActiveModules() const
