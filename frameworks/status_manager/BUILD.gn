@@ -35,4 +35,5 @@ ohos_static_library("libstatusmanager") {
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   part_name = "sys_installer"
+  subsystem_name = "updater"
 }

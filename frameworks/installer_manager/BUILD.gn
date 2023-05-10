@@ -36,7 +36,6 @@ ohos_static_library("libinstallermanager") {
     "${sys_installer_path}/services/ab_update/include",
     "//base/update/updater/services/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//utils/native/base/include",
   ]
 
   deps = [
@@ -52,4 +51,5 @@ ohos_static_library("libinstallermanager") {
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   part_name = "sys_installer"
+  subsystem_name = "updater"
 }

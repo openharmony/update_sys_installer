@@ -32,7 +32,6 @@ ohos_static_library("libverifyaction") {
     "${sys_installer_path}/frameworks/status_manager/include",
     "//base/update/updater/services/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//utils/native/base/include",
   ]
 
   deps = [
