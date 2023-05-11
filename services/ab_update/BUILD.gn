@@ -30,7 +30,6 @@ ohos_static_library("libabupdate") {
     "${sys_installer_path}/frameworks/status_manager/include",
     "${sys_installer_path}/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//utils/native/base/include",
     "${sys_installer_path}/services/ab_update/include",
   ]
 
@@ -38,4 +37,5 @@ ohos_static_library("libabupdate") {
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   part_name = "sys_installer"
+  subsystem_name = "updater"
 }

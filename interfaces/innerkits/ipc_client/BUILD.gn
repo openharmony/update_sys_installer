@@ -32,13 +32,8 @@ ohos_static_library("libsysinstallerkits") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
     "//base/update/updater/services/include",
     "//base/update/updater/utils/include",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
-    "//foundation/distributedschedule/safwk/services/safwk/include",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk",
-    "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include",
     "//third_party/bounds_checking_function/include",
     "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
   ]
 
   deps = [
@@ -81,6 +76,7 @@ ohos_executable("sys_installer_client") {
   ]
   install_enable = true
   part_name = "sys_installer"
+  subsystem_name = "updater"
 }
 
 ohos_shared_library("module_update") {
