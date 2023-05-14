@@ -21,6 +21,7 @@ ohos_static_library("libverifyaction") {
   ]
 
   include_dirs = [
+    "//base/update/updater/services/common",
     "//base/update/updater/utils/include",
     "//base/update/updater/interfaces/kits/include",
     "${sys_installer_path}/common/include",
