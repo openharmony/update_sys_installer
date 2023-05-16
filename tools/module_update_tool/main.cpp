@@ -26,7 +26,7 @@ static const std::string HELP_MSG =
     "command list:\n"
     "  install        : upgrade some SA via hmp package\n"
     "  uninstall      : degrade some SA via hmp name\n"
-    "  show hmpname   : show upgrade sa info, if hmap name is null, show all\n";
+    "  show hmpname   : show upgrade sa info, if hmp name is null, show all\n";
 
 static const std::string INSTALL_PARAM = "install";
 static const std::string UNINSTALL_PARAM = "uninstall";
@@ -67,7 +67,7 @@ static std::string GetFailReasonByErrCode(int32_t err)
     }
 }
 
-static void PrintErrMsg(std::string errMsg)
+static void PrintErrMsg(const std::string &errMsg)
 {
     printf("%s\n", errMsg.c_str());
 }
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
     }
 
     if (INSTALL_PARAM.compare(argv[1]) == 0 && argc == MAX_PARAM_NUM) {
-        printf("try to update a mudule\n");
+        printf("try to update a module\n");
         ret = moduleUpdateKits.InstallModulePackage(argv[MIN_PARAM_NUM]);
         PrintErrMsg(GetFailReasonByErrCode(ret));
         return ret;

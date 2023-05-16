@@ -24,6 +24,8 @@
 
 namespace OHOS {
 namespace SysInstaller {
+static constexpr int32_t IPC_MAX_SIZE = 128;
+
 struct SaStatus {
     int32_t saId;
     bool isPreInstalled;
@@ -58,6 +60,9 @@ public:
         const std::function<void(MessageParcel &, T &)> &read)
     {
         int32_t size = reply.ReadInt32();
+        if (size > IPC_MAX_SIZE) {
+            return;
+        }
         for (int32_t i = 0; i < size; ++i) {
             T item;
             read(reply, item);
