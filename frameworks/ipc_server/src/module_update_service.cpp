@@ -59,6 +59,35 @@ bool ClearModuleDirs(const std::string &hmpName)
     std::string hmpActiveDir = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
     return ForceRemoveDirectory(hmpInstallDir) && ForceRemoveDirectory(hmpActiveDir);
 }
+
+bool BackupFile(const std::string &file)
+{
+    if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
+        return true;
+    }
+    std::string fileName = GetFileName(file);
+    std::string hmpName = GetHmpName(file);
+    if (fileName.empty() || hmpName.empty()) {
+        return true;
+    }
+    std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
+    if (moduleFile == nullptr) {
+        LOG(ERROR) << "Wrong module file " << file << " in active dir";
+        return false;
+    }
+    std::string destPath = std::string(UPDATE_BACKUP_DIR) + "/" + hmpName;
+    if (!CreateDirIfNeeded(destPath, DIR_MODE)) {
+        LOG(ERROR) << "Failed to create hmp dir " << destPath;
+        return false;
+    }
+    std::string destFile = destPath + "/" + fileName + MODULE_PACKAGE_SUFFIX;
+    int ret = link(file.c_str(), destFile.c_str());
+    if (ret != 0) {
+        LOG(ERROR) << "Failed to link file " << file << " to dest " << destFile;
+        return false;
+    }
+    return true;
+}
 }
 
 ModuleUpdateService::ModuleUpdateService() : SystemAbility(MODULE_UPDATE_SERVICE_ID, true)
@@ -177,12 +206,12 @@ int32_t ModuleUpdateService::UninstallModulePackage(const std::string &hmpName)
     LOG(INFO) << "UninstallModulePackage " << hmpName;
     int ret = ModuleErrorCode::MODULE_UPDATE_SUCCESS;
     if (hmpName.empty() || hmpSet_.find(hmpName) == hmpSet_.end()) {
-        return ret;
+        return ModuleErrorCode::ERR_INVALID_PATH;
     }
     std::vector<std::string> uninstallDir {UPDATE_INSTALL_DIR, UPDATE_ACTIVE_DIR, UPDATE_BACKUP_DIR};
     std::string hmpDir = "/" + hmpName;
     bool hmpIsValid = false;
-    for (auto &iter : uninstallDir) {
+    for (const auto &iter : uninstallDir) {
         std::string dir = iter + hmpDir;
         if (!CheckPathExists(dir)) {
             continue;
@@ -254,7 +283,7 @@ int32_t ModuleUpdateService::ReportModuleUpdateStatus(const ModuleUpdateStatus &
         return ModuleErrorCode::ERR_REPORT_STATUS_FAIL;
     }
     std::unordered_set<std::string> hmpSet;
-    for (auto &iter : status.saStatusList) {
+    for (const auto &iter : status.saStatusList) {
         ProcessSaStatus(iter, hmpSet);
     }
     processHmpMap_.emplace(status.process, hmpSet);
@@ -348,29 +377,8 @@ bool ModuleUpdateService::BackupActiveModules() const
             LOG(WARNING) << "Failed to remove backup dir when backup failed";
         }
     };
-    for (auto &file : activeFiles) {
-        if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
-            continue;
-        }
-        std::string fileName = GetFileName(file);
-        std::string hmpName = GetHmpName(file);
-        if (fileName.empty() || hmpName.empty()) {
-            continue;
-        }
-        std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
-        if (moduleFile == nullptr) {
-            LOG(ERROR) << "Wrong module file " << file << " in active dir";
-            return false;
-        }
-        std::string destPath = std::string(UPDATE_BACKUP_DIR) + "/" + hmpName;
-        if (!CreateDirIfNeeded(destPath, DIR_MODE)) {
-            LOG(ERROR) << "Failed to create hmp dir " << destPath;
-            return false;
-        }
-        std::string destFile = destPath + "/" + fileName + MODULE_PACKAGE_SUFFIX;
-        int ret = link(file.c_str(), destFile.c_str());
-        if (ret != 0) {
-            LOG(ERROR) << "Failed to link file " << file << " to dest " << destFile;
+    for (const auto &file : activeFiles) {
+        if (!BackupFile(file)) {
             return false;
         }
     }
