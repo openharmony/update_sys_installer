@@ -38,7 +38,6 @@ public:
 protected:
     UpdateStatus updateStatus_ = UPDATE_STATE_INIT;
     int percent_ = 0;
-    std::mutex updateCbMutex_ {};
     sptr<ISysInstallerCallback> updateCallback_ {};
 };
 } // SysInstaller
