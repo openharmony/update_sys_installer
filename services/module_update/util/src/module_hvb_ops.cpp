@@ -90,7 +90,7 @@ static enum hvb_io_errno HvbReadFromPartition(
         LOG(ERROR) << "failed to open file " << realPath << " err=" << errno;
         return HVB_IO_ERROR_IO;
     }
-    if (!ReadFullyAtOffset(fd.Get(), (uint8_t *)buf, count, realOffset)) {
+    if (!ReadFullyAtOffset(fd.Get(), reinterpret_cast<uint8_t *>(buf), count, realOffset)) {
         LOG(ERROR) << "failed to read file " << realPath;
         return HVB_IO_ERROR_IO;
     }

@@ -37,6 +37,8 @@ public:
 private:
     ModuleFileRepository() = default;
     ~ModuleFileRepository();
+    void ProcessFile(const std::unordered_set<int32_t> &saIdSet, const std::string &path, const std::string &file,
+        std::unordered_map<int32_t, ModuleFile> &fileMap) const;
     bool CheckFilePath(const ModuleFile &moduleFile, const std::string &prefix) const;
 
     std::unordered_map<std::string, std::unordered_map<int32_t, ModuleFile>> moduleFileMap_;

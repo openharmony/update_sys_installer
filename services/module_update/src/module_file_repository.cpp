@@ -44,32 +44,38 @@ void ModuleFileRepository::InitRepository(const std::unordered_set<int32_t> &saI
         GetDirFiles(path, files);
         std::unordered_map<int32_t, ModuleFile> fileMap;
         for (string &file : files) {
-            if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
-                continue;
-            }
-            std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
-            if (moduleFile == nullptr || saIdSet.find(moduleFile->GetSaId()) == saIdSet.end()) {
-                continue;
-            }
-            string pubkey = moduleFile->GetPublicKey();
-            if (path != MODULE_PREINSTALL_DIR) {
-                pubkey = GetPublicKey(moduleFile->GetSaId());
-                if (!CheckFilePath(*moduleFile, path)) {
-                    continue;
-                }
-                if (!ModuleFile::VerifyModulePackageSign(file)) {
-                    LOG(ERROR) << "verify sign failed of " << file;
-                    continue;
-                }
-            }
-            if (moduleFile->GetImageStat().has_value() && !moduleFile->VerifyModuleVerity(pubkey)) {
-                LOG(ERROR) << "verify verity failed of " << file;
-                continue;
-            }
-            fileMap.emplace(moduleFile->GetSaId(), std::move(*moduleFile));
+            ProcessFile(saIdSet, path, file, fileMap);
         }
         moduleFileMap_.emplace(path, std::move(fileMap));
     }
+}
+
+void ModuleFileRepository::ProcessFile(const std::unordered_set<int32_t> &saIdSet, const string &path,
+    const string &file, std::unordered_map<int32_t, ModuleFile> &fileMap) const
+{
+    if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
+        return;
+    }
+    std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
+    if (moduleFile == nullptr || saIdSet.find(moduleFile->GetSaId()) == saIdSet.end()) {
+        return;
+    }
+    string pubkey = moduleFile->GetPublicKey();
+    if (path != MODULE_PREINSTALL_DIR) {
+        pubkey = GetPublicKey(moduleFile->GetSaId());
+        if (!CheckFilePath(*moduleFile, path)) {
+            return;
+        }
+        if (!ModuleFile::VerifyModulePackageSign(file)) {
+            LOG(ERROR) << "verify sign failed of " << file;
+            return;
+        }
+    }
+    if (moduleFile->GetImageStat().has_value() && !moduleFile->VerifyModuleVerity(pubkey)) {
+        LOG(ERROR) << "verify verity failed of " << file;
+        return;
+    }
+    fileMap.emplace(moduleFile->GetSaId(), std::move(*moduleFile));
 }
 
 std::unique_ptr<ModuleFile> ModuleFileRepository::GetModuleFile(const std::string &pathPrefix, const int32_t saId) const

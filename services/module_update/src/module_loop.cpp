@@ -248,7 +248,6 @@ bool SetUpLoopDevice(const int deviceFd, const string &target, const uint32_t im
 
 std::unique_ptr<LoopbackDeviceUniqueFd> WaitForDevice(const int num)
 {
-    string openedDevice;
     const std::vector<string> candidateDevices = {
         LOOP_BLOCK_PATH + std::to_string(num),
         LOOP_DEV_PATH + std::to_string(num),
