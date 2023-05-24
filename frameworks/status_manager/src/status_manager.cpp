@@ -31,6 +31,7 @@ void StatusManager::Init()
 
 int StatusManager::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback)
 {
+    std::lock_guard<std::mutex> lock(updateCbMutex_);
     if (updateCallback == nullptr) {
         LOG(ERROR) << "para error";
         return -1;
@@ -47,6 +48,7 @@ int StatusManager::GetUpdateStatus()
 
 void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent, const std::string &resultMsg)
 {
+    std::lock_guard<std::mutex> lock(updateCbMutex_);
     if (updateCallback_ == nullptr) {
         LOG(ERROR) << "updateCallback_ null";
         return;
