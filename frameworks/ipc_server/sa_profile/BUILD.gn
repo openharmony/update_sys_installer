@@ -14,7 +14,7 @@
 import("//build/ohos/sa_profile/sa_profile.gni")
 
 ohos_sa_profile("sys_installer_sa_profile") {
-  sources = [ "4101.xml" ]
+  sources = [ "4101.json" ]
 
   part_name = "sys_installer"
 }
