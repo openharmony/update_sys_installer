@@ -15,14 +15,21 @@ import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
+
+config("libverifyaction_exported_headers") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "${sys_installer_path}/frameworks/actions/include",
+    "${sys_installer_path}/frameworks/actions/verify_action/include",
+    "${sys_installer_path}/frameworks/action_processer/include",
+  ]
+}
 ohos_static_library("libverifyaction") {
   sources = [
     "${sys_installer_path}/frameworks/actions/verify_action/src/pkg_verify.cpp",
   ]
 
   include_dirs = [
-    "//base/update/updater/utils/include",
-    "//base/update/updater/interfaces/kits/include",
     "${sys_installer_path}/common/include",
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
@@ -30,16 +37,19 @@ ohos_static_library("libverifyaction") {
     "${sys_installer_path}/frameworks/actions/verify_action/include",
     "${sys_installer_path}/frameworks/action_processer/include",
     "${sys_installer_path}/frameworks/status_manager/include",
-    "//base/update/updater/services/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   deps = [
-    "//base/update/updater/services/log:libupdaterlog",
     "//third_party/openssl:libcrypto_shared",
     "//third_party/openssl:libssl_shared",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "updater:libupdaterlog",
+    "updater:libpackageExt",
+    "ipc:ipc_core",
+  ]
+  subsystem_name = "updater"
   part_name = "sys_installer"
 }

@@ -15,6 +15,18 @@ import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
+
+config("libsysinstallerkits_exported_headers") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "${sys_installer_path}/common/include",
+    "${sys_installer_path}/include",
+    "${sys_installer_path}/interfaces/innerkits",
+    "${sys_installer_path}/interfaces/inner_api/include",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
+  ]
+}
+
 ohos_static_library("libsysinstallerkits") {
   defines = [ "SYS_INSTALLER_KITS" ]
   sources = [
@@ -30,15 +42,12 @@ ohos_static_library("libsysinstallerkits") {
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
-    "//base/update/updater/services/include",
-    "//base/update/updater/utils/include",
     "//third_party/bounds_checking_function/include",
-    "//commonlibrary/c_utils/base/include",
   ]
 
+  public_configs = [ ":libsysinstallerkits_exported_headers" ]
+
   deps = [
-    "//base/update/updater/services/log:libupdaterlog",
-    "//base/update/updater/utils:libutils",
     "//third_party/bounds_checking_function:libsec_static",
   ]
 
@@ -52,6 +61,7 @@ ohos_static_library("libsysinstallerkits") {
   ]
 
   part_name = "sys_installer"
+  subsystem_name = "updater"
 }
 
 ohos_executable("sys_installer_client") {
@@ -73,6 +83,8 @@ ohos_executable("sys_installer_client") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "updater:libupdaterlog",
+    "updater:libutils",
   ]
   install_enable = true
   part_name = "sys_installer"
@@ -107,20 +119,17 @@ ohos_static_library("module_update_client") {
   ]
 
   include_dirs = [
-    "../../../../updater/services/include",
-    "../../../../updater/utils/include",
     "//third_party/bounds_checking_function/include",
   ]
 
   public_configs = [ ":exported_header_files" ]
-
-  deps = [ "../../../../updater/services/log:libupdaterlog" ]
 
   external_deps = [
     "c_utils:utils",
     "init:libbegetutil",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "updater:libupdaterlog",
   ]
 
   part_name = "sys_installer"

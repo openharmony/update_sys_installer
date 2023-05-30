@@ -26,13 +26,16 @@
         "samgr_standard",
         "updater",
         "access_token",
-        "hisysevent_native"
+        "hisysevent_native",
+        "updater",
+        "init"
       ],
       "third_party": [
         "curl",
         "zlib",
         "cJSON",
-        "bounds_checking_function"
+        "bounds_checking_function",
+        "lz4"
       ]
     },
     "build": {
@@ -45,7 +48,38 @@
         "//base/update/sys_installer/services/module_update/service:module_update_service",
         "//base/update/sys_installer/tools/module_update_tool:module_update_tool"
       ],
-      "inner_kits": [],
+      "inner_kits": [
+        {
+          "name": "//base/update/sys_installer/interfaces/innerkits/ipc_client:libsysinstallerkits",
+          "header": {
+            "header_files": [],
+            "header_base": [
+               "//base/update/sys_installer/interfaces/innerkits/inner_api/include",
+               "//base/update/sys_installer/interfaces/innerkits/ipc_client/include",
+               "//base/update/sys_installer/interfaces/innerkits",
+               "//base/update/sys_installer/common/include"
+            ]
+          }
+        },
+        {
+          "name": "//base/update/sys_installer/frameworks/installer_manager:libinstallermanager",
+          "header": {
+            "header_files": [],
+            "header_base": [
+               "//base/update/sys_installer/frameworks/installer_manager/include"
+            ]
+          }
+        },
+        {
+          "name": "//base/update/sys_installer/frameworks/ipc_server:sys_installer",
+          "header": {
+            "header_files": [],
+            "header_base": [
+               "//base/update/sys_installer/frameworks/ipc_server/include"
+            ]
+          }
+        }
+      ],
       "test": [
         "//base/update/sys_installer:unittest"
       ]
