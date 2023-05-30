@@ -19,10 +19,6 @@ config("utils_exported_header") {
   visibility = [ ":*" ]
   include_dirs = [
     "${sys_installer_path}/services/module_update/util/include",
-    "../../../updater/interfaces/kits/include",
-    "../../../updater/services/include",
-    "../../../updater/utils/include",
-    "../../../updater/utils/json",
     "//third_party/cJSON",
     "//third_party/zlib",
     "//third_party/zlib/contrib/minizip",
@@ -42,6 +38,8 @@ ohos_static_library("module_update_utils") {
     "c_utils:utils",
     "updater:libmiscinfo",
     "updater:libpackageExt",
+    "updater:libutils",
+    "updater:libupdaterlog",
   ]
 
   if (defined(global_parts_info.startup_hvb)) {
@@ -76,7 +74,10 @@ ohos_static_library("module_update_static") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update_client",
   ]
 
-  external_deps = [ "samgr:samgr_common" ]
+  external_deps = [
+    "samgr:samgr_common",
+    "updater:libupdaterlog",
+]
 
   if (defined(global_parts_info.startup_hvb)) {
     defines = [ "SUPPORT_HVB" ]

@@ -21,19 +21,18 @@ ohos_static_library("libstatusmanager") {
   ]
 
   include_dirs = [
-    "//base/update/updater/utils/include",
     "${sys_installer_path}/common/include",
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/frameworks/status_manager/include",
-    "//base/update/updater/services/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//commonlibrary/c_utils/base/include",
   ]
 
-  deps = [ "//base/update/updater/services/log:libupdaterlog" ]
-
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "c_utils:utils",
+    "ipc:ipc_core",
+    "updater:libupdaterlog",
+  ]
   part_name = "sys_installer"
   subsystem_name = "updater"
 }

@@ -43,6 +43,9 @@ ohos_executable("module_update_service") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "updater:libutils",
+    "updater:libupdaterlog",
+    "updater:libpackageExt",
   ]
 
   part_name = "sys_installer"
