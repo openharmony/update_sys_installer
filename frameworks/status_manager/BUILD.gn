@@ -28,8 +28,8 @@ ohos_static_library("libstatusmanager") {
   ]
 
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
     "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "updater:libupdaterlog",
   ]

@@ -38,8 +38,8 @@ ohos_static_library("module_update_utils") {
     "c_utils:utils",
     "updater:libmiscinfo",
     "updater:libpackageExt",
-    "updater:libutils",
     "updater:libupdaterlog",
+    "updater:libutils",
   ]
 
   if (defined(global_parts_info.startup_hvb)) {

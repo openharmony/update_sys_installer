@@ -31,8 +31,8 @@ ohos_static_library("libabupdate") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
-    "updater:libupdater",
     "ipc:ipc_core",
+    "updater:libupdater",
     "updater:libutils",
   ]
   part_name = "sys_installer"

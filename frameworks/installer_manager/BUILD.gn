@@ -55,8 +55,8 @@ ohos_static_library("libinstallermanager") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
-    "updater:libupdaterlog",
     "updater:libpackageExt",
+    "updater:libupdaterlog",
     "updater:libupdaterpackage",
   ]
   part_name = "sys_installer"

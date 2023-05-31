@@ -29,8 +29,8 @@ ohos_static_library("libactionprocesser") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
-    "updater:libupdaterlog",
     "ipc:ipc_core",
+    "updater:libupdaterlog",
   ]
   part_name = "sys_installer"
 }

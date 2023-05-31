@@ -46,9 +46,9 @@ ohos_static_library("libverifyaction") {
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
-    "updater:libupdaterlog",
-    "updater:libpackageExt",
     "ipc:ipc_core",
+    "updater:libpackageExt",
+    "updater:libupdaterlog",
   ]
   subsystem_name = "updater"
   part_name = "sys_installer"
