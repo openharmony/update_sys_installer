@@ -47,9 +47,7 @@ ohos_static_library("libsysinstallerkits") {
 
   public_configs = [ ":libsysinstallerkits_exported_headers" ]
 
-  deps = [
-    "//third_party/bounds_checking_function:libsec_static",
-  ]
+  deps = [ "//third_party/bounds_checking_function:libsec_static" ]
 
   external_deps = [
     "c_utils:utils",
@@ -118,9 +116,7 @@ ohos_static_library("module_update_client") {
     "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
   ]
 
-  include_dirs = [
-    "//third_party/bounds_checking_function/include",
-  ]
+  include_dirs = [ "//third_party/bounds_checking_function/include" ]
 
   public_configs = [ ":exported_header_files" ]
 
