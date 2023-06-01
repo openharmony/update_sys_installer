@@ -20,6 +20,7 @@ ohos_static_library("libabupdate") {
 
   include_dirs = [
     "//base/update/updater/interfaces/kits/include",
+    "../../../updater/services/common",
     "//base/update/updater/services/include",
     "//base/update/updater/utils/include",
     "${sys_installer_path}/common/include",
