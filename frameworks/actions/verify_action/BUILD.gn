@@ -48,6 +48,7 @@ ohos_static_library("libverifyaction") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "updater:libpackageExt",
+    "updater:libringbuffer",
     "updater:libupdaterlog",
   ]
   subsystem_name = "updater"
