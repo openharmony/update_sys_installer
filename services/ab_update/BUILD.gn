@@ -19,10 +19,6 @@ ohos_static_library("libabupdate") {
   sources = [ "${sys_installer_path}/services/ab_update/src/ab_update.cpp" ]
 
   include_dirs = [
-    "//base/update/updater/interfaces/kits/include",
-    "../../../updater/services/common",
-    "//base/update/updater/services/include",
-    "//base/update/updater/utils/include",
     "${sys_installer_path}/common/include",
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
@@ -30,13 +26,16 @@ ohos_static_library("libabupdate") {
     "${sys_installer_path}/frameworks/installer_manager/include",
     "${sys_installer_path}/frameworks/status_manager/include",
     "${sys_installer_path}/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "${sys_installer_path}/services/ab_update/include",
   ]
 
-  deps = [ "//base/update/updater/services:libupdater" ]
-
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "updater:libringbuffer",
+    "updater:libupdater",
+    "updater:libutils",
+  ]
   part_name = "sys_installer"
   subsystem_name = "updater"
 }

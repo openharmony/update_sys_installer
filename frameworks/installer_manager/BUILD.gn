@@ -15,6 +15,17 @@ import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
+
+config("libinstallermanager_exported_headers") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "${sys_installer_path}/frameworks/actions/include",
+    "${sys_installer_path}/frameworks/actions/verify_action/include",
+    "${sys_installer_path}/frameworks/action_processer/include",
+    "${sys_installer_path}/frameworks/installer_manager/include",
+    "${sys_installer_path}/frameworks/status_manager/include",
+  ]
+}
 ohos_static_library("libinstallermanager") {
   sources = [
     "${sys_installer_path}/frameworks/installer_manager/src/installer_manager.cpp",
@@ -23,9 +34,6 @@ ohos_static_library("libinstallermanager") {
 
   include_dirs = [
     "../../../updater/services",
-    "../../../updater/services/common",
-    "//base/update/updater/utils/include",
-    "//base/update/updater/interfaces/kits/include",
     "${sys_installer_path}/common/include",
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
@@ -35,22 +43,23 @@ ohos_static_library("libinstallermanager") {
     "${sys_installer_path}/frameworks/installer_manager/include",
     "${sys_installer_path}/frameworks/status_manager/include",
     "${sys_installer_path}/services/ab_update/include",
-    "//base/update/updater/services/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
   deps = [
     "${sys_installer_path}/frameworks/action_processer:libactionprocesser",
     "${sys_installer_path}/frameworks/actions/verify_action:libverifyaction",
     "${sys_installer_path}/services/ab_update:libabupdate",
-    "//base/update/updater/interfaces/kits/packages:libpackageExt",
-    "//base/update/updater/services/log:libupdaterlog",
-    "//base/update/updater/services/package:libupdaterpackage",
     "//third_party/openssl:libcrypto_shared",
     "//third_party/openssl:libssl_shared",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "updater:libpackageExt",
+    "updater:libringbuffer",
+    "updater:libupdaterlog",
+    "updater:libupdaterpackage",
+  ]
   part_name = "sys_installer"
   subsystem_name = "updater"
 }

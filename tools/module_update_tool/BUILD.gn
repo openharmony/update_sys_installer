@@ -35,7 +35,7 @@ ohos_executable("module_update_tool") {
 
   ldflags = [ "-Wl -std=c++11" ]
 
-  subsystem_name = "sys_installer"
+  subsystem_name = "updater"
 
-  part_name = "module_update_tool"
+  part_name = "sys_installer"
 }
