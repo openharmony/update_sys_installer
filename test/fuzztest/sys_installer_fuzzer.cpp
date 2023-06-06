@@ -42,17 +42,19 @@ static inline std::string GetTestPrivateKeyName()
 static int32_t BuildFileDigest(uint8_t &digest, size_t size, const std::string &packagePath)
 {
     PkgManager::StreamPtr stream = nullptr;
-    PkgManager::PkgManagerPtr packageManager = PkgManager::GetPackageInstance();
+    PkgManager::PkgManagerPtr packageManager = PkgManager::CreatePackageInstance();
 
     int32_t ret = packageManager->CreatePkgStream(stream, packagePath, 0, PkgStream::PkgStreamType_Read);
     if (ret != PKG_SUCCESS) {
         packageManager->ClosePkgStream(stream);
+        PkgManager::ReleasePackageInstance(packageManager);
         return ret;
     }
 
     size_t fileLen = stream->GetFileLength();
     if (fileLen == 0 || fileLen > SIZE_MAX) {
         packageManager->ClosePkgStream(stream);
+        PkgManager::ReleasePackageInstance(packageManager);
         return PKG_INVALID_FILE;
     }
 
@@ -61,6 +63,7 @@ static int32_t BuildFileDigest(uint8_t &digest, size_t size, const std::string &
     DigestAlgorithm::DigestAlgorithmPtr algorithm = PkgAlgorithmFactory::GetDigestAlgorithm(PKG_DIGEST_TYPE_SHA256);
     if (algorithm == nullptr) {
         packageManager->ClosePkgStream(stream);
+        PkgManager::ReleasePackageInstance(packageManager);
         return PKG_NOT_EXIST_ALGORITHM;
     }
     algorithm->Init();
@@ -72,6 +75,7 @@ static int32_t BuildFileDigest(uint8_t &digest, size_t size, const std::string &
         if (ret != PKG_SUCCESS) {
             PKG_LOGE("read buffer fail %s", stream->GetFileName().c_str());
             packageManager->ClosePkgStream(stream);
+            PkgManager::ReleasePackageInstance(packageManager);
             return ret;
         }
         algorithm->Update(buff, readLen);
@@ -82,6 +86,7 @@ static int32_t BuildFileDigest(uint8_t &digest, size_t size, const std::string &
     PkgBuffer signBuffer(&digest, size);
     algorithm->Final(signBuffer);
     packageManager->ClosePkgStream(stream);
+    PkgManager::ReleasePackageInstance(packageManager);
     return PKG_SUCCESS;
 }
 

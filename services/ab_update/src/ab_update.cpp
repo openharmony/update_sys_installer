@@ -33,7 +33,7 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
         return UPDATE_ERROR;
     }
 
-    Hpackage::PkgManager::PkgManagerPtr pkgManager = Hpackage::PkgManager::GetPackageInstance();
+    Hpackage::PkgManager::PkgManagerPtr pkgManager = Hpackage::PkgManager::CreatePackageInstance();
     if (pkgManager == nullptr) {
         LOG(ERROR) << "pkgManager is nullptr";
         return UPDATE_ERROR;
