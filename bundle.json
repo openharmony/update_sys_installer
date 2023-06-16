@@ -23,7 +23,7 @@
         "hiviewdfx_hilog_native",
         "ipc",
         "safwk",
-        "samgr_standard",
+        "samgr",
         "updater",
         "access_token",
         "hisysevent_native",
@@ -33,9 +33,10 @@
       "third_party": [
         "curl",
         "zlib",
-        "cJSON",
+        "cjson",
         "bounds_checking_function",
-        "lz4"
+        "lz4",
+        "openssl"
       ]
     },
     "build": {
