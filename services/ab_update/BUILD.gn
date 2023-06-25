@@ -30,7 +30,7 @@ ohos_static_library("libabupdate") {
   ]
 
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "updater:libringbuffer",
     "updater:libupdater",
