@@ -38,7 +38,7 @@ ohos_executable("module_update_service") {
 
   external_deps = [
     "c_utils:utils",
-    "hisysevent_native:libhisyseventmanager",
+    "hisysevent:libhisyseventmanager",
     "init:libbeget_proxy",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
