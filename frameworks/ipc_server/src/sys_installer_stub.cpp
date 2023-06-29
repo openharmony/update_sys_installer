@@ -22,6 +22,7 @@
 #include "ipc_skeleton.h"
 #include "log/log.h"
 #include "securec.h"
+#include "sys_installer_sa_ipc_interface_code.h"
 #include "utils.h"
 
 namespace OHOS {
@@ -32,17 +33,17 @@ using namespace std::placeholders;
 
 SysInstallerStub::SysInstallerStub()
 {
-    requestFuncMap_.emplace(ISysInstaller::SYS_INSTALLER_INIT,
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::SYS_INSTALLER_INIT,
         bind(&SysInstallerStub::SysInstallerInitStub, this, _1, _2, _3, _4));
-    requestFuncMap_.emplace(ISysInstaller::UPDATE_PACKAGE,
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::UPDATE_PACKAGE,
         bind(&SysInstallerStub::StartUpdatePackageZipStub, this, _1, _2, _3, _4));
-    requestFuncMap_.emplace(ISysInstaller::SET_UPDATE_CALLBACK,
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::SET_UPDATE_CALLBACK,
         bind(&SysInstallerStub::SetUpdateCallbackStub, this, _1, _2, _3, _4));
-    requestFuncMap_.emplace(ISysInstaller::GET_UPDATE_STATUS,
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::GET_UPDATE_STATUS,
         bind(&SysInstallerStub::GetUpdateStatusStub, this, _1, _2, _3, _4));
-    requestFuncMap_.emplace(ISysInstaller::UPDATE_PARA_PACKAGE,
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::UPDATE_PARA_PACKAGE,
         bind(&SysInstallerStub::StartUpdateParaZipStub, this, _1, _2, _3, _4));
-    requestFuncMap_.emplace(ISysInstaller::DELETE_PARA_PACKAGE,
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::DELETE_PARA_PACKAGE,
         bind(&SysInstallerStub::StartDeleteParaZipStub, this, _1, _2, _3, _4));
 }
 

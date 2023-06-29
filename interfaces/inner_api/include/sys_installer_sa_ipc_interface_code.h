@@ -13,24 +13,31 @@
  * limitations under the License.
  */
 
-#ifndef SYS_INSTALLER_IMODULE_UPDATE_H
-#define SYS_INSTALLER_IMODULE_UPDATE_H
+#ifndef SYS_INSTALLER_SA_IPC_INTERFACE_CODE_H
+#define SYS_INSTALLER_SA_IPC_INTERFACE_CODE_H
 
-#include "iremote_broker.h"
-#include "module_ipc_helper.h"
-
+/* SAID: 4101 */
 namespace OHOS {
 namespace SysInstaller {
-class IModuleUpdate : public OHOS::IRemoteBroker {
-public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Updater.IModuleUpdate");
+enum ModuleUpdateInterfaceCode{
+    INSTALL_MODULE_PACKAGE = 1,
+    UNINSTALL_MODULE_PACKAGE,
+    GET_MODULE_PACKAGE_INFO,
+    REPORT_MODULE_UPDATE_STATUS,
+    EXIT_MODULE_UPDATE
+};
 
-    virtual int32_t InstallModulePackage(const std::string &pkgPath) = 0;
-    virtual int32_t UninstallModulePackage(const std::string &hmpName) = 0;
-    virtual int32_t GetModulePackageInfo(const std::string &hmpName,
-        std::list<ModulePackageInfo> &modulePackageInfos) = 0;
-    virtual int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status) = 0;
-    virtual int32_t ExitModuleUpdate() = 0;
+enum SysInstallerCallbackInterfaceCode{
+    UPDATE_RESULT = 1,
+};
+
+enum SysInstallerInterfaceCode{
+    SYS_INSTALLER_INIT = 1,
+    UPDATE_PACKAGE,
+    SET_UPDATE_CALLBACK,
+    GET_UPDATE_STATUS,
+    UPDATE_PARA_PACKAGE,
+    DELETE_PARA_PACKAGE,
 };
 } // namespace SysInstaller
 } // namespace OHOS

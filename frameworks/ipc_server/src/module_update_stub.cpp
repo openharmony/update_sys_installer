@@ -14,6 +14,7 @@
  */
 
 #include "module_update_stub.h"
+#include "sys_installer_sa_ipc_interface_code.h"
 
 #include "log/log.h"
 #include "string_ex.h"
@@ -26,15 +27,15 @@ using namespace std::placeholders;
 
 ModuleUpdateStub::ModuleUpdateStub()
 {
-    requestFuncMap_.emplace(IModuleUpdate::INSTALL_MODULE_PACKAGE,
+    requestFuncMap_.emplace(ModuleUpdateInterfaceCode::INSTALL_MODULE_PACKAGE,
         bind(&ModuleUpdateStub::InstallModulePackageStub, this, _1, _2, _3, _4));
-    requestFuncMap_.emplace(IModuleUpdate::UNINSTALL_MODULE_PACKAGE,
+    requestFuncMap_.emplace(ModuleUpdateInterfaceCode::UNINSTALL_MODULE_PACKAGE,
         bind(&ModuleUpdateStub::UninstallModulePackageStub, this, _1, _2, _3, _4));
-    requestFuncMap_.emplace(IModuleUpdate::GET_MODULE_PACKAGE_INFO,
+    requestFuncMap_.emplace(ModuleUpdateInterfaceCode::GET_MODULE_PACKAGE_INFO,
         bind(&ModuleUpdateStub::GetModulePackageInfoStub, this, _1, _2, _3, _4));
-    requestFuncMap_.emplace(IModuleUpdate::REPORT_MODULE_UPDATE_STATUS,
+    requestFuncMap_.emplace(ModuleUpdateInterfaceCode::REPORT_MODULE_UPDATE_STATUS,
         bind(&ModuleUpdateStub::ReportModuleUpdateStatusStub, this, _1, _2, _3, _4));
-    requestFuncMap_.emplace(IModuleUpdate::EXIT_MODULE_UPDATE,
+    requestFuncMap_.emplace(ModuleUpdateInterfaceCode::EXIT_MODULE_UPDATE,
         bind(&ModuleUpdateStub::ExitModuleUpdateStub, this, _1, _2, _3, _4));
 }
 

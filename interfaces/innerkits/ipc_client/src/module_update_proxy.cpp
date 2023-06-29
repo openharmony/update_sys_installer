@@ -18,6 +18,7 @@
 #include "log/log.h"
 #include "module_ipc_helper.h"
 #include "string_ex.h"
+#include "sys_installer_sa_ipc_interface_code.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -41,7 +42,8 @@ int32_t ModuleUpdateProxy::InstallModulePackage(const std::string &pkgPath)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(INSTALL_MODULE_PACKAGE, data, reply, option);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(ModuleUpdateInterfaceCode::INSTALL_MODULE_PACKAGE), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;
@@ -68,7 +70,8 @@ int32_t ModuleUpdateProxy::UninstallModulePackage(const std::string &hmpName)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(UNINSTALL_MODULE_PACKAGE, data, reply, option);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(ModuleUpdateInterfaceCode::UNINSTALL_MODULE_PACKAGE), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;
@@ -96,7 +99,8 @@ int32_t ModuleUpdateProxy::GetModulePackageInfo(const std::string &hmpName,
 
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(GET_MODULE_PACKAGE_INFO, data, reply, option);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(ModuleUpdateInterfaceCode::GET_MODULE_PACKAGE_INFO), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;
@@ -124,7 +128,8 @@ int32_t ModuleUpdateProxy::ReportModuleUpdateStatus(const ModuleUpdateStatus &st
 
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(REPORT_MODULE_UPDATE_STATUS, data, reply, option);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(ModuleUpdateInterfaceCode::REPORT_MODULE_UPDATE_STATUS), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;
@@ -150,7 +155,8 @@ int32_t ModuleUpdateProxy::ExitModuleUpdate()
 
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(EXIT_MODULE_UPDATE, data, reply, option);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(ModuleUpdateInterfaceCode::EXIT_MODULE_UPDATE), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;

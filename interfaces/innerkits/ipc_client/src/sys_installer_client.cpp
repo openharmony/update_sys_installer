@@ -15,6 +15,7 @@
 
 #include "sys_installer_callback.h"
 #include "sys_installer_kits_impl.h"
+#include "sys_installer_sa_ipc_interface_code.h"
 #include "isys_installer_callback_func.h"
 
 using namespace OHOS;
@@ -50,17 +51,17 @@ int main(int argc, char **argv)
 
     printf("argv[1]:%d\n", atoi(argv[1]));
     switch (atoi(argv[1])) {
-        case ISysInstaller::UPDATE_PACKAGE:
+        case SysInstallerInterfaceCode::UPDATE_PACKAGE:
             ret = SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip("/data/ota_package/update.zip");
             break;
-        case ISysInstaller::GET_UPDATE_STATUS:
+        case SysInstallerInterfaceCode::GET_UPDATE_STATUS:
             ret = SysInstallerKitsImpl::GetInstance().GetUpdateStatus();
             break;
-        case ISysInstaller::UPDATE_PARA_PACKAGE:
+        case SysInstallerInterfaceCode::UPDATE_PARA_PACKAGE:
             ret = SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(
                 "/data/ota_package/update_para.zip", "System", "/taboo");
             break;
-        case ISysInstaller::DELETE_PARA_PACKAGE:
+        case SysInstallerInterfaceCode::DELETE_PARA_PACKAGE:
             ret = SysInstallerKitsImpl::GetInstance().StartDeleteParaZip("System", "/taboo");
             break;
         default:
