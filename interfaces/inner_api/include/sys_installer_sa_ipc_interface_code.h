@@ -19,7 +19,7 @@
 /* SAID: 4101 */
 namespace OHOS {
 namespace SysInstaller {
-enum ModuleUpdateInterfaceCode{
+enum ModuleUpdateInterfaceCode {
     INSTALL_MODULE_PACKAGE = 1,
     UNINSTALL_MODULE_PACKAGE,
     GET_MODULE_PACKAGE_INFO,
@@ -27,11 +27,11 @@ enum ModuleUpdateInterfaceCode{
     EXIT_MODULE_UPDATE
 };
 
-enum SysInstallerCallbackInterfaceCode{
+enum SysInstallerCallbackInterfaceCode {
     UPDATE_RESULT = 1,
 };
 
-enum SysInstallerInterfaceCode{
+enum SysInstallerInterfaceCode {
     SYS_INSTALLER_INIT = 1,
     UPDATE_PACKAGE,
     SET_UPDATE_CALLBACK,

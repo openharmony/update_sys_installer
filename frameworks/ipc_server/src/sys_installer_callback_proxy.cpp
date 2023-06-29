@@ -45,7 +45,7 @@ void SysInstallerCallbackProxy::OnUpgradeProgress(UpdateStatus updateStatus, int
     data.WriteInt32(percent);
     data.WriteString(resultMsg);
     int32_t result = remote->SendRequest(
-        static_cast<uint32_t>(SysInstallerCallbackInterfaceCode::UPDATE_RESULT),data, reply, option);
+        static_cast<uint32_t>(SysInstallerCallbackInterfaceCode::UPDATE_RESULT), data, reply, option);
     if (result != ERR_OK) {
         LOG(ERROR) << "Can not SendRequest " << result;
     }
