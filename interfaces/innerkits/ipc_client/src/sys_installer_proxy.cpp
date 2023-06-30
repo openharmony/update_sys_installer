@@ -19,6 +19,7 @@
 
 #include "log/log.h"
 #include "securec.h"
+#include "sys_installer_sa_ipc_interface_code.h"
 
 namespace OHOS {
 namespace SysInstaller {
