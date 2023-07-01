@@ -14,6 +14,7 @@
  */
 
 #include "sys_installer_callback_proxy.h"
+#include "sys_installer_sa_ipc_interface_code.h"
 
 #include "log/log.h"
 #include "securec.h"
@@ -43,7 +44,8 @@ void SysInstallerCallbackProxy::OnUpgradeProgress(UpdateStatus updateStatus, int
     data.WriteInt32(updateStatus);
     data.WriteInt32(percent);
     data.WriteString(resultMsg);
-    int32_t result = remote->SendRequest(UPDATE_RESULT, data, reply, option);
+    int32_t result = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerCallbackInterfaceCode::UPDATE_RESULT), data, reply, option);
     if (result != ERR_OK) {
         LOG(ERROR) << "Can not SendRequest " << result;
     }

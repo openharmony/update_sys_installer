@@ -25,18 +25,8 @@ namespace OHOS {
 namespace SysInstaller {
 class ISysInstaller : public OHOS::IRemoteBroker {
 public:
-    enum {
-        SYS_INSTALLER_INIT = 1,
-        UPDATE_PACKAGE,
-        SET_UPDATE_CALLBACK,
-        GET_UPDATE_STATUS,
-        UPDATE_PARA_PACKAGE,
-        DELETE_PARA_PACKAGE,
-    };
-
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Updater.ISysInstaller");
 
-public:
     virtual int32_t SysInstallerInit() = 0;
     virtual int32_t StartUpdatePackageZip(const std::string &pkgPath) = 0;
     virtual int32_t SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback) = 0;

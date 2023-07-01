@@ -34,12 +34,9 @@ enum UpdateStatus {
 class ISysInstallerCallback : public OHOS::IRemoteBroker {
 public:
     virtual ~ISysInstallerCallback() = default;
-    enum {
-        UPDATE_RESULT = 1,
-    };
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Update.ISysInstallerCallback");
-public:
+
     virtual void OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) = 0;
 };
 } // namespace SysInstaller

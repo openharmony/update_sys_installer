@@ -23,6 +23,7 @@
 
 #include "isys_installer_callback.h"
 #include "sys_installer_common.h"
+#include "sys_installer_sa_ipc_interface_code.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -36,7 +37,7 @@ int32_t SysInstallerCallbackStub::OnRemoteRequest(uint32_t code,
         return -1;
     }
     switch (code) {
-        case UPDATE_RESULT: {
+        case static_cast<uint32_t>(SysInstallerCallbackInterfaceCode::UPDATE_RESULT): {
             int updateStatus = data.ReadInt32();
             int percent = data.ReadInt32();
             OnUpgradeProgress(static_cast<UpdateStatus>(updateStatus), percent, data.ReadString());

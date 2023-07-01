@@ -19,6 +19,7 @@
 
 #include "log/log.h"
 #include "securec.h"
+#include "sys_installer_sa_ipc_interface_code.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -39,7 +40,8 @@ int32_t SysInstallerProxy::SysInstallerInit()
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(SYS_INSTALLER_INIT, data, reply, option);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::SYS_INSTALLER_INIT), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;
@@ -66,7 +68,8 @@ int32_t SysInstallerProxy::StartUpdatePackageZip(const std::string &pkgPath)
 
     MessageParcel reply;
     MessageOption option { MessageOption::TF_ASYNC};
-    int32_t ret = remote->SendRequest(UPDATE_PACKAGE, data, reply, option);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::UPDATE_PACKAGE), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;
@@ -102,7 +105,8 @@ int32_t SysInstallerProxy::SetUpdateCallback(const sptr<ISysInstallerCallback> &
     }
     MessageParcel reply;
     MessageOption option { MessageOption::TF_ASYNC};
-    int32_t res = remote->SendRequest(SET_UPDATE_CALLBACK, data, reply, option);
+    int32_t res = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::SET_UPDATE_CALLBACK), data, reply, option);
     if (res != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;
@@ -125,7 +129,8 @@ int32_t SysInstallerProxy::GetUpdateStatus()
     }
     MessageParcel reply;
     MessageOption option { MessageOption::TF_ASYNC};
-    int32_t ret = remote->SendRequest(GET_UPDATE_STATUS, data, reply, option);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::GET_UPDATE_STATUS), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;
@@ -155,7 +160,8 @@ int32_t SysInstallerProxy::StartUpdateParaZip(const std::string &pkgPath,
 
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(UPDATE_PARA_PACKAGE, data, reply, option);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::UPDATE_PARA_PACKAGE), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;
@@ -183,7 +189,8 @@ int32_t SysInstallerProxy::StartDeleteParaZip(const std::string &location, const
 
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = remote->SendRequest(DELETE_PARA_PACKAGE, data, reply, option);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::DELETE_PARA_PACKAGE), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;
