@@ -21,6 +21,7 @@
       "components": [
         "c_utils",
         "hilog",
+        "hvb",
         "ipc",
         "safwk",
         "samgr",
