@@ -47,7 +47,10 @@ ohos_static_library("module_update_utils") {
 
     defines = [ "SUPPORT_HVB" ]
 
-    external_deps += [ "init:libfsmanager_static" ]
+    external_deps += [
+      "hvb:libhvb_static",
+      "init:libfsmanager_static",
+    ]
   }
 
   part_name = "sys_installer"
@@ -82,7 +85,10 @@ ohos_static_library("module_update_static") {
   if (defined(global_parts_info.startup_hvb)) {
     defines = [ "SUPPORT_HVB" ]
 
-    external_deps += [ "init:libfsmanager_static" ]
+    external_deps += [
+      "hvb:libhvb_static",
+      "init:libfsmanager_static",
+    ]
   }
 
   part_name = "sys_installer"
