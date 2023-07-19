@@ -17,6 +17,7 @@
 
 #include <cstring>
 #include "module_update.h"
+#include "securec.h"
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -29,12 +30,26 @@ constexpr int SA_ARG_COUNT = 2;
 constexpr const char *SA_PATH = "/system/bin/sa_main";
 }
 
-void CheckModuleUpdate(int argc, char **argv)
+char *CheckModuleUpdate(int argc, char **argv)
 {
     if (argc >= SA_ARG_COUNT && std::strcmp(argv[0], SA_PATH) == 0) {
         OHOS::SysInstaller::ModuleUpdate update;
-        update.CheckModuleUpdate(argv[1]);
+        std::string updateResult = update.CheckModuleUpdate(argv[1]);
+        if (updateResult.empty()) {
+            return nullptr;
+        }
+        size_t length = updateResult.size() + 1;
+        char *result = new (std::nothrow) char[length];
+        if (result == nullptr) {
+            return nullptr;
+        }
+        errno_t ret = strcpy_s(result, length, updateResult.c_str());
+        if (ret != EOK) {
+            return nullptr;
+        }
+        return result;
     }
+    return nullptr;
 }
 
 #ifdef __cplusplus

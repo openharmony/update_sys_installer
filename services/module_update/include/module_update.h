@@ -30,17 +30,17 @@ public:
     ModuleUpdate() = default;
     virtual ~ModuleUpdate() = default;
 
-    void CheckModuleUpdate(const std::string &path);
+    std::string CheckModuleUpdate(const std::string &path);
 private:
     bool ParseSaProfiles(const std::string &path);
     void PrepareModuleFileList();
-    bool ActivateModules() const;
+    bool ActivateModules();
     bool MountModulePackage(const ModuleFile &moduleFile, const bool mountOnVerity) const;
     void ReportMountStatus(const ModuleUpdateStatus &status) const;
 
-    std::string processName_;
     std::unordered_set<int32_t> saIdSet_;
     std::list<ModuleFile> moduleFileList_;
+    ModuleUpdateStatus status_;
 };
 } // SysInstaller
 } // namespace OHOS

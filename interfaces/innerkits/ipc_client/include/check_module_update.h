@@ -22,7 +22,7 @@ extern "C" {
 #endif
 #endif
 
-void CheckModuleUpdate(int argc, char **argv);
+char *CheckModuleUpdate(int argc, char **argv);
 
 #ifdef __cplusplus
 #if __cplusplus
