@@ -28,13 +28,12 @@
         "updater",
         "access_token",
         "hisysevent",
-        "updater",
         "init"
       ],
       "third_party": [
         "curl",
         "zlib",
-        "cjson",
+        "cJSON",
         "bounds_checking_function",
         "lz4",
         "openssl"
