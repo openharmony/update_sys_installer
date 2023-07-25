@@ -43,6 +43,10 @@ int32_t InstallerManagerHelper::SysInstallerInit()
 int32_t InstallerManagerHelper::StartUpdatePackageZip(const std::string &pkgPath)
 {
     LOG(INFO) << "StartUpdatePackageZip start";
+    if (statusManager_ == nullptr) {
+        LOG(ERROR) << "statusManager_ nullptr";
+        return -1;
+    }
     if (ActionProcesser::GetInstance().IsRunning()) {
         LOG(ERROR) << "ActionProcesser IsRunning";
         return -1;
