@@ -105,15 +105,27 @@ std::unique_ptr<ModuleFile> GetLatestUpdateModulePackage(const int32_t saId)
     }
     return ret;
 }
+
+string GetSuccessSaIdString(const ModuleUpdateStatus &status)
+{
+    string ret = "";
+    for (const SaStatus &saStatus : status.saStatusList) {
+        if (saStatus.isMountSuccess) {
+            ret += std::to_string(saStatus.saId) + " ";
+        }
+    }
+    return ret;
+}
 }
 
-void ModuleUpdate::CheckModuleUpdate(const string &path)
+string ModuleUpdate::CheckModuleUpdate(const string &path)
 {
     LOG(INFO) << "CheckModuleUpdate path=" << path;
     Timer timer;
+    string ret = "";
     if (!ParseSaProfiles(path)) {
         LOG(ERROR) << "Failed to parse sa profile";
-        return;
+        return ret;
     }
     ModuleFileRepository::GetInstance().InitRepository(saIdSet_);
     ON_SCOPE_EXIT(clear) {
@@ -122,17 +134,19 @@ void ModuleUpdate::CheckModuleUpdate(const string &path)
     PrepareModuleFileList();
     if (moduleFileList_.empty()) {
         LOG(INFO) << "No module needs to activate";
-        return;
+        return ret;
     }
     if (!Loop::PreAllocateLoopDevices(moduleFileList_.size())) {
         LOG(ERROR) << "Failed to pre allocate loop devices";
-        return;
+        return ret;
     }
     if (!ActivateModules()) {
         LOG(ERROR) << "Failed to activate modules";
-        return;
+        return ret;
     }
-    LOG(INFO) << "CheckModuleUpdate done, duration=" << timer;
+    ret = GetSuccessSaIdString(status_);
+    LOG(INFO) << "CheckModuleUpdate done, duration=" << timer << ", ret=" << ret;
+    return ret;
 }
 
 bool ModuleUpdate::ParseSaProfiles(const string &path)
@@ -147,7 +161,7 @@ bool ModuleUpdate::ParseSaProfiles(const string &path)
         LOG(ERROR) << "ParseSaProfiles failed! path=" << realProfilePath;
         return false;
     }
-    processName_ = Str16ToStr8(parser.GetProcessName());
+    status_.process = Str16ToStr8(parser.GetProcessName());
     auto saInfos = parser.GetAllSaProfiles();
     for (const auto &saInfo : saInfos) {
         saIdSet_.insert(saInfo.saId);
@@ -173,10 +187,8 @@ void ModuleUpdate::PrepareModuleFileList()
     }
 }
 
-bool ModuleUpdate::ActivateModules() const
+bool ModuleUpdate::ActivateModules()
 {
-    ModuleUpdateStatus status;
-    status.process = processName_;
     bool activateSuccess = true;
     for (const auto &moduleFile : moduleFileList_) {
         if (!moduleFile.GetImageStat().has_value()) {
@@ -191,9 +203,9 @@ bool ModuleUpdate::ActivateModules() const
             LOG(ERROR) << "Failed to mount module package " << moduleFile.GetPath();
             activateSuccess = false;
         }
-        status.saStatusList.emplace_back(std::move(saStatus));
+        status_.saStatusList.emplace_back(std::move(saStatus));
     }
-    ReportMountStatus(status);
+    ReportMountStatus(status_);
     return activateSuccess;
 }
 
