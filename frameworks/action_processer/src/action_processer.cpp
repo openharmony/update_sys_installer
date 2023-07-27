@@ -59,6 +59,10 @@ void ActionProcesser::Start()
     statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 0, "");
     curAction_ = std::move(actionQue_.front());
     actionQue_.pop_front();
+    if (curAction_ == nullptr) {
+        LOG(WARNING) << "curAction_ nullptr";
+        return;
+    }
     LOG(INFO) << "Start " << curAction_->GetActionName();
     curAction_->PerformAction();
 }
