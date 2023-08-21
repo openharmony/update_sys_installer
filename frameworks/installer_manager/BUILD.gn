@@ -24,6 +24,7 @@ config("libinstallermanager_exported_headers") {
     "${sys_installer_path}/frameworks/action_processer/include",
     "${sys_installer_path}/frameworks/installer_manager/include",
     "${sys_installer_path}/frameworks/status_manager/include",
+    "${sys_installer_path}/services/ab_update/include",
   ]
 }
 ohos_static_library("libinstallermanager") {

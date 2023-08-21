@@ -73,5 +73,10 @@ void StatusManager::SetUpdatePercent(int percent)
 {
     UpdateCallback(updateStatus_, percent, "");
 }
+
+float StatusManager::GetUpdateProgress()
+{
+    return percent_ / 100.0; // 100.0 : max percent
+}
 } // namespace SysInstaller
 } // namespace OHOS

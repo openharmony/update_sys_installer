@@ -20,7 +20,7 @@
 #include "package/cert_verify.h"
 #include "package/pkg_manager.h"
 #include "utils.h"
-
+#include "pkg_verify.h"
 #include "ab_update.h"
 
 namespace OHOS {
@@ -51,6 +51,7 @@ int32_t InstallerManagerHelper::StartUpdatePackageZip(const std::string &pkgPath
         LOG(ERROR) << "ActionProcesser IsRunning";
         return -1;
     }
+    ActionProcesser::GetInstance().AddAction(std::make_unique<PkgVerify>(statusManager_, pkgPath));
     ActionProcesser::GetInstance().AddAction(std::make_unique<ABUpdate>(statusManager_, pkgPath));
     ActionProcesser::GetInstance().Start();
     return 0;
