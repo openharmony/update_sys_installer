@@ -28,20 +28,9 @@
 namespace OHOS {
 using namespace SysInstaller;
 
-class ProcessCallbackForTest : public ISysInstallerCallbackFunc {
-public:
-    ProcessCallbackForTest() = default;
-    ~ProcessCallbackForTest() = default;
-    void OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) override
-    {
-        printf("ProgressCallback progress %d percent %d msg %s\n", updateStatus, percent, resultMsg.c_str());
-    }
-};
-
 void FuzzSysInstaller(const uint8_t* data, size_t size)
 {
     SysInstallerKitsImpl::GetInstance().SysInstallerInit();
-    sptr<ISysInstallerCallbackFunc> callback = new ProcessCallbackForTest;
     SysInstallerKitsImpl::GetInstance().SetUpdateCallback(nullptr);
     SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(std::string(reinterpret_cast<const char*>(data)));
     const std::string pkgPath = "/data/updater/fuzz/updater.zip";

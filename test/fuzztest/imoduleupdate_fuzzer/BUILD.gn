@@ -13,9 +13,7 @@
 
 module_output_path = "updater/imodule_update_fuzzer"
 
-sys_installer_absolutely_path = "//base/update/sys_installer"
-
-import("//base/update/updater/updater_default_cfg.gni")
+import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
