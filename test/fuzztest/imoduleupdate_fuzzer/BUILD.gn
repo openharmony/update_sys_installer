@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-module_output_path = "updater/imodule_update_fuzzer"
+module_output_path = "updater/imodule_update"
 
 import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 
@@ -21,7 +21,7 @@ import("//build/test.gni")
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("ImoduleUpdateFuzzer") {
+ohos_fuzztest("ImoduleUpdateFuzzerTest") {
   module_out_path = module_output_path
   fuzz_config_file = "${sys_installer_path}/test/fuzztest/imoduleupdate_fuzzer"
   include_dirs = [
