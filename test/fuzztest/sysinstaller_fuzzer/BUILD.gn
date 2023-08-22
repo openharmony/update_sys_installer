@@ -1,0 +1,55 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+module_output_path = "updater/sys_installer"
+
+import("//base/update/sys_installer/sys_installer_default_cfg.gni")
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
+
+##############################fuzztest##########################################
+ohos_fuzztest("SysInstallerFuzzTest") {
+  module_out_path = module_output_path
+  fuzz_config_file = "${sys_installer_path}/test/fuzztest/sysinstaller_fuzzer"
+  include_dirs = [
+    "${sys_installer_path}/interfaces/inner_api/include",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/include/",
+  ]
+
+  deps = [
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits",
+    "//third_party/bounds_checking_function:libsec_static",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "updater:libupdaterlog",
+    "updater:libutils",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "sys_installer_fuzzer.cpp" ]
+}

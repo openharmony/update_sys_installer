@@ -16,7 +16,10 @@ import("//build/ohos.gni")
 
 group("fuzztest") {
   testonly = true
-  deps = []
+  deps = [
+    "test/fuzztest/imoduleupdate_fuzzer:ImoduleUpdateFuzzTest",
+    "test/fuzztest/sysinstaller_fuzzer:SysInstallerFuzzTest",
+  ]
 }
 
 group("unittest") {

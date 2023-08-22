@@ -82,6 +82,7 @@
         }
       ],
       "test": [
+        "//base/update/sys_installer:fuzztest",
         "//base/update/sys_installer:unittest"
       ]
     }
