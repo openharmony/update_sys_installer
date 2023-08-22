@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef I_MODULE_UPDATE_FUZZER_H
-#define I_MODULE_UPDATE_FUZZER_H
+#ifndef SYS_INSTALLER_FUZZER_H
+#define SYS_INSTALLER_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "imodule_update_fuzzer"
+#define FUZZ_PROJECT_NAME "sys_installer_fuzzer"
 
-#endif /* I_MODULE_UPDATE_FUZZER_H */
+#endif /* SYS_INSTALLER_FUZZER_H */
