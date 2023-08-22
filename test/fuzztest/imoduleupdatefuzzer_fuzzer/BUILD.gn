@@ -23,7 +23,7 @@ sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 ##############################fuzztest##########################################
 ohos_fuzztest("ImoduleUpdateFuzzerTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${sys_installer_path}/test/fuzztest/imoduleupdate_fuzzer"
+  fuzz_config_file = "${sys_installer_path}/test/fuzztest/imoduleupdatefuzzer_fuzzer"
   include_dirs = [
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/include/",
