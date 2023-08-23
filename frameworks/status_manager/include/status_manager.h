@@ -34,6 +34,7 @@ public:
     virtual void UpdateCallback(UpdateStatus updateStatus, int percent, const std::string &resultMsg);
 
     void SetUpdatePercent(int percent);
+    float GetUpdateProgress();
 
 protected:
     UpdateStatus updateStatus_ = UPDATE_STATE_INIT;

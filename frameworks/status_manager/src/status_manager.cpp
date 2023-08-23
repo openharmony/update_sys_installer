@@ -60,7 +60,7 @@ void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent, const
     }
     if (updateStatus == UPDATE_STATE_SUCCESSFUL || updateStatus == UPDATE_STATE_FAILED) {
         percent_ = 100; // 100 : max percent
-    } else if (percent >= 0 && percent <= 100 && percent >= percent_) { // 100 : max percent
+    } else if (percent >= 0 && percent <= 100 && percent > percent_) { // 100 : max percent
         percent_ = percent;
     }
 
@@ -72,6 +72,11 @@ void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent, const
 void StatusManager::SetUpdatePercent(int percent)
 {
     UpdateCallback(updateStatus_, percent, "");
+}
+
+float StatusManager::GetUpdateProgress()
+{
+    return percent_ / 100.0; // 100.0 : max percent
 }
 } // namespace SysInstaller
 } // namespace OHOS
