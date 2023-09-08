@@ -20,6 +20,7 @@
 #include "package/pkg_manager.h"
 #include "scope_guard.h"
 #include "utils.h"
+#include "updater/updater_const.h"
 
 namespace OHOS {
 namespace SysInstaller {
