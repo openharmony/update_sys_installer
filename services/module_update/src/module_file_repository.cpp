@@ -15,6 +15,10 @@
 
 #include "module_file_repository.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "directory_ex.h"
 #include "log/log.h"
 #include "module_constants.h"
