@@ -25,10 +25,10 @@
 namespace OHOS {
 namespace SysInstaller {
 struct HmpVersionInfo : public Parcelable {
-    std::string name {}; 
-    std::string laneCode {}; 
-    std::string compatibleVersion {};
-    std::string version {};
+    std::string name{}; 
+    std::string laneCode{}; 
+    std::string compatibleVersion{};
+    std::string version{};
 
     virtual bool Marshalling(Parcel &parcel) const override
     {
@@ -68,9 +68,9 @@ struct HmpVersionInfo : public Parcelable {
 };
 
 struct HmpUpdateInfo : public Parcelable {
-    std::string path {};
+    std::string path{};
     int32_t result = 0; // 0 means success
-    std::string resultMsg {};
+    std::string resultMsg{};
 
     virtual bool Marshalling(Parcel &parcel) const override
     {

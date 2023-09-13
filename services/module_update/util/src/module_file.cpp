@@ -19,7 +19,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dlfcn.h>
-#include <signal.h>
 
 #include "json_node.h"
 #include "log/log.h"

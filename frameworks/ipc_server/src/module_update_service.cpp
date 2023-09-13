@@ -156,7 +156,7 @@ int32_t ModuleUpdateService::ReallyInstallModulePackage(const std::string &pkgPa
         }
         if (updateCallback != nullptr) {
             int percent = static_cast<float>(index) / files.size() * 95;  // 95 : 95% percent
-            updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, percent , "");
+            updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, percent, "");
         }
         index++;
     }
