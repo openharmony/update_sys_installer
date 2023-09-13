@@ -18,12 +18,17 @@ sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 ohos_executable("module_update_tool") {
   sources = [ "main.cpp" ]
 
-  include_dirs =
-      [ "${sys_installer_path}/interfaces/innerkits/ipc_client/include" ]
+  include_dirs = [
+    "${sys_installer_path}/interfaces/inner_api/include",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
+    "${sys_installer_path}/interfaces/innerkits/include",
+    "${sys_installer_path}/services/module_update/util/include",
+    "//third_party/zlib",
+    "//third_party/zlib/contrib/minizip",
+  ]
 
   deps = [
-    "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update_client",
-    "${sys_installer_path}/services/module_update:module_update_utils",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update",
   ]
 
   external_deps = [

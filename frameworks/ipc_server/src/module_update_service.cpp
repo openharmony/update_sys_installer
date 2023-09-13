@@ -15,7 +15,12 @@
 
 #include "module_update_service.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "directory_ex.h"
+#include "json_node.h"
 #include "log/log.h"
 #include "module_constants.h"
 #include "module_error_code.h"
@@ -25,6 +30,7 @@
 #include "scope_guard.h"
 #include "system_ability_definition.h"
 #include "utils.h"
+#include "unique_fd.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -108,9 +114,15 @@ int32_t ModuleUpdateService::InstallModulePackage(const std::string &pkgPath)
         LOG(ERROR) << "Invalid package path " << pkgPath;
         return ModuleErrorCode::ERR_INVALID_PATH;
     }
-    std::string hmpName = GetFileName(realPath);
+    return ReallyInstallModulePackage(realPath, nullptr);
+}
+
+int32_t ModuleUpdateService::ReallyInstallModulePackage(const std::string &pkgPath,
+    const sptr<ISysInstallerCallback> &updateCallback)
+{
+    std::string hmpName = GetFileName(pkgPath);
     if (hmpName.empty()) {
-        LOG(ERROR) << "Failed to get hmp name " << realPath;
+        LOG(ERROR) << "Failed to get hmp name " << pkgPath;
         return ModuleErrorCode::ERR_INVALID_PATH;
     }
     if (hmpSet_.find(hmpName) == hmpSet_.end()) {
@@ -129,18 +141,24 @@ int32_t ModuleUpdateService::InstallModulePackage(const std::string &pkgPath)
     };
     std::string hmpDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
     std::string outPath = hmpDir + "/";
-    ret = ExtraPackageDir(realPath.c_str(), nullptr, nullptr, outPath.c_str());
+    ret = ExtraPackageDir(pkgPath.c_str(), nullptr, nullptr, outPath.c_str());
     if (ret != 0) {
-        LOG(ERROR) << "Failed to unpack hmp package " << realPath;
+        LOG(ERROR) << "Failed to unpack hmp package " << pkgPath;
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
     std::vector<std::string> files;
     GetDirFiles(hmpDir, files);
+    int index = 1;
     for (auto &file : files) {
         ret = InstallModuleFile(hmpName, file);
         if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
             return ret;
         }
+        if (updateCallback != nullptr) {
+            int percent = static_cast<float>(index) / files.size() * 95;  // 95 : 95% percent
+            updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, percent , "");
+        }
+        index++;
     }
     if (!BackupActiveModules()) {
         LOG(ERROR) << "Failed to backup active modules";
@@ -294,6 +312,149 @@ int32_t ModuleUpdateService::ExitModuleUpdate()
 {
     LOG(INFO) << "ExitModuleUpdate";
     exit(0);
+}
+
+bool ModuleUpdateService::GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo)
+{
+    LOG(INFO) << "GetHmpVersion " << hmpPath;
+    std::string packInfoPath = hmpPath + "/" + PACK_INFO_NAME;
+    if (!ModuleFile::VerifyModulePackageSign(packInfoPath)) {
+        LOG(ERROR) << "Verify sign failed " << packInfoPath;
+        return false;
+    }
+    JsonNode root(std::filesystem::path { packInfoPath });
+    const JsonNode &package = root["package"];
+    std::optional<std::string> name = package["name"].As<std::string>();
+    if (!name.has_value()) {
+        LOG(ERROR) << "count get name val";
+        return false;
+    }
+
+    std::optional<std::string> version = package["version"].As<std::string>();
+    if (!version.has_value()) {
+        LOG(ERROR) << "count get version val";
+        return false;
+    }
+
+    const JsonNode &laneInfoNode = package["laneInfo"];
+    std::optional<std::string> compatibleVersion = laneInfoNode["compatibleVersion"].As<std::string>();
+    if (!compatibleVersion.has_value()) {
+        LOG(ERROR) << "count get compatibleVersion val";
+        return false;
+    }
+
+    std::optional<std::string> laneCode = laneInfoNode["laneCode"].As<std::string>();
+    if (!laneCode.has_value()) {
+        LOG(ERROR) << "count get laneCode val";
+        return false;
+    }
+
+    versionInfo.name = name.value();
+    versionInfo.version = version.value();
+    versionInfo.compatibleVersion = compatibleVersion.value();
+    versionInfo.laneCode = laneCode.value();
+    return true;
+}
+
+std::vector<HmpVersionInfo> ModuleUpdateService::GetHmpVersionInfo()
+{
+    LOG(INFO) << "GetHmpVersionInfo";
+    std::vector<HmpVersionInfo> versionInfos {};
+    ScanPreInstalledHmp();
+    for (auto &hmp : hmpSet_) {
+        std::string preInstallHmpPath = std::string(MODULE_PREINSTALL_DIR) + "/" + hmp;
+        std::string activeHmpPath = std::string(UPDATE_ACTIVE_DIR) + "/" + hmp;
+        LOG(INFO) << "preInstallHmpPath:" << preInstallHmpPath << " activeHmpPath:" << activeHmpPath;
+        if (CheckPathExists(activeHmpPath)) {
+            HmpVersionInfo info {};
+            if (GetHmpVersion(activeHmpPath, info)) {
+                versionInfos.emplace_back(info);
+                continue;
+            }
+        }
+        HmpVersionInfo info {};
+        if (GetHmpVersion(preInstallHmpPath, info)) {
+            versionInfos.emplace_back(info);
+        }
+    }
+    return versionInfos;
+}
+
+void ModuleUpdateService::SaveInstallerResult(const std::string &hmpPath, int result, const std::string &resultInfo)
+{
+    LOG(INFO) << "hmpPath:" << hmpPath << " result:" << result << " resultInfo:" << resultInfo;
+    UniqueFd fd(open(MODULE_RESULT_PATH, O_RDWR | O_CREAT | O_CLOEXEC));
+    if (fd.Get() == -1) {
+        LOG(ERROR) << "Failed to open file";
+        return;
+    }
+    constexpr mode_t mode = 0755; // 0755 : rwx-r-x-r-x
+    if (chmod(MODULE_RESULT_PATH, mode) != 0) {
+        LOG(ERROR) << "Could not chmod " << MODULE_RESULT_PATH;
+    }
+    std::string writeInfo = hmpPath + ";" + std::to_string(result) + ";" + resultInfo;
+    if (write(fd, writeInfo.data(), writeInfo.length()) <= 0) {
+        LOG(WARNING) << "write result file failed, err:" << errno;
+    }
+    fsync(fd.Get());
+}
+
+int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
+    const sptr<ISysInstallerCallback> &updateCallback)
+{
+    int32_t ret = -1;
+    ON_SCOPE_EXIT(saveResult) {
+        SaveInstallerResult(path, ret, std::to_string(ret));
+        updateCallback->OnUpgradeProgress(ret == 0 ? UPDATE_STATE_SUCCESSFUL : UPDATE_STATE_FAILED,
+            100, ""); // 100 : 100% percent
+    };
+    LOG(INFO) << "StartUpdateHmpPackage " << path;
+    if (updateCallback == nullptr) {
+        LOG(ERROR) << "StartUpdateHmpPackage updateCallback null";
+        ret = ModuleErrorCode::ERR_INVALID_PATH;
+        return ret;
+    }
+
+    updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, 0, "");
+    ret = InstallModulePackage(path);
+    return ret;
+}
+
+std::vector<HmpUpdateInfo> ModuleUpdateService::GetHmpUpdateResult()
+{
+    LOG(INFO) << "GetHmpUpdateResult";
+    std::vector<HmpUpdateInfo> updateInfo {};
+    std::ifstream ifs { MODULE_RESULT_PATH };
+    if (!ifs.is_open()) {
+        LOG(ERROR) << "open " << MODULE_RESULT_PATH << " failed";
+        return updateInfo;
+    }
+    std::string resultInfo {std::istreambuf_iterator<char> {ifs}, {}};
+    std::vector<std::string> results {};
+    SplitStr(resultInfo, "\n", results);
+    for (auto &result : results) {
+        HmpUpdateInfo tmpUpdateInfo {};
+        std::vector<std::string> signalResult {};
+        SplitStr(result, ";", signalResult);
+        if (signalResult.size() < 3) { // 3: pkg; result; result info
+            LOG(ERROR) << "parse " << result << " failed";
+            continue;
+        }
+        tmpUpdateInfo.path = signalResult[0];
+        tmpUpdateInfo.result = stoi(signalResult[1]);
+        tmpUpdateInfo.resultMsg = signalResult[2]; // 2: result info
+        for (auto &iter : updateInfo) {
+            if (iter.path.find(tmpUpdateInfo.path) != std::string::npos) {
+                iter.result = tmpUpdateInfo.result;
+                iter.resultMsg = tmpUpdateInfo.resultMsg;
+                continue;
+            }
+        }
+        updateInfo.emplace_back(tmpUpdateInfo);
+    }
+    ifs.close();
+    (void)unlink(MODULE_RESULT_PATH);
+    return updateInfo;
 }
 
 void ModuleUpdateService::ProcessSaStatus(const SaStatus &status, std::unordered_set<std::string> &hmpSet)

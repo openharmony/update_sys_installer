@@ -47,6 +47,13 @@ private:
     int32_t ExitModuleUpdateStub(ModuleUpdateStub *service,
         MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
 
+    int32_t GetHmpVersionInfoStub(ModuleUpdateStub *service,
+        MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
+    int32_t StartUpdateHmpPackageStub(ModuleUpdateStub *service,
+        MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
+    int32_t GetHmpUpdateResultStub(ModuleUpdateStub *service,
+        MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
+
 private:
     std::unordered_map<uint32_t, RequestFuncType> requestFuncMap_ {};
 };

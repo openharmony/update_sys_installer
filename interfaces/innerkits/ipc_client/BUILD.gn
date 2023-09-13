@@ -111,12 +111,18 @@ config("exported_header_files") {
 
 ohos_static_library("module_update_client") {
   sources = [
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_callback.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_kits_impl.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_proxy.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
   ]
 
-  include_dirs = [ "//third_party/bounds_checking_function/include" ]
+  include_dirs = [
+    "${sys_installer_path}/common/include",
+    "//third_party/bounds_checking_function/include",
+    "//third_party/zlib",
+    "//third_party/zlib/contrib/minizip",
+  ]
 
   public_configs = [ ":exported_header_files" ]
 

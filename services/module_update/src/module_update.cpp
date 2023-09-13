@@ -79,6 +79,23 @@ bool StageUpdateModulePackage(const string &updatePath, const string &stagePath)
         LOG(ERROR) << "Unable to link " << updatePath << " to " << stagePath;
         return false;
     }
+
+    // stage other files
+    std::vector<std::string> files;
+    if (Updater::Utils::GetFilesFromDirectory(updatePath.substr(0, updatePath.rfind("/")), files, true) <= 0) {
+        LOG(ERROR) << "Failed to get files form " << updatePath;
+        return false;
+    }
+    for (const auto &file : files) {
+        std::string targetFile = path + ExtractFileName(file);
+        (void)unlink(targetFile.c_str());
+        ret = link(file.c_str(), targetFile.c_str());
+        if (ret != 0) {
+            LOG(ERROR) << "Unable to link " << file << " to " << targetFile;
+            return false;
+        }
+    }
+    LOG(INFO) << "success to link " << updatePath << " to " << stagePath;
     return true;
 }
 
@@ -98,10 +115,12 @@ std::unique_ptr<ModuleFile> GetLatestUpdateModulePackage(const int32_t saId)
             }
             updateModuleFile->SetPath(activePath);
             ret = std::move(updateModuleFile);
+            LOG(INFO) << "add updateModuleFile " << updatePath;
         }
     }
     if (ret == nullptr && activeModuleFile != nullptr) {
         ret = std::move(activeModuleFile);
+        LOG(INFO) << "add activeModuleFile " << activeModuleFile->GetPath();
     }
     return ret;
 }
@@ -202,9 +221,12 @@ bool ModuleUpdate::ActivateModules()
         if (!saStatus.isMountSuccess) {
             LOG(ERROR) << "Failed to mount module package " << moduleFile.GetPath();
             activateSuccess = false;
+            ModuleFileRepository::GetInstance().SaveInstallerResult(moduleFile.GetPath(),
+                GetHmpName(moduleFile.GetPath()), ERR_INSTALL_FAIL, "mount fail");
         }
         status_.saStatusList.emplace_back(std::move(saStatus));
     }
+    LOG(INFO) << "ActivateModules activateSuccess:" << activateSuccess;
     ReportMountStatus(status_);
     return activateSuccess;
 }

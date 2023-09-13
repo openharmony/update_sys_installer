@@ -79,6 +79,15 @@
                "//base/update/sys_installer/frameworks/ipc_server/include"
             ]
           }
+        },
+        {
+          "name": "//base/update/sys_installer/services/module_update:module_update_utils",
+          "header": {
+            "header_files": [],
+            "header_base": [
+               "//base/update/sys_installer/services/module_update/utils/include"
+            ]
+          }
         }
       ],
       "test": [

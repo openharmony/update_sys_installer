@@ -14,6 +14,8 @@
  */
 
 #include "module_update_stub.h"
+
+#include "isys_installer_callback.h"
 #include "sys_installer_sa_ipc_interface_code.h"
 
 #include "log/log.h"
@@ -37,6 +39,13 @@ ModuleUpdateStub::ModuleUpdateStub()
         bind(&ModuleUpdateStub::ReportModuleUpdateStatusStub, this, _1, _2, _3, _4));
     requestFuncMap_.emplace(ModuleUpdateInterfaceCode::EXIT_MODULE_UPDATE,
         bind(&ModuleUpdateStub::ExitModuleUpdateStub, this, _1, _2, _3, _4));
+
+    requestFuncMap_.emplace(ModuleUpdateInterfaceCode::GET_HMP_VERSION_INFO,
+        bind(&ModuleUpdateStub::GetHmpVersionInfoStub, this, _1, _2, _3, _4));
+    requestFuncMap_.emplace(ModuleUpdateInterfaceCode::START_UPDATE_HMP_PACKAGE,
+        bind(&ModuleUpdateStub::StartUpdateHmpPackageStub, this, _1, _2, _3, _4));
+    requestFuncMap_.emplace(ModuleUpdateInterfaceCode::GET_HMP_UPDATE_RESULT,
+        bind(&ModuleUpdateStub::GetHmpUpdateResultStub, this, _1, _2, _3, _4));
 }
 
 ModuleUpdateStub::~ModuleUpdateStub()
@@ -108,6 +117,63 @@ int32_t ModuleUpdateStub::ExitModuleUpdateStub(ModuleUpdateStub *service,
     }
     int32_t ret = service->ExitModuleUpdate();
     reply.WriteInt32(ret);
+    return 0;
+}
+
+int32_t ModuleUpdateStub::GetHmpVersionInfoStub(ModuleUpdateStub *service,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option) const
+{
+    if (service == nullptr) {
+        LOG(ERROR) << "Invalid param";
+        return -1;
+    }
+    std::vector<HmpVersionInfo> versionInfo = service->GetHmpVersionInfo();
+    reply.WriteInt32(versionInfo.size());
+    for (auto &info : versionInfo) {
+        reply.WriteParcelable(&info);
+    }
+    return 0;
+}
+
+int32_t ModuleUpdateStub::StartUpdateHmpPackageStub(ModuleUpdateStub *service,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option) const
+{
+    if (service == nullptr) {
+        LOG(ERROR) << "Invalid param";
+        return -1;
+    }
+
+    sptr<IRemoteObject> object = data.ReadRemoteObject();
+    if (object == nullptr) {
+        LOG(ERROR) << "object null";
+        return -1;
+    }
+
+    sptr<ISysInstallerCallback> updateCallback = iface_cast<ISysInstallerCallback>(object);
+    if (updateCallback == nullptr) {
+        LOG(ERROR) << "ISysInstallerCallback updateCallback is null";
+        return ERR_NULL_OBJECT;
+    }
+    std::string path = Str16ToStr8(data.ReadString16());
+    LOG(ERROR) << "StartUpdateHmpPackageStub path:" << path;
+
+    int32_t ret = service->StartUpdateHmpPackage(path, updateCallback);
+    reply.WriteInt32(ret);
+    return 0;
+}
+
+int32_t ModuleUpdateStub::GetHmpUpdateResultStub(ModuleUpdateStub *service,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option) const
+{
+    if (service == nullptr) {
+        LOG(ERROR) << "Invalid param";
+        return -1;
+    }
+    std::vector<HmpUpdateInfo> updateInfo = service->GetHmpUpdateResult();
+    reply.WriteInt32(updateInfo.size());
+    for (auto &info : updateInfo) {
+        reply.WriteParcelable(&info);
+    }
     return 0;
 }
 

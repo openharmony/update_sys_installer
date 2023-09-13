@@ -22,6 +22,7 @@
 #include "module_update_proxy.h"
 #include "service_control.h"
 #include "system_ability_definition.h"
+#include "sys_installer_callback.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -159,6 +160,55 @@ int32_t ModuleUpdateKitsImpl::InitModuleUpdate()
         return ModuleErrorCode::ERR_SERVICE_NOT_FOUND;
     }
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
+}
+
+std::vector<HmpVersionInfo> ModuleUpdateKitsImpl::GetHmpVersionInfo()
+{
+    LOG(INFO) << "GetHmpVersionInfo";
+    std::vector<HmpVersionInfo> versionInfo {};
+    auto moduleUpdate = GetService();
+    if (moduleUpdate == nullptr) {
+        LOG(ERROR) << "Get moduleUpdate failed";
+        return versionInfo;
+    }
+    versionInfo = moduleUpdate->GetHmpVersionInfo();
+    return versionInfo;
+}
+
+int32_t ModuleUpdateKitsImpl::StartUpdateHmpPackage(const std::string &path,
+    sptr<ISysInstallerCallbackFunc> callback)
+{
+    LOG(INFO) << "StartUpdateHmpPackage";
+    if (callback == nullptr) {
+        LOG(ERROR) << "callback null";
+        return ModuleErrorCode::ERR_SERVICE_PARA_ERROR;
+    }
+
+    auto moduleUpdate = GetService();
+    if (moduleUpdate == nullptr) {
+        LOG(ERROR) << "Get moduleUpdate failed";
+        return ModuleErrorCode::ERR_SERVICE_NOT_FOUND;
+    }
+
+    if (updateCallBack_ == nullptr) {
+        updateCallBack_ = new SysInstallerCallback;
+    }
+    static_cast<SysInstallerCallback *>(updateCallBack_.GetRefPtr())->RegisterCallback(callback);
+
+    return moduleUpdate->StartUpdateHmpPackage(path, updateCallBack_);
+}
+
+std::vector<HmpUpdateInfo> ModuleUpdateKitsImpl::GetHmpUpdateResult()
+{
+    LOG(INFO) << "GetHmpUpdateResult";
+    std::vector<HmpUpdateInfo> updateInfo {};
+    auto moduleUpdate = GetService();
+    if (moduleUpdate == nullptr) {
+        LOG(ERROR) << "Get moduleUpdate failed";
+        return updateInfo;
+    }
+    updateInfo = moduleUpdate->GetHmpUpdateResult();
+    return updateInfo;
 }
 }
 } // namespace OHOS

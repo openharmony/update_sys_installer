@@ -164,5 +164,113 @@ int32_t ModuleUpdateProxy::ExitModuleUpdate()
 
     return reply.ReadInt32();
 }
+
+std::vector<HmpVersionInfo> ModuleUpdateProxy::GetHmpVersionInfo()
+{
+    LOG(INFO) << "GetHmpVersionInfo";
+    std::vector<HmpVersionInfo> versionInfo {};
+    auto remote = Remote();
+    if (remote == nullptr) {
+        LOG(ERROR) << "Can not get remote";
+        return versionInfo;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOG(ERROR) << "WriteInterfaceToken error";
+        return versionInfo;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(ModuleUpdateInterfaceCode::GET_HMP_VERSION_INFO), data, reply, option);
+    if (ret != ERR_OK) {
+        LOG(ERROR) << "SendRequest error";
+        return versionInfo;
+    }
+
+    int32_t count = reply.ReadInt32();
+    for (int32_t i = 0; i < count; i++) {
+        std::unique_ptr<HmpVersionInfo> infoPtr(reply.ReadParcelable<HmpVersionInfo>());
+        if (infoPtr != nullptr) {
+            versionInfo.push_back(*infoPtr);
+        }
+    }
+    return versionInfo;
+}
+
+int32_t ModuleUpdateProxy::StartUpdateHmpPackage(const std::string &path,
+    const sptr<ISysInstallerCallback> &updateCallback)
+{
+    LOG(INFO) << "StartUpdateHmpPackage";
+    if (updateCallback == nullptr) {
+        LOG(ERROR) <<  "Invalid param";
+        return ERR_INVALID_VALUE;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        LOG(ERROR) << "Can not get remote";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOG(ERROR) << "WriteInterfaceToken error";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    if (!data.WriteRemoteObject(updateCallback->AsObject())) {
+        LOG(ERROR) << "WriteRemoteObject fail";
+        return ERR_FLATTEN_OBJECT;
+    }
+    data.WriteString16(Str8ToStr16(path));
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(ModuleUpdateInterfaceCode::START_UPDATE_HMP_PACKAGE), data, reply, option);
+    if (ret != ERR_OK) {
+        LOG(ERROR) << "SendRequest error";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    return reply.ReadInt32();
+}
+
+std::vector<HmpUpdateInfo> ModuleUpdateProxy::GetHmpUpdateResult()
+{
+    LOG(INFO) << "GetHmpUpdateResult";
+    std::vector<HmpUpdateInfo> updateInfo {};
+    auto remote = Remote();
+    if (remote == nullptr) {
+        LOG(ERROR) << "Can not get remote";
+        return updateInfo;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOG(ERROR) << "WriteInterfaceToken error";
+        return updateInfo;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(ModuleUpdateInterfaceCode::GET_HMP_UPDATE_RESULT), data, reply, option);
+    if (ret != ERR_OK) {
+        LOG(ERROR) << "SendRequest error";
+        return updateInfo;
+    }
+
+    int32_t count = reply.ReadInt32();
+    for (int32_t i = 0; i < count; i++) {
+        std::unique_ptr<HmpUpdateInfo> infoPtr(reply.ReadParcelable<HmpUpdateInfo>());
+        if (infoPtr != nullptr) {
+            updateInfo.push_back(*infoPtr);
+        }
+    }
+    return updateInfo;
+}
 } // namespace SysInstaller
 } // namespace OHOS

@@ -18,6 +18,8 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <dlfcn.h>
+#include <signal.h>
 
 #include "json_node.h"
 #include "log/log.h"
@@ -115,19 +117,6 @@ bool ParseImageStat(ModuleZipHelper &helper, const string &path, ImageStat &imag
     return true;
 }
 
-bool ExtractZipFile(ModuleZipHelper &helper, const string &fileName, string &buf)
-{
-    if (!helper.LocateFile(fileName)) {
-        LOG(ERROR) << "Could not find " << fileName;
-        return false;
-    }
-    if (!helper.GetFileContent(buf)) {
-        LOG(ERROR) << "Failed to get content of " << fileName;
-        return false;
-    }
-    return true;
-}
-
 bool ParseModuleInfo(const string &moduleInfo, string &saName, int32_t &saId, ModuleVersion &versionInfo)
 {
     JsonNode root(moduleInfo);
@@ -167,9 +156,38 @@ bool ParseModuleInfo(const string &moduleInfo, string &saName, int32_t &saId, Mo
 }
 } // namespace
 
+bool ExtractZipFile(ModuleZipHelper &helper, const string &fileName, string &buf)
+{
+    if (!helper.LocateFile(fileName)) {
+        LOG(ERROR) << "Could not find " << fileName;
+        return false;
+    }
+    if (!helper.GetFileContent(buf)) {
+        LOG(ERROR) << "Failed to get content of " << fileName;
+        return false;
+    }
+    return true;
+}
+
 bool ModuleFile::VerifyModulePackageSign(const std::string &path)
 {
-    return VerifyPackage(path.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0) == 0;
+    void *handle = dlopen("libmodule_update_ext.z.so", RTLD_NOW);
+    if (handle == NULL) {
+        LOG(INFO) << "dlopen module update ext lib failed with error:" << dlerror();
+        return VerifyPackage(path.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0) == 0;
+    }
+    ON_SCOPE_EXIT(clear) {
+        dlclose(handle);
+    };
+
+    typedef int32_t* (*ExtFunc)(const char *, const char *, const char *, const uint8_t *, size_t);
+    ExtFunc func = (ExtFunc)dlsym(handle, "VerifyModulePackage");
+    if (func == NULL) {
+        LOG(INFO) << "dlsym get func failed with error:" << dlerror();
+        return VerifyPackage(path.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0) == 0;
+    }
+
+    return func(path.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0) == 0;
 }
 
 std::unique_ptr<ModuleFile> ModuleFile::Open(const string &path)

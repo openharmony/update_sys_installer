@@ -37,6 +37,11 @@ public:
     int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status) override;
     int32_t ExitModuleUpdate() override;
 
+    std::vector<HmpVersionInfo> GetHmpVersionInfo() override;
+    int32_t StartUpdateHmpPackage(const std::string &path,
+        const sptr<ISysInstallerCallback> &updateCallback) override;
+    std::vector<HmpUpdateInfo> GetHmpUpdateResult() override;
+
     void ScanPreInstalledHmp();
     void OnProcessCrash(const std::string &processName);
     void OnBootCompleted();
@@ -54,6 +59,9 @@ private:
     bool RevertAndReboot() const;
     void OnHmpError(const std::string &hmpName);
     void ProcessSaStatus(const SaStatus &status, std::unordered_set<std::string> &hmpSet);
+    bool GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo);
+    void SaveInstallerResult(const std::string &hmpPath, int result, const std::string &resultInfo);
+    int32_t ReallyInstallModulePackage(const std::string &pkgPath, const sptr<ISysInstallerCallback> &updateCallback);
 
     std::unordered_set<std::string> hmpSet_;
     std::unordered_map<int32_t, std::string> saIdHmpMap_;
