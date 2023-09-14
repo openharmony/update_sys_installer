@@ -56,7 +56,7 @@ void FuzzModuleUpdateOther(const uint8_t* data, size_t size)
     std::vector<HmpVersionInfo> versionInfo = moduleUpdateKits.GetHmpVersionInfo();
     sptr<ISysInstallerCallbackFunc> callback = new ProcessCallback;
     moduleUpdateKits.StartUpdateHmpPackage(std::string(reinterpret_cast<const char*>(data), size),
-        ProcessCallback);
+        callback);
     std::vector<HmpUpdateInfo> updateInfo = moduleUpdateKits.GetHmpUpdateResult();
     moduleUpdateKits.ExitModuleUpdate();
 }
