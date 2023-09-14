@@ -43,10 +43,9 @@ void FuzzModuleUpdate(const uint8_t* data, size_t size)
 void FuzzModuleUpdateOther(const uint8_t* data, size_t size)
 {
     ModuleUpdateKits &moduleUpdateKits = ModuleUpdateKits::GetInstance();
-    moduleUpdateKits.InstallModulePackage(std::string(reinterpret_cast<const char*>(data), size));
     std::vector<HmpVersionInfo> versionInfo = moduleUpdateKits.GetHmpVersionInfo();
-    moduleUpdateKits.StartUpdateHmpPackage(std::string(reinterpret_cast<const char*>(data),
-        reinterpret_cast<ISysInstallerCallback *>(const_cast<uint8_t *>(data))));
+    moduleUpdateKits.StartUpdateHmpPackage(std::string(reinterpret_cast<const char*>(data), size),
+        reinterpret_cast<ISysInstallerCallback *>(const_cast<uint8_t *>(data)));
     std::vector<HmpUpdateInfo> updateInfo = moduleUpdateKits.GetHmpUpdateResult();
     moduleUpdateKits.ExitModuleUpdate();
 }
