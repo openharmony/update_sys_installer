@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-module_output_path = "updater/imodule_update"
+module_output_path = "updater/sys_installer"
 
 import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 
