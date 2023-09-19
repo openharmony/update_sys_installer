@@ -63,6 +63,15 @@
           }
         },
         {
+          "name": "//base/update/sys_installer/interfaces/innerkits/ipc_client:module_update",
+          "header": {
+            "header_files": [],
+            "header_base": [
+              "//base/update/sys_installer/interfaces/innerkits/inner_api/include"
+            ]
+          }
+        },
+        {
           "name": "//base/update/sys_installer/frameworks/installer_manager:libinstallermanager",
           "header": {
             "header_files": [],
