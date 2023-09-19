@@ -383,7 +383,7 @@ std::vector<HmpVersionInfo> ModuleUpdateService::GetHmpVersionInfo()
 void ModuleUpdateService::SaveInstallerResult(const std::string &hmpPath, int result, const std::string &resultInfo)
 {
     LOG(INFO) << "hmpPath:" << hmpPath << " result:" << result << " resultInfo:" << resultInfo;
-    UniqueFd fd(open(MODULE_RESULT_PATH, O_RDWR | O_CREAT | O_CLOEXEC));
+    UniqueFd fd(open(MODULE_RESULT_PATH, O_APPEND | O_RDWR | O_CREAT | O_CLOEXEC));
     if (fd.Get() == -1) {
         LOG(ERROR) << "Failed to open file";
         return;
@@ -392,7 +392,7 @@ void ModuleUpdateService::SaveInstallerResult(const std::string &hmpPath, int re
     if (chmod(MODULE_RESULT_PATH, mode) != 0) {
         LOG(ERROR) << "Could not chmod " << MODULE_RESULT_PATH;
     }
-    std::string writeInfo = hmpPath + ";" + std::to_string(result) + ";" + resultInfo;
+    std::string writeInfo = hmpPath + ";" + std::to_string(result) + ";" + resultInfo + "\n";
     if (write(fd, writeInfo.data(), writeInfo.length()) <= 0) {
         LOG(WARNING) << "write result file failed, err:" << errno;
     }
