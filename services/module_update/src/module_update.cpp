@@ -119,8 +119,8 @@ std::unique_ptr<ModuleFile> GetLatestUpdateModulePackage(const int32_t saId)
         }
     }
     if (ret == nullptr && activeModuleFile != nullptr) {
-        ret = std::move(activeModuleFile);
         LOG(INFO) << "add activeModuleFile " << activeModuleFile->GetPath();
+        ret = std::move(activeModuleFile);
     }
     return ret;
 }
