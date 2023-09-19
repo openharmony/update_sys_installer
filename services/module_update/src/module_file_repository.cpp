@@ -90,7 +90,6 @@ void ModuleFileRepository::ProcessFile(const std::unordered_set<int32_t> &saIdSe
     }
     std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
     if (moduleFile == nullptr || saIdSet.find(moduleFile->GetSaId()) == saIdSet.end()) {
-        LOG(ERROR) << "Open " << file << " failed";
         return;
     }
     string pubkey = moduleFile->GetPublicKey();
