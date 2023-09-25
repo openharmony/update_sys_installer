@@ -55,6 +55,9 @@ private:
         MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
 
 private:
+    bool IsPermissionGranted(void);
+    bool CheckCallingPerm(void);
+
     std::unordered_map<uint32_t, RequestFuncType> requestFuncMap_ {};
 };
 } // namespace SysInstaller
