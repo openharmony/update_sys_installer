@@ -41,6 +41,7 @@ ohos_executable("module_update_service") {
   deps = [ "${sys_installer_path}/services/module_update:module_update_utils" ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "hisysevent:libhisyseventmanager",
     "init:libbeget_proxy",
