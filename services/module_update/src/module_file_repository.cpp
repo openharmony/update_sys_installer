@@ -15,10 +15,16 @@
 
 #include "module_file_repository.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "directory_ex.h"
 #include "log/log.h"
 #include "module_constants.h"
 #include "module_utils.h"
+#include "module_error_code.h"
+#include "scope_guard.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -50,6 +56,32 @@ void ModuleFileRepository::InitRepository(const std::unordered_set<int32_t> &saI
     }
 }
 
+void ModuleFileRepository::SaveInstallerResult(const std::string &path, const std::string &hmpName,
+    int result, const std::string &resultInfo) const
+{
+    if (path.find(UPDATE_INSTALL_DIR) == std::string::npos) {
+        return;
+    }
+    LOG(INFO) << "path:" << path << "hmp:" << hmpName << "result:" << result << "Info:" << resultInfo << "\n";
+    if (!CheckPathExists(MODULE_RESULT_PATH)) {
+        LOG(ERROR) << MODULE_RESULT_PATH << " not exist";
+        return;
+    }
+    int fd = open(MODULE_RESULT_PATH, 'a');
+    if (fd == -1) {
+        LOG(ERROR) << "Failed to open file";
+        return;
+    }
+    ON_SCOPE_EXIT(closeFd) {
+        fsync(fd);
+        close(fd);
+    };
+    std::string writeInfo = hmpName + ";" + std::to_string(result) + ";" + resultInfo;
+    if (write(fd, writeInfo.data(), writeInfo.length()) <= 0) {
+        LOG(WARNING) << "write result file failed, err:" << errno;
+    }
+}
+
 void ModuleFileRepository::ProcessFile(const std::unordered_set<int32_t> &saIdSet, const string &path,
     const string &file, std::unordered_map<int32_t, ModuleFile> &fileMap) const
 {
@@ -64,17 +96,25 @@ void ModuleFileRepository::ProcessFile(const std::unordered_set<int32_t> &saIdSe
     if (path != MODULE_PREINSTALL_DIR) {
         pubkey = GetPublicKey(moduleFile->GetSaId());
         if (!CheckFilePath(*moduleFile, path)) {
+            LOG(ERROR) << "Open " << file << " failed";
+            SaveInstallerResult(path, GetHmpName(moduleFile->GetPath()),
+                ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "get pub key fail");
             return;
         }
         if (!ModuleFile::VerifyModulePackageSign(file)) {
-            LOG(ERROR) << "verify sign failed of " << file;
+            LOG(ERROR) << "VerifyModulePackageSign failed of " << file;
+            SaveInstallerResult(path, GetHmpName(moduleFile->GetPath()),
+                ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "verify fail");
             return;
         }
     }
     if (moduleFile->GetImageStat().has_value() && !moduleFile->VerifyModuleVerity(pubkey)) {
+        SaveInstallerResult(path, GetHmpName(moduleFile->GetPath()),
+            ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "hvb fail");
         LOG(ERROR) << "verify verity failed of " << file;
         return;
     }
+    LOG(INFO) << "ProcessFile  " << file << " successful";
     fileMap.emplace(moduleFile->GetSaId(), std::move(*moduleFile));
 }
 

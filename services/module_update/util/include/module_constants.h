@@ -28,6 +28,8 @@ static constexpr const char *MODULE_PACKAGE_SUFFIX = ".zip";
 static constexpr const char *CONFIG_FILE_NAME = "config.json";
 static constexpr const char *IMG_FILE_NAME = "module.img";
 static constexpr const char *PUBLIC_KEY_NAME = "pub_key.pem";
+static constexpr const char *PACK_INFO_NAME = "pack.info";
+static constexpr const char *MODULE_RESULT_PATH = "/data/update/module_update_result";
 } // namespace SysInstaller
 } // namespace OHOS
 #endif // SYS_INSTALLER_MODULE_CONSTANTS_H

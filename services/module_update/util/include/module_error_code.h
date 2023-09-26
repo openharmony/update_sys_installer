@@ -20,6 +20,7 @@ namespace OHOS {
 namespace SysInstaller {
 enum ModuleErrorCode {
     MODULE_UPDATE_SUCCESS = 0,
+    ERR_SERVICE_PARA_ERROR,
     ERR_SERVICE_NOT_FOUND,
     ERR_INVALID_PATH,
     ERR_LOWER_VERSION,

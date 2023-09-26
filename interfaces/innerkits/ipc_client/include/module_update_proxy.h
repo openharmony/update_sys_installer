@@ -31,6 +31,11 @@ public:
         std::list<ModulePackageInfo> &modulePackageInfos);
     virtual int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status);
     virtual int32_t ExitModuleUpdate();
+
+    virtual std::vector<HmpVersionInfo> GetHmpVersionInfo();
+    virtual int32_t StartUpdateHmpPackage(const std::string &path,
+        const sptr<ISysInstallerCallback> &updateCallback);
+    virtual std::vector<HmpUpdateInfo> GetHmpUpdateResult();
 private:
     static inline BrokerDelegator<ModuleUpdateProxy> delegator_;
 };

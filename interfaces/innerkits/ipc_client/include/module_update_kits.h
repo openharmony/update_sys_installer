@@ -16,6 +16,8 @@
 #ifndef SYS_INSTALLER_MODULE_UPDATE_KITS_H
 #define SYS_INSTALLER_MODULE_UPDATE_KITS_H
 
+#include "imodule_update.h"
+#include "isys_installer_callback_func.h"
 #include "module_ipc_helper.h"
 #include "singleton.h"
 
@@ -36,6 +38,11 @@ public:
         std::list<ModulePackageInfo> &modulePackageInfos) = 0;
     virtual int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status) = 0;
     virtual int32_t ExitModuleUpdate() = 0;
+
+    virtual std::vector<HmpVersionInfo> GetHmpVersionInfo() = 0;
+    virtual int32_t StartUpdateHmpPackage(const std::string &path,
+        sptr<ISysInstallerCallbackFunc> callback) = 0;
+    virtual std::vector<HmpUpdateInfo> GetHmpUpdateResult() = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS

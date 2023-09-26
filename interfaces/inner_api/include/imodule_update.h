@@ -17,10 +17,94 @@
 #define SYS_INSTALLER_IMODULE_UPDATE_H
 
 #include "iremote_broker.h"
+#include "isys_installer_callback.h"
 #include "module_ipc_helper.h"
+#include "parcel.h"
+#include "string_ex.h"
 
 namespace OHOS {
 namespace SysInstaller {
+struct HmpVersionInfo : public Parcelable {
+    std::string name {}; 
+    std::string laneCode {}; 
+    std::string compatibleVersion {};
+    std::string version {};
+
+    virtual bool Marshalling(Parcel &parcel) const override
+    {
+        if (!parcel.WriteString16(Str8ToStr16(name))) {
+            return false;
+        }
+        if (!parcel.WriteString16(Str8ToStr16(laneCode))) {
+            return false;
+        }
+        if (!parcel.WriteString16(Str8ToStr16(compatibleVersion))) {
+            return false;
+        }
+        if (!parcel.WriteString16(Str8ToStr16(version))) {
+            return false;
+        }
+        return true;
+    }
+
+    bool ReadFromParcel(Parcel &parcel)
+    {
+        name = Str16ToStr8(parcel.ReadString16());
+        laneCode = Str16ToStr8(parcel.ReadString16());
+        compatibleVersion = Str16ToStr8(parcel.ReadString16());
+        version = Str16ToStr8(parcel.ReadString16());
+        return true;
+    }
+
+    static HmpVersionInfo *Unmarshalling(Parcel &parcel)
+    {
+        HmpVersionInfo *obj = new (std::nothrow) HmpVersionInfo();
+        if (obj != nullptr && !obj->ReadFromParcel(parcel)) {
+            delete obj;
+            obj = nullptr;
+        }
+        return obj;
+    }
+};
+
+struct HmpUpdateInfo : public Parcelable {
+    std::string path {};
+    int32_t result = 0; // 0 means success
+    std::string resultMsg {};
+
+    virtual bool Marshalling(Parcel &parcel) const override
+    {
+        if (!parcel.WriteString16(Str8ToStr16(path))) {
+            return false;
+        }
+        if (!parcel.WriteInt32(result)) {
+            return false;
+        }
+        if (!parcel.WriteString16(Str8ToStr16(resultMsg))) {
+            return false;
+        }
+        return true;
+    }
+
+    bool ReadFromParcel(Parcel &parcel)
+    {
+        path = Str16ToStr8(parcel.ReadString16());
+        result = parcel.ReadInt32();
+        resultMsg = Str16ToStr8(parcel.ReadString16());
+        return true;
+    }
+
+    static HmpUpdateInfo *Unmarshalling(Parcel &parcel)
+    {
+        HmpUpdateInfo *obj = new (std::nothrow) HmpUpdateInfo();
+        if (obj != nullptr && !obj->ReadFromParcel(parcel)) {
+            delete obj;
+            obj = nullptr;
+        }
+        return obj;
+    }
+};
+
 class IModuleUpdate : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Updater.IModuleUpdate");
@@ -31,6 +115,11 @@ public:
         std::list<ModulePackageInfo> &modulePackageInfos) = 0;
     virtual int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status) = 0;
     virtual int32_t ExitModuleUpdate() = 0;
+
+    virtual std::vector<HmpVersionInfo> GetHmpVersionInfo() = 0;
+    virtual int32_t StartUpdateHmpPackage(const std::string &path,
+        const sptr<ISysInstallerCallback> &updateCallback) = 0;
+    virtual std::vector<HmpUpdateInfo> GetHmpUpdateResult() = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS

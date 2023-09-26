@@ -39,6 +39,27 @@ void FuzzModuleUpdate(const uint8_t* data, size_t size)
     moduleUpdateKits.ReportModuleUpdateStatus(updateStatus);
     moduleUpdateKits.ExitModuleUpdate();
 }
+
+class ProcessCallback : public ISysInstallerCallbackFunc {
+public:
+    ProcessCallback() = default;
+    ~ProcessCallback() = default;
+    void OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) override
+    {
+        printf("ProgressCallback progress %d percent %d msg %s\n", updateStatus, percent, resultMsg.c_str());
+    }
+};
+
+void FuzzModuleUpdateOther(const uint8_t* data, size_t size)
+{
+    ModuleUpdateKits &moduleUpdateKits = ModuleUpdateKits::GetInstance();
+    std::vector<HmpVersionInfo> versionInfo = moduleUpdateKits.GetHmpVersionInfo();
+    sptr<ISysInstallerCallbackFunc> callback = new ProcessCallback;
+    moduleUpdateKits.StartUpdateHmpPackage(std::string(reinterpret_cast<const char*>(data), size),
+        callback);
+    std::vector<HmpUpdateInfo> updateInfo = moduleUpdateKits.GetHmpUpdateResult();
+    moduleUpdateKits.ExitModuleUpdate();
+}
 }
 
 /* Fuzzer entry point */

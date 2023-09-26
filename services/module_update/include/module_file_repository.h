@@ -34,6 +34,8 @@ public:
     bool IsPreInstalledModule(const ModuleFile &moduleFile) const;
     std::string GetPublicKey(const int32_t saId) const;
     void Clear();
+    void SaveInstallerResult(const std::string &path, const std::string &hmpName,
+        int result, const std::string &resultInfo) const;
 private:
     ModuleFileRepository() = default;
     ~ModuleFileRepository();

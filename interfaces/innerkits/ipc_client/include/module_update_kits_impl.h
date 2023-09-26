@@ -36,6 +36,11 @@ public:
     int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status) final;
     int32_t ExitModuleUpdate() final;
 
+    std::vector<HmpVersionInfo> GetHmpVersionInfo() final;
+    int32_t StartUpdateHmpPackage(const std::string &path,
+        sptr<ISysInstallerCallbackFunc> callback) final;
+    std::vector<HmpUpdateInfo> GetHmpUpdateResult() final;
+
 #ifndef UPDATER_UT
 private:
 #endif
@@ -54,6 +59,7 @@ private:
     std::mutex moduleUpdateLock_;
     sptr<IModuleUpdate> moduleUpdate_ {};
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {};
+    sptr<ISysInstallerCallback> updateCallBack_ {};
 };
 } // namespace SysInstaller
 } // namespace OHOS

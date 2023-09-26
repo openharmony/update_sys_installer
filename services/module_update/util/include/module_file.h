@@ -23,11 +23,14 @@
 #ifdef SUPPORT_HVB
 #include "hvb.h"
 #endif
+#include "module_zip_helper.h"
 namespace OHOS {
 namespace SysInstaller {
 namespace {
 constexpr size_t FS_TYPE_MAX_SIZE = 10;
 }
+
+bool ExtractZipFile(ModuleZipHelper &helper, const std::string &fileName, std::string &buf);
 
 struct ModuleVersion {
     uint32_t apiVersion;
