@@ -20,6 +20,7 @@
 #include "package/pkg_manager.h"
 #include "scope_guard.h"
 #include "utils.h"
+#include "updater/updater_const.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -51,13 +52,16 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
         LOG(INFO) << "Install package failed!";
         STAGE(UPDATE_STAGE_FAIL) << "Install package failed";
         Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
+        if (!DeleteUpdaterPath(GetWorkPath()) || !DeleteUpdaterPath(std::string(UPDATER_PATH))) {
+            LOG(WARNING) << "Delete Work Path fail.";
+        }
         return updateRet;
     }
     LOG(INFO) << "Install package successfully!";
     STAGE(UPDATE_STAGE_SUCCESS) << "Install package success";
     Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
-    if (!DeleteUpdaterPath(GetWorkPath())) {
-        LOG(WARNING) << "Delete Updater Path fail.";
+    if (!DeleteUpdaterPath(GetWorkPath()) || !DeleteUpdaterPath(std::string(UPDATER_PATH))) {
+        LOG(WARNING) << "Delete Work Path fail.";
     }
     return updateRet;
 }
