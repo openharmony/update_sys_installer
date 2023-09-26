@@ -32,12 +32,12 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
 {
     SysInstallerKitsImpl::GetInstance().SysInstallerInit();
     SysInstallerKitsImpl::GetInstance().SetUpdateCallback(nullptr);
-    SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(std::string(reinterpret_cast<const char*>(data)));
+    SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(std::string(reinterpret_cast<const char*>(data), size));
     const std::string pkgPath = "/data/updater/fuzz/updater.zip";
     const std::string location = "location";
     SysInstallerKitsImpl::GetInstance().GetUpdateStatus();
     SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(pkgPath,
-        location, std::string(reinterpret_cast<const char*>(data)));
+        location, std::string(reinterpret_cast<const char*>(data), size));
 }
 }
 
