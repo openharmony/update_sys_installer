@@ -53,6 +53,11 @@ ohos_executable("module_update_service") {
     "updater:libutils",
   ]
 
+  if (build_selinux) {
+    external_deps += [ "selinux_adapter:librestorecon" ]
+    cflags = [ "-DWITH_SELINUX" ]
+  }
+
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
