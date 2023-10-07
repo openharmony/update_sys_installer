@@ -20,6 +20,7 @@
 #include <fcntl.h>
 
 #include "directory_ex.h"
+#include "init_reboot.h"
 #include "json_node.h"
 #include "log/log.h"
 #include "module_constants.h"
@@ -588,9 +589,10 @@ bool ModuleUpdateService::RevertAndReboot() const
         LOG(ERROR) << "Failed to restore original permissions for " << UPDATE_ACTIVE_DIR << " err=" << errno;
         return false;
     }
-
+ 
+    sync();
     LOG(INFO) << "Rebooting";
-    Utils::UpdaterDoReboot("");
+    DoReboot("");
     return true;
 }
 
