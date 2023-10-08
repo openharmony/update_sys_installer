@@ -20,6 +20,7 @@
 #include <fcntl.h>
 
 #include "directory_ex.h"
+#include "init_reboot.h"
 #include "json_node.h"
 #include "log/log.h"
 #include "module_constants.h"
@@ -31,6 +32,9 @@
 #include "system_ability_definition.h"
 #include "utils.h"
 #include "unique_fd.h"
+#ifdef WITH_SELINUX
+#include <policycoreutils.h>
+#endif // WITH_SELINUX
 
 namespace OHOS {
 namespace SysInstaller {
@@ -46,6 +50,11 @@ int32_t CreateModuleDirs(const std::string &hmpName)
         LOG(ERROR) << "Failed to create install dir";
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
+#ifdef WITH_SELINUX
+    if (Restorecon(UPDATE_INSTALL_DIR) == -1) {
+        LOG(WARNING) << "restore " << UPDATE_INSTALL_DIR << " failed";
+    }
+#endif // WITH_SELINUX
     std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
     if (!CreateDirIfNeeded(hmpInstallDir, DIR_MODE)) {
         LOG(ERROR) << "Failed to create hmp install dir " << hmpInstallDir;
@@ -443,14 +452,18 @@ std::vector<HmpUpdateInfo> ModuleUpdateService::GetHmpUpdateResult()
         tmpUpdateInfo.path = signalResult[0];
         tmpUpdateInfo.result = stoi(signalResult[1]);
         tmpUpdateInfo.resultMsg = signalResult[2]; // 2: result info
+        bool isFind = false;
         for (auto &iter : updateInfo) {
             if (iter.path.find(tmpUpdateInfo.path) != std::string::npos) {
                 iter.result = tmpUpdateInfo.result;
                 iter.resultMsg = tmpUpdateInfo.resultMsg;
-                continue;
+                isFind = true;
+                break;
             }
         }
-        updateInfo.emplace_back(tmpUpdateInfo);
+        if (!isFind) {
+            updateInfo.emplace_back(tmpUpdateInfo);
+        }
     }
     ifs.close();
     (void)unlink(MODULE_RESULT_PATH);
@@ -576,9 +589,10 @@ bool ModuleUpdateService::RevertAndReboot() const
         LOG(ERROR) << "Failed to restore original permissions for " << UPDATE_ACTIVE_DIR << " err=" << errno;
         return false;
     }
-
+ 
+    sync();
     LOG(INFO) << "Rebooting";
-    Utils::UpdaterDoReboot("");
+    DoReboot("");
     return true;
 }
 

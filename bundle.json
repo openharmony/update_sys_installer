@@ -28,6 +28,7 @@
         "updater",
         "access_token",
         "hisysevent",
+        "selinux_adapter",
         "init"
       ],
       "third_party": [
