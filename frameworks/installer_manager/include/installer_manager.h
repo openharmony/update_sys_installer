@@ -47,7 +47,7 @@ private:
 enum SysInstallerInitEvent {
     SYS_PRE_INIT_EVENT = 0,
     SYS_POST_INIT_EVENT,
-
+    SYS_POST_EVENT,
     SYS_INIT_EVENT_BUTT
 };
 using InitHandler = void (*)(void);

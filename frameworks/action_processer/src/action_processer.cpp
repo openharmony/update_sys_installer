@@ -15,6 +15,7 @@
 
 #include "action_processer.h"
 
+#include "installer_manager.h"
 #include "log/log.h"
 
 namespace OHOS {
@@ -128,6 +129,7 @@ void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::strin
         statusManager_->UpdateCallback(UPDATE_STATE_FAILED, 100, errStr); // 100 : action failed
         actionQue_.clear();
         LOG(ERROR) << "CompletedAction errCode:" << errCode << " str:" << errStr;
+        SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_POST_EVENT);
         return;
     }
 
