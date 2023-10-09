@@ -77,18 +77,10 @@ bool ClearModuleDirs(const std::string &hmpName)
 
 bool BackupFile(const std::string &file)
 {
-    if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
-        return true;
-    }
     std::string fileName = GetFileName(file);
     std::string hmpName = GetHmpName(file);
     if (fileName.empty() || hmpName.empty()) {
         return true;
-    }
-    std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
-    if (moduleFile == nullptr) {
-        LOG(ERROR) << "Wrong module file " << file << " in active dir";
-        return false;
     }
     std::string destPath = std::string(UPDATE_BACKUP_DIR) + "/" + hmpName;
     if (!CreateDirIfNeeded(destPath, DIR_MODE)) {
