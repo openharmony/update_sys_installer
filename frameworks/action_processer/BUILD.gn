@@ -25,6 +25,7 @@ ohos_static_library("libactionprocesser") {
     "${sys_installer_path}/frameworks/actions/include",
     "${sys_installer_path}/frameworks/action_processer/include",
     "${sys_installer_path}/frameworks/status_manager/include",
+    "${sys_installer_path}/frameworks/installer_manager/include",
   ]
 
   external_deps = [
