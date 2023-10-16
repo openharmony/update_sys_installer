@@ -44,10 +44,6 @@ ohos_shared_library("sys_installer") {
     "//third_party/lz4:liblz4_static",
   ]
 
-  if (defined(sys_installer_custom_lib)) {
-    deps += sys_installer_custom_lib
-  }
-
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
@@ -62,6 +58,10 @@ ohos_shared_library("sys_installer") {
     "updater:libupdaterpackage",
     "updater:libutils",
   ]
+
+  if (defined(sys_installer_custom_external_deps)) {
+    deps += sys_installer_custom_external_deps
+  }
 
   part_name = "sys_installer"
   subsystem_name = "updater"

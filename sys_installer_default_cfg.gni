@@ -12,5 +12,10 @@
 # limitations under the License.
 
 declare_args() {
+  sys_installer_cfg_file = ""
   sys_installer_absolutely_path = "//base/update/sys_installer"
+}
+
+if (sys_installer_cfg_file != "") {
+  import("${sys_installer_cfg_file}")
 }
