@@ -60,7 +60,7 @@ ohos_shared_library("sys_installer") {
   ]
 
   if (defined(sys_installer_custom_external_deps)) {
-    deps += sys_installer_custom_external_deps
+    external_deps += sys_installer_custom_external_deps
   }
 
   part_name = "sys_installer"
