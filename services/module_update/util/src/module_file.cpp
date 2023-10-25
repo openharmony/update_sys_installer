@@ -52,6 +52,7 @@ constexpr size_t API_VERSION_INDEX = 0;
 constexpr size_t VERSION_CODE_INDEX = 1;
 constexpr size_t PATCH_VERSION_INDEX = 2;
 constexpr size_t VERSION_VECTOR_SIZE = 3;
+constexpr size_t PACKINFO_VERSION_VECTOR_SIZE = 5;
 
 struct FsMagic {
     const char *type;
