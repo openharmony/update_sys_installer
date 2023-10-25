@@ -417,6 +417,11 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
     }
 
     updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, 0, "");
+    if (!ModuleFile::VerifyModulePackageSign(path)) {
+        LOG(ERROR) << "Verify sign failed " << path;
+        return ModuleErrorCode::ERR_VERIFY_SIGN_FAIL;
+    }
+
     ret = InstallModulePackage(path);
     return ret;
 }
