@@ -52,6 +52,7 @@ constexpr size_t API_VERSION_INDEX = 0;
 constexpr size_t VERSION_CODE_INDEX = 1;
 constexpr size_t PATCH_VERSION_INDEX = 2;
 constexpr size_t VERSION_VECTOR_SIZE = 3;
+constexpr size_t PACKINFO_VERSION_VECTOR_SIZE = 5;
 
 struct FsMagic {
     const char *type;
@@ -165,6 +166,51 @@ bool ExtractZipFile(ModuleZipHelper &helper, const string &fileName, string &buf
         LOG(ERROR) << "Failed to get content of " << fileName;
         return false;
     }
+    return true;
+}
+
+__attribute__((unused)) bool ComparePackInfoVer(const std::vector<std::string> &smallVersion,
+    const std::vector<std::string> &bigVersion)
+{
+    if (smallVersion.size() != PACKINFO_VERSION_VECTOR_SIZE || bigVersion.size() != PACKINFO_VERSION_VECTOR_SIZE) {
+        LOG(ERROR) << "invalid smallVersion " << smallVersion.size() << " invalid bigVersion " << bigVersion.size();
+        return false;
+    }
+    if (smallVersion[0] != bigVersion[0]) {
+        LOG(ERROR) << "pre " << smallVersion[0] << " not same as pkg " << bigVersion[0];
+        return false;
+    }
+
+    for (size_t i = 1; i < PACKINFO_VERSION_VECTOR_SIZE; i++) {
+        uint32_t smallVer = static_cast<uint32_t>(std::stoi(smallVersion.at(i)));
+        uint32_t bigVer = static_cast<uint32_t>(std::stoi(bigVersion.at(i)));
+        if (smallVer > bigVer) {
+            return false;
+        } else if (smallVer < bigVer) {
+            return true;
+        }
+    }
+    // same
+    return true;
+}
+
+__attribute__((unused)) bool ParseVersion(const std::string &version, const std::string &split,
+    std::vector<std::string> &versionVec)
+{
+    size_t index = version.rfind(split);
+    if (index == std::string::npos) {
+        LOG(ERROR) << "ParseVersion failed " << version;
+        return false;
+    }
+    versionVec.emplace_back(version.substr(0, index));
+    std::string versionNumber = version.substr(index + split.length());
+
+    std::vector<std::string> tmpVersionVec = Utils::SplitString(versionNumber, "."); // xxx-d01_4.10.0.1
+    if (tmpVersionVec.size() != 4) { // 4: version number size
+        LOG(ERROR) << version << " is not right";
+        return false;
+    }
+    versionVec.insert(versionVec.end(), tmpVersionVec.begin(), tmpVersionVec.end());
     return true;
 }
 

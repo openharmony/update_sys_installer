@@ -62,6 +62,8 @@ private:
     bool GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo);
     void SaveInstallerResult(const std::string &hmpPath, int result, const std::string &resultInfo);
     int32_t ReallyInstallModulePackage(const std::string &pkgPath, const sptr<ISysInstallerCallback> &updateCallback);
+    void ParseHmpVersionInfo(std::vector<HmpVersionInfo> &versionInfos, const HmpVersionInfo &preInfo,
+        const HmpVersionInfo &actInfo);
 
     std::unordered_set<std::string> hmpSet_;
     std::unordered_map<int32_t, std::string> saIdHmpMap_;

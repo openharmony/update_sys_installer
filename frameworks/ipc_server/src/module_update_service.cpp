@@ -357,6 +357,36 @@ bool ModuleUpdateService::GetHmpVersion(const std::string &hmpPath, HmpVersionIn
     return true;
 }
 
+void ModuleUpdateService::ParseHmpVersionInfo(std::vector<HmpVersionInfo> &versionInfos, const HmpVersionInfo &preInfo,
+    const HmpVersionInfo &actInfo)
+{
+    if (preInfo.version.size() == 0 && actInfo.version.size() == 0) {
+        LOG(WARNING) << "version is empty";
+        return;
+    }
+
+    if (actInfo.version.size() == 0) {
+        LOG(INFO) << "add preinstaller info";
+        versionInfos.emplace_back(preInfo);
+        return;
+    }
+    std::vector<std::string> preVersion {};
+    std::vector<std::string> actVersion {};
+    // version: xxx-d01 4.5.10.100
+    if (!ParseVersion(preInfo.version, " ", preVersion) || !ParseVersion(actInfo.version, " ", actVersion)) {
+        LOG(ERROR) << "ParseVersion failed";
+        return;
+    }
+
+    if (ComparePackInfoVer(preVersion, actVersion)) {
+        LOG(INFO) << "add active info";
+        versionInfos.emplace_back(actInfo);
+    } else {
+        LOG(INFO) << "add preinstaller info";
+        versionInfos.emplace_back(preInfo);
+    }
+}
+
 std::vector<HmpVersionInfo> ModuleUpdateService::GetHmpVersionInfo()
 {
     LOG(INFO) << "GetHmpVersionInfo";
@@ -366,17 +396,11 @@ std::vector<HmpVersionInfo> ModuleUpdateService::GetHmpVersionInfo()
         std::string preInstallHmpPath = std::string(MODULE_PREINSTALL_DIR) + "/" + hmp;
         std::string activeHmpPath = std::string(UPDATE_ACTIVE_DIR) + "/" + hmp;
         LOG(INFO) << "preInstallHmpPath:" << preInstallHmpPath << " activeHmpPath:" << activeHmpPath;
-        if (CheckPathExists(activeHmpPath)) {
-            HmpVersionInfo info {};
-            if (GetHmpVersion(activeHmpPath, info)) {
-                versionInfos.emplace_back(info);
-                continue;
-            }
-        }
-        HmpVersionInfo info {};
-        if (GetHmpVersion(preInstallHmpPath, info)) {
-            versionInfos.emplace_back(info);
-        }
+        HmpVersionInfo actinfo {};
+        HmpVersionInfo preinfo {};
+        (void)GetHmpVersion(preInstallHmpPath, preinfo);
+        (void)GetHmpVersion(activeHmpPath, actinfo);
+        ParseHmpVersionInfo(versionInfos, preinfo, actinfo);
     }
     return versionInfos;
 }
@@ -417,6 +441,12 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
     }
 
     updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, 0, "");
+    if (!ModuleFile::VerifyModulePackageSign(path)) {
+        LOG(ERROR) << "Verify sign failed " << path;
+        ret = ModuleErrorCode::ERR_VERIFY_SIGN_FAIL;
+        return ret;
+    }
+
     ret = InstallModulePackage(path);
     return ret;
 }
