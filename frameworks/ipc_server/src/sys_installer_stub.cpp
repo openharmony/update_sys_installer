@@ -156,9 +156,6 @@ bool SysInstallerStub::CheckCallingPerm(void)
 {
     int32_t callingUid = OHOS::IPCSkeleton::GetCallingUid();
     LOG(INFO) << "CheckCallingPerm callingUid:" << callingUid;
-    if (callingUid == 0) {
-        return true;
-    }
     return callingUid == Updater::Utils::USER_UPDATE_AUTHORITY && IsPermissionGranted();
 }
 
