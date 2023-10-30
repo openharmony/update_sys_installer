@@ -60,7 +60,10 @@ ohos_shared_library("libsysinstaller_shared") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "updater:libfsmanager",
+    "updater:libmiscinfo",
     "updater:libupdaterlog",
+    "updater:libupdaterpackage",
     "updater:libutils",
   ]
 
@@ -143,6 +146,11 @@ ohos_shared_library("module_update") {
   deps = [ "${sys_installer_path}/services/module_update:module_update_static" ]
 
   public_configs = [ ":exported_header_files" ]
+
+  innerapi_tags = [
+    "platformsdk",
+    "sasdk",
+  ]
 
   part_name = "sys_installer"
   subsystem_name = "updater"
