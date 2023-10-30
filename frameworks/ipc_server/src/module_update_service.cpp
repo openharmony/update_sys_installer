@@ -77,7 +77,7 @@ bool ClearModuleDirs(const std::string &hmpName)
 
 bool BackupFile(const std::string &file)
 {
-    std::string fileName = GetFileName(file);
+    std::string fileName = GetFileAllName(file);
     std::string hmpName = GetHmpName(file);
     if (fileName.empty() || hmpName.empty()) {
         return true;
@@ -87,7 +87,7 @@ bool BackupFile(const std::string &file)
         LOG(ERROR) << "Failed to create hmp dir " << destPath;
         return false;
     }
-    std::string destFile = destPath + "/" + fileName + MODULE_PACKAGE_SUFFIX;
+    std::string destFile = destPath + "/" + fileName;
     int ret = link(file.c_str(), destFile.c_str());
     if (ret != 0) {
         LOG(ERROR) << "Failed to link file " << file << " to dest " << destFile;
