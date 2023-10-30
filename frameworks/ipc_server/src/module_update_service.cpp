@@ -75,9 +75,21 @@ bool ClearModuleDirs(const std::string &hmpName)
     return ForceRemoveDirectory(hmpInstallDir) && ForceRemoveDirectory(hmpActiveDir);
 }
 
+std::string GetFileAllName(const std::string &path)
+{
+    auto pos = path.find_last_of('/');
+    if (pos == std::string::npos) {
+        pos = path.find_last_of('\\');
+        if (pos == std::string::npos) {
+            return "";
+        }
+    }
+    return path.substr(pos + 1);
+}
+
 bool BackupFile(const std::string &file)
 {
-    std::string fileName = GetFileName(file);
+    std::string fileName = GetFileAllName(file);
     std::string hmpName = GetHmpName(file);
     if (fileName.empty() || hmpName.empty()) {
         return true;
@@ -87,7 +99,7 @@ bool BackupFile(const std::string &file)
         LOG(ERROR) << "Failed to create hmp dir " << destPath;
         return false;
     }
-    std::string destFile = destPath + "/" + fileName + MODULE_PACKAGE_SUFFIX;
+    std::string destFile = destPath + "/" + fileName;
     int ret = link(file.c_str(), destFile.c_str());
     if (ret != 0) {
         LOG(ERROR) << "Failed to link file " << file << " to dest " << destFile;
