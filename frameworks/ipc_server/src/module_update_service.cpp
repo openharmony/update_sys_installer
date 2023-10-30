@@ -75,6 +75,18 @@ bool ClearModuleDirs(const std::string &hmpName)
     return ForceRemoveDirectory(hmpInstallDir) && ForceRemoveDirectory(hmpActiveDir);
 }
 
+std::string GetFileAllName(const std::string &path)
+{
+    auto pos = path.find_last_of('/');
+    if (pos == std::string::npos) {
+        pos = path.find_last_of('\\');
+        if (pos == std::string::npos) {
+            return "";
+        }
+    }
+    return path.substr(pos + 1);
+}
+
 bool BackupFile(const std::string &file)
 {
     std::string fileName = GetFileAllName(file);
