@@ -48,7 +48,7 @@ ohos_shared_library("libsysinstaller_shared") {
   public_configs = [ ":libsysinstallerkits_exported_headers" ]
 
   deps = [
-    "//third_party/bounds_checking_function:libsec_static"
+    "//third_party/bounds_checking_function:libsec_static",
     "//third_party/lz4:liblz4_static",
     "//third_party/zlib:libz",
   ]
