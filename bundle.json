@@ -67,6 +67,18 @@
           }
         },
         {
+          "name": "//base/update/sys_installer/interfaces/innerkits/ipc_client:libsysinstaller_shared",
+          "header": {
+            "header_files": [],
+            "header_base": [
+               "//base/update/sys_installer/interfaces/innerkits/inner_api/include",
+               "//base/update/sys_installer/interfaces/innerkits/ipc_client/include",
+               "//base/update/sys_installer/interfaces/innerkits",
+               "//base/update/sys_installer/common/include"
+            ]
+          }
+        },
+        {
           "name": "//base/update/sys_installer/interfaces/innerkits/ipc_client:module_update",
           "header": {
             "header_files": [],
