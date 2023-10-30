@@ -198,6 +198,9 @@ bool ModuleUpdateStub::CheckCallingPerm(void)
 {
     int32_t callingUid = OHOS::IPCSkeleton::GetCallingUid();
     LOG(INFO) << "CheckCallingPerm callingUid:" << callingUid;
+    if (callingUid == 0) {
+        return true;
+    }
     return callingUid == USER_UPDATE_AUTHORITY && IsPermissionGranted();
 }
 
