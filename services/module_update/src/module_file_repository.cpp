@@ -59,7 +59,8 @@ void ModuleFileRepository::InitRepository(const std::unordered_set<int32_t> &saI
 void ModuleFileRepository::SaveInstallerResult(const std::string &path, const std::string &hmpName,
     int result, const std::string &resultInfo) const
 {
-    if (path.find(UPDATE_INSTALL_DIR) == std::string::npos) {
+    if (path.find(UPDATE_INSTALL_DIR) == std::string::npos ||
+        path.find(UPDATE_ACTIVE_DIR) == std::string::npos) {
         return;
     }
     LOG(INFO) << "path:" << path << "hmp:" << hmpName << "result:" << result << "Info:" << resultInfo << "\n";
