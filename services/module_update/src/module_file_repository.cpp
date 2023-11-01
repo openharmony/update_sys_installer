@@ -25,6 +25,7 @@
 #include "module_utils.h"
 #include "module_error_code.h"
 #include "scope_guard.h"
+#include "unique_fd.h"
 
 namespace OHOS {
 namespace SysInstaller {
