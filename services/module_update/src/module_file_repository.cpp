@@ -60,28 +60,29 @@ void ModuleFileRepository::InitRepository(const std::unordered_set<int32_t> &saI
 void ModuleFileRepository::SaveInstallerResult(const std::string &path, const std::string &hmpName,
     int result, const std::string &resultInfo) const
 {
-    if (path.find(UPDATE_INSTALL_DIR) == std::string::npos &&
-        path.find(UPDATE_ACTIVE_DIR) == std::string::npos) {
+    if (path.find(UPDATE_INSTALL_DIR) == std::string::npos && path.find(UPDATE_ACTIVE_DIR) == std::string::npos) {
         return;
     }
-    LOG(INFO) << "path:" << path << "hmp:" << hmpName << "result:" << result << "Info:" << resultInfo << "\n";
+    if (!CheckFileSuffix(path, MODULE_PACKAGE_SUFFIX)) {
+        return;
+    }
     if (!CheckPathExists(MODULE_RESULT_PATH)) {
         LOG(ERROR) << MODULE_RESULT_PATH << " not exist";
         return;
     }
-    int fd = open(MODULE_RESULT_PATH, 'a');
-    if (fd == -1) {
+    LOG(INFO) << "path:" << path << "hmp:" << hmpName << "result:" << result << "Info:" << resultInfo << "\n";
+
+    UniqueFd fd(open(MODULE_RESULT_PATH, O_APPEND | O_RDWR | O_CLOEXEC));
+    if (fd.Get() == -1) {
         LOG(ERROR) << "Failed to open file";
         return;
     }
-    ON_SCOPE_EXIT(closeFd) {
-        fsync(fd);
-        close(fd);
-    };
+
     std::string writeInfo = hmpName + ";" + std::to_string(result) + ";" + resultInfo;
     if (write(fd, writeInfo.data(), writeInfo.length()) <= 0) {
         LOG(WARNING) << "write result file failed, err:" << errno;
     }
+    fsync(fd.Get());
 }
 
 void ModuleFileRepository::ProcessFile(const std::unordered_set<int32_t> &saIdSet, const string &path,
