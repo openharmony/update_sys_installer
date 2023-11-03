@@ -71,8 +71,7 @@ int32_t CreateModuleDirs(const std::string &hmpName)
 bool ClearModuleDirs(const std::string &hmpName)
 {
     std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
-    std::string hmpActiveDir = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
-    return ForceRemoveDirectory(hmpInstallDir) && ForceRemoveDirectory(hmpActiveDir);
+    return ForceRemoveDirectory(hmpInstallDir);
 }
 
 std::string GetFileAllName(const std::string &path)
