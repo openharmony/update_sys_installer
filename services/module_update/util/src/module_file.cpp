@@ -214,25 +214,10 @@ __attribute__((unused)) bool ParseVersion(const std::string &version, const std:
     return true;
 }
 
-bool ModuleFile::VerifyModulePackageSign(const std::string &path)
+__attribute__((weak)) int32_t VerifyModulePackageSign(const std::string &path)
 {
-    void *handle = dlopen("libmodule_update_ext.z.so", RTLD_NOW);
-    if (handle == NULL) {
-        LOG(INFO) << "dlopen module update ext lib failed with error:" << dlerror();
-        return VerifyPackage(path.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0) == 0;
-    }
-    ON_SCOPE_EXIT(clear) {
-        dlclose(handle);
-    };
-
-    typedef int32_t* (*ExtFunc)(const char *, const char *, const char *, const uint8_t *, size_t);
-    ExtFunc func = (ExtFunc)dlsym(handle, "VerifyModulePackage");
-    if (func == NULL) {
-        LOG(INFO) << "dlsym get func failed with error:" << dlerror();
-        return VerifyPackage(path.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0) == 0;
-    }
-
-    return func(path.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0) == 0;
+    LOG(INFO) << "VerifyModulePackageSign " << path;
+    return VerifyPackage(path.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0);
 }
 
 std::unique_ptr<ModuleFile> ModuleFile::Open(const string &path)
