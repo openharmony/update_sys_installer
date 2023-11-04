@@ -104,7 +104,7 @@ void ModuleFileRepository::ProcessFile(const std::unordered_set<int32_t> &saIdSe
                 ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "get pub key fail");
             return;
         }
-        if (ModuleFile::VerifyModulePackageSign(file) != 0) {
+        if (VerifyModulePackageSign(file) != 0) {
             LOG(ERROR) << "VerifyModulePackageSign failed of " << file;
             SaveInstallerResult(path, GetHmpName(moduleFile->GetPath()),
                 ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "verify fail");
