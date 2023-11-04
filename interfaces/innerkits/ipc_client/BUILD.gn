@@ -152,6 +152,10 @@ ohos_shared_library("module_update") {
     "sasdk",
   ]
 
+  if (defined(module_update_custom_external_deps)) {
+    external_deps = module_update_custom_external_deps
+  }
+
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
