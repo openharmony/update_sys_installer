@@ -207,7 +207,7 @@ int32_t ModuleUpdateService::InstallModuleFile(const std::string &hmpName, const
         LOG(ERROR) << "Module file " << file << " should be in hmp " << preInstalledHmp;
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
-    if (ModuleFile::VerifyModulePackageSign(file) != 0) {
+    if (VerifyModulePackageSign(file) != 0) {
         LOG(ERROR) << "Verify sign failed " << file;
         return ModuleErrorCode::ERR_VERIFY_SIGN_FAIL;
     }
@@ -330,7 +330,7 @@ bool ModuleUpdateService::GetHmpVersion(const std::string &hmpPath, HmpVersionIn
 {
     LOG(INFO) << "GetHmpVersion " << hmpPath;
     std::string packInfoPath = hmpPath + "/" + PACK_INFO_NAME;
-    if (ModuleFile::VerifyModulePackageSign(packInfoPath) != 0) {
+    if (VerifyModulePackageSign(packInfoPath) != 0) {
         LOG(ERROR) << "Verify sign failed " << packInfoPath;
         return false;
     }
@@ -452,7 +452,7 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
     }
 
     updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, 0, "");
-    if (ModuleFile::VerifyModulePackageSign(path) != 0) {
+    if (VerifyModulePackageSign(path) != 0) {
         LOG(ERROR) << "Verify sign failed " << path;
         ret = ModuleErrorCode::ERR_VERIFY_SIGN_FAIL;
         return ret;
