@@ -58,6 +58,8 @@ ohos_executable("module_update_service") {
     cflags = [ "-DWITH_SELINUX" ]
   }
 
+  if (defined)
+
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
