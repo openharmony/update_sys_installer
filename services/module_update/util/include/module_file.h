@@ -33,6 +33,13 @@ constexpr size_t FS_TYPE_MAX_SIZE = 10;
 bool ExtractZipFile(ModuleZipHelper &helper, const std::string &fileName, std::string &buf);
 bool ParseVersion(const std::string &version, const std::string &split, std::vector<std::string> &versionVec);
 bool ComparePackInfoVer(const std::vector<std::string> &smallVersion, const std::vector<std::string> &bigVersion);
+#ifdef __cplusplus
+extern "C" {
+#endif
+int32_t VerifyModulePackageSign(const std::string &path);
+#ifdef __cplusplus
+}
+#endif
 
 struct ModuleVersion {
     uint32_t apiVersion;
@@ -54,7 +61,6 @@ struct ImageStat {
 class ModuleFile {
 public:
     static std::unique_ptr<ModuleFile> Open(const std::string &path);
-    static bool VerifyModulePackageSign(const std::string &path);
     static bool CompareVersion(const ModuleFile &file1, const ModuleFile &file2);
     ModuleFile(const std::string &modulePath,
                const std::string &saName,

@@ -58,6 +58,19 @@ ohos_executable("module_update_service") {
     cflags = [ "-DWITH_SELINUX" ]
   }
 
+  if (defined(module_update_custom_external_deps)) {
+    external_deps += module_update_custom_external_deps
+  }
+
+  # force link invisible function
+  if (defined(module_update_force_link_libs)) {
+    ldflags = [ "-Wl,--whole-archive" ]
+    foreach(lib, module_update_force_link_libs) {
+      ldflags += [ "${lib}" ]
+    }
+    ldflags += [ "-Wl,--no-whole-archive" ]
+  }
+
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
