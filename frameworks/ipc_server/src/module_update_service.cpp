@@ -548,11 +548,12 @@ void ModuleUpdateService::OnBootCompleted()
 void ModuleUpdateService::OnHmpError(const std::string &hmpName)
 {
     LOG(INFO) << "OnHmpError hmpName=" << hmpName;
-    std::string errPath = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
-    if (!CheckPathExists(errPath)) {
+    std::string activePath = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
+    if (!CheckPathExists(activePath)) {
         LOG(INFO) << "No update package in " << hmpName;
         return;
     }
+    std::string errPath = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
     if (!ForceRemoveDirectory(errPath)) {
         LOG(ERROR) << "Failed to remove " << errPath;
         return;
