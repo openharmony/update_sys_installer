@@ -78,7 +78,7 @@ void ModuleFileRepository::SaveInstallerResult(const std::string &path, const st
         return;
     }
 
-    std::string writeInfo = hmpName + ";" + std::to_string(result) + ";" + resultInfo;
+    std::string writeInfo = hmpName + ";" + std::to_string(result) + ";" + resultInfo + "\n";
     if (write(fd, writeInfo.data(), writeInfo.length()) <= 0) {
         LOG(WARNING) << "write result file failed, err:" << errno;
     }
