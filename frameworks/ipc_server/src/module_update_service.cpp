@@ -554,7 +554,7 @@ void ModuleUpdateService::OnHmpError(const std::string &hmpName)
         return;
     }
     std::string errPath = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
-    if (!ForceRemoveDirectory(errPath)) {
+    if (CheckPathExists(errPath) && !ForceRemoveDirectory(errPath)) {
         LOG(ERROR) << "Failed to remove " << errPath;
         return;
     }
