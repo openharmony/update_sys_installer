@@ -263,6 +263,10 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
         return false;
     }
     const int waitTime = 50;
+    int time = 0;
+    while (!CheckPathExists(loopbackDevice.name) && time++ < waitTime) {
+        usleep(20); // 20ms
+    }
     LOG(INFO) << "Loopback device created: " << loopbackDevice.name;
 
     string blockDevice = loopbackDevice.name;
