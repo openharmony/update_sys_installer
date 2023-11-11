@@ -262,6 +262,7 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
         LOG(ERROR) << "Could not create loop device for " << fullPath;
         return false;
     }
+    const int waitTime = 50;
     LOG(INFO) << "Loopback device created: " << loopbackDevice.name;
 
     string blockDevice = loopbackDevice.name;
