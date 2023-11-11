@@ -231,6 +231,15 @@ bool ModuleUpdate::ActivateModules()
     return activateSuccess;
 }
 
+void ModuleUpdate::WaitDevice(const std::string &blockDevice) const
+{
+    const int waitTime = 150; // wait max 3s
+    int time = 0;
+    while (!CheckPathExists(blockDevice) && time++ < waitTime) {
+        usleep(20); // 20ms
+    }
+}
+
 bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool mountOnVerity) const
 {
     string mountPoint = string(MODULE_ROOT_DIR) + "/" + std::to_string(moduleFile.GetSaId());
@@ -271,6 +280,7 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
             return false;
         }
     }
+    WaitDevice(blockDevice);
     uint32_t mountFlags = MS_NOATIME | MS_NODEV | MS_DIRSYNC | MS_RDONLY;
     LOG(INFO) << "fsType=" << imageStat.fsType;
     ret = mount(blockDevice.c_str(), mountPoint.c_str(), imageStat.fsType, mountFlags, nullptr);
