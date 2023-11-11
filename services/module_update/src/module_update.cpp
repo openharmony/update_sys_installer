@@ -262,7 +262,7 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
         LOG(ERROR) << "Could not create loop device for " << fullPath;
         return false;
     }
-    const int waitTime = 50;
+    const int waitTime = 150;
     int time = 0;
     while (!CheckPathExists(loopbackDevice.name) && time++ < waitTime) {
         usleep(20); // 20ms
