@@ -236,7 +236,7 @@ void ModuleUpdate::WaitDevice(const std::string &blockDevice) const
     const int waitTime = 150; // wait max 3s
     int time = 0;
     while (!CheckPathExists(blockDevice) && time++ < waitTime) {
-        usleep(20); // 20ms
+        usleep(20000); // 20ms
     }
 }
 
