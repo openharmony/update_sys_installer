@@ -80,6 +80,19 @@ int32_t SysInstallerServer::StartDeleteParaZip(const std::string &location, cons
     return InstallerManager::GetInstance().StartDeleteParaZip(location, cfgDir);
 }
 
+int32_t SysInstallerServer::AccDecompressAndVerifyPkg(const std::string &srcPath,
+    const std::string &dstPath, const uint32_t type)
+{
+    LOG(INFO) << "AccDecompressAndVerifyPkg";
+    return InstallerManager::GetInstance().AccDecompressAndVerifyPkg(srcPath, dstPath, type);
+}
+
+int32_t SysInstallerServer::AccDeleteDir(const std::string &dstPath)
+{
+    LOG(INFO) << "AccDeleteDir";
+    return InstallerManager::GetInstance().AccDeleteDir(dstPath);
+}
+
 void SysInstallerServer::OnStart()
 {
     LOG(INFO) << "OnStart";

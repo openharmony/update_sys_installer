@@ -198,5 +198,64 @@ int32_t SysInstallerProxy::StartDeleteParaZip(const std::string &location, const
 
     return reply.ReadInt32();
 }
+
+int32_t SysInstallerProxy::AccDecompressAndVerifyPkg(const std::string &srcPath,
+    const std::string &dstPath, const uint32_t type)
+{
+    LOG(INFO) << "AccDecompressAndVerifyPkg";
+    auto remote = Remote();
+    if (remote == nullptr) {
+        LOG(ERROR) << "Can not get remote";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOG(ERROR) << "WriteInterfaceToken error";
+        return ERR_FLATTEN_OBJECT;
+    }
+    data.WriteString16(Str8ToStr16(srcPath));
+    data.WriteString16(Str8ToStr16(dstPath));
+    data.WriteInt32(static_cast<int32_t>(type));
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::DECOMPRESS_ACC_PACKAGE), data, reply, option);
+    if (ret != ERR_OK) {
+        LOG(ERROR) << "SendRequest error";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    return reply.ReadInt32();
+}
+
+int32_t SysInstallerProxy::AccDeleteDir(const std::string &dstPath)
+{
+    LOG(INFO) << "AccDeleteDir";
+    auto remote = Remote();
+    if (remote == nullptr) {
+        LOG(ERROR) << "Can not get remote";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOG(ERROR) << "WriteInterfaceToken error";
+        return ERR_FLATTEN_OBJECT;
+    }
+    data.WriteString16(Str8ToStr16(dstPath));
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::DELETE_ACC_PACKAGE), data, reply, option);
+    if (ret != ERR_OK) {
+        LOG(ERROR) << "SendRequest error";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    return reply.ReadInt32();
+}
 }
 } // namespace OHOS

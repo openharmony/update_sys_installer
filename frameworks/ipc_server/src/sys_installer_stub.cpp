@@ -45,6 +45,10 @@ SysInstallerStub::SysInstallerStub()
         bind(&SysInstallerStub::StartUpdateParaZipStub, this, _1, _2, _3, _4));
     requestFuncMap_.emplace(SysInstallerInterfaceCode::DELETE_PARA_PACKAGE,
         bind(&SysInstallerStub::StartDeleteParaZipStub, this, _1, _2, _3, _4));
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::DECOMPRESS_ACC_PACKAGE,
+        bind(&SysInstallerStub::AccDecompressAndVerifyPkgStub, this, _1, _2, _3, _4));
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::DELETE_ACC_PACKAGE,
+        bind(&SysInstallerStub::AccDeleteDirStub, this, _1, _2, _3, _4));
 }
 
 SysInstallerStub::~SysInstallerStub()
@@ -135,6 +139,38 @@ int32_t SysInstallerStub::StartDeleteParaZipStub(SysInstallerStub *service,
     LOG(INFO) << "StartDeleteParaZipStub location:" << location << " cfgDir:" << cfgDir;
 
     int32_t ret = service->StartDeleteParaZip(location, cfgDir);
+    reply.WriteInt32(ret);
+    return 0;
+}
+
+int32_t SysInstallerStub::AccDecompressAndVerifyPkgStub(SysInstallerStub *service,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (service == nullptr) {
+        LOG(ERROR) << "Invalid param";
+        return -1;
+    }
+    string srcPath = Str16ToStr8(data.ReadString16());
+    string dstPath = Str16ToStr8(data.ReadString16());
+    uint32_t type = static_cast<uint32_t>(data.ReadInt32());
+    LOG(INFO) << "StartUpdateParaZipStub srcPath:" << srcPath << " dstPath:" << dstPath;
+
+    int32_t ret = service->AccDecompressAndVerifyPkg(srcPath, dstPath, type);
+    reply.WriteInt32(ret);
+    return 0;
+}
+
+int32_t SysInstallerStub::AccDeleteDirStub(SysInstallerStub *service,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (service == nullptr) {
+        LOG(ERROR) << "Invalid param";
+        return -1;
+    }
+    string dstPath = Str16ToStr8(data.ReadString16());
+    LOG(INFO) << "AccDeleteDirStub dstPath:" << dstPath;
+
+    int32_t ret = service->AccDeleteDir(dstPath);
     reply.WriteInt32(ret);
     return 0;
 }

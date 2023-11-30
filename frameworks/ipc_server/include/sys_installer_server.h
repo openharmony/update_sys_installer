@@ -43,6 +43,9 @@ public:
     int32_t StartUpdateParaZip(const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir) override;
     int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir) override;
+    int32_t AccDecompressAndVerifyPkg(const std::string &srcPath,
+        const std::string &dstPath, const uint32_t type) override;
+    int32_t AccDeleteDir(const std::string &dstPath) override;
 
 #ifndef UPDATER_UT
 private:

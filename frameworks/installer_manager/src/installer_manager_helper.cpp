@@ -85,5 +85,16 @@ int32_t InstallerManagerHelper::StartDeleteParaZip(const std::string &location, 
 {
     return -1;
 }
+
+int32_t InstallerManagerHelper::AccDecompressAndVerifyPkg(const std::string &srcPath,
+    const std::string &dstPath, const uint32_t type)
+{
+    return -1;
+}
+
+int32_t InstallerManagerHelper::AccDeleteDir(const std::string &dstPath)
+{
+    return -1;
+}
 } // namespace SysInstaller
 } // namespace OHOS

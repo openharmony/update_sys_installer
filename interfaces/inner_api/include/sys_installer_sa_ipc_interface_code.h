@@ -41,6 +41,8 @@ enum SysInstallerInterfaceCode {
     GET_UPDATE_STATUS,
     UPDATE_PARA_PACKAGE,
     DELETE_PARA_PACKAGE,
+    DECOMPRESS_ACC_PACKAGE,
+    DELETE_ACC_PACKAGE,
 };
 } // namespace SysInstaller
 } // namespace OHOS
