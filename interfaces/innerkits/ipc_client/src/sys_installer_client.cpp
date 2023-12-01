@@ -64,6 +64,14 @@ int main(int argc, char **argv)
         case SysInstallerInterfaceCode::DELETE_PARA_PACKAGE:
             ret = SysInstallerKitsImpl::GetInstance().StartDeleteParaZip("System", "/taboo");
             break;
+        case SysInstallerInterfaceCode::DECOMPRESS_ACC_PACKAGE:
+            ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
+                "/data/ota_package/update.zip",
+                "/data/ota_package/", 1);
+            break;
+        case SysInstallerInterfaceCode::DELETE_ACC_PACKAGE:
+            ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("/data/ota_package/");
+            break;
         default:
             break;
     }

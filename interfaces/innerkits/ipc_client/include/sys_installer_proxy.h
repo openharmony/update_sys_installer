@@ -32,6 +32,9 @@ public:
     virtual int32_t StartUpdateParaZip(const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir);
     virtual int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir);
+    virtual int32_t AccDecompressAndVerifyPkg(const std::string &srcPath,
+        const std::string &dstPath, const uint32_t type);
+    virtual int32_t AccDeleteDir(const std::string &dstPath);
 private:
     static inline BrokerDelegator<SysInstallerProxy> delegator_;
 };

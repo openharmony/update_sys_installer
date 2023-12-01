@@ -219,6 +219,33 @@ int32_t SysInstallerKitsImpl::StartDeleteParaZip(const std::string &location, co
     return ret;
 }
 
+int32_t SysInstallerKitsImpl::AccDecompressAndVerifyPkg(const std::string &srcPath,
+    const std::string &dstPath, const uint32_t type)
+{
+    LOG(INFO) << "AccDecompressAndVerifyPkg";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->AccDecompressAndVerifyPkg(srcPath, dstPath, type);
+    LOG(INFO) << "AccDecompressAndVerifyPkg ret:" << ret;
+    return ret;
+}
+
+int32_t SysInstallerKitsImpl::AccDeleteDir(const std::string &dstPath)
+{
+    LOG(INFO) << "AccDeleteDir";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->AccDeleteDir(dstPath);
+    LOG(INFO) << "AccDeleteDir ret:" << ret;
+    return ret;
+}
+
 void SysInstallerKitsImpl::LoadServiceSuccess()
 {
     serviceCv_.notify_all();

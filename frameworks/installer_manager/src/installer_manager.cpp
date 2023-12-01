@@ -93,5 +93,24 @@ int32_t InstallerManager::StartDeleteParaZip(const std::string &location, const 
     }
     return helper_->StartDeleteParaZip(location, cfgDir);
 }
+
+int32_t InstallerManager::AccDecompressAndVerifyPkg(const std::string &srcPath,
+    const std::string &dstPath, const uint32_t type)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->AccDecompressAndVerifyPkg(srcPath, dstPath, type);
+}
+
+int32_t InstallerManager::AccDeleteDir(const std::string &dstPath)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->AccDeleteDir(dstPath);
+}
 } // namespace SysInstaller
 } // namespace OHOS

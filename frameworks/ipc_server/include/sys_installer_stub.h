@@ -49,6 +49,10 @@ private:
         MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t StartDeleteParaZipStub(SysInstallerStub *service,
         MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t AccDecompressAndVerifyPkgStub(SysInstallerStub *service,
+        MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t AccDeleteDirStub(SysInstallerStub *service,
+        MessageParcel &data, MessageParcel &reply, MessageOption &option);
     bool CheckCallingPerm(void);
     bool IsPermissionGranted(void);
 
