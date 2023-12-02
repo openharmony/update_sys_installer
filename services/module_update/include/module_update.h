@@ -38,6 +38,7 @@ private:
     bool MountModulePackage(const ModuleFile &moduleFile, const bool mountOnVerity) const;
     void ReportMountStatus(const ModuleUpdateStatus &status) const;
     void WaitDevice(const std::string &blockDevice) const;
+    bool CheckMountComplete(std::string &status) const;
 
     std::unordered_set<int32_t> saIdSet_;
     std::list<ModuleFile> moduleFileList_;

@@ -137,6 +137,19 @@ string GetSuccessSaIdString(const ModuleUpdateStatus &status)
 }
 }
 
+bool ModuleUpdate::CheckMountComplete(string &status) const
+{
+    bool mountStatus = false;
+    for (int32_t saId : saIdSet_) {
+        string path = std::string(MODULE_ROOT_DIR) + "/" + std::to_string(saId);
+        if (CheckPathExists(path)) {
+            mountStatus = true;
+            status += std::to_string(saId) + " ";
+        }
+    }
+    return mountStatus;
+}
+
 string ModuleUpdate::CheckModuleUpdate(const string &path)
 {
     LOG(INFO) << "CheckModuleUpdate path=" << path;
@@ -146,6 +159,11 @@ string ModuleUpdate::CheckModuleUpdate(const string &path)
         LOG(ERROR) << "Failed to parse sa profile";
         return ret;
     }
+    if (CheckMountComplete(ret)) {
+        LOG(INFO) << "CheckMountComplete ret=" << ret;
+        return ret;
+    }
+
     ModuleFileRepository::GetInstance().InitRepository(saIdSet_);
     ON_SCOPE_EXIT(clear) {
         ModuleFileRepository::GetInstance().Clear();
