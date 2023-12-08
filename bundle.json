@@ -31,7 +31,6 @@
         "access_token",
         "hisysevent",
         "selinux_adapter",
-        "sys_installer_ext",
         "init"
       ],
       "third_party": [
@@ -102,6 +101,15 @@
             "header_files": [],
             "header_base": [
                "//base/update/sys_installer/frameworks/ipc_server/include"
+            ]
+          }
+        },
+        {
+          "name": "//base/update/sys_installer/services/module_update/service:module_update_service",
+          "header": {
+            "header_files": [],
+            "header_base": [
+              "//base/update/sys_installer/services/module_update/service/include"
             ]
           }
         },

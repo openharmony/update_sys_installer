@@ -15,7 +15,7 @@ import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
-ohos_executable("module_update_service") {
+module_update_service_gen("module_update_service") {
   install_enable = true
 
   sources = [
@@ -56,19 +56,6 @@ ohos_executable("module_update_service") {
   if (build_selinux) {
     external_deps += [ "selinux_adapter:librestorecon" ]
     cflags = [ "-DWITH_SELINUX" ]
-  }
-
-  if (defined(module_update_custom_external_deps)) {
-    external_deps += module_update_custom_external_deps
-  }
-
-  # force link invisible function
-  if (defined(module_update_force_link_libs)) {
-    ldflags = [ "-Wl,--whole-archive" ]
-    foreach(lib, module_update_force_link_libs) {
-      ldflags += [ "${lib}" ]
-    }
-    ldflags += [ "-Wl,--no-whole-archive" ]
   }
 
   part_name = "sys_installer"
