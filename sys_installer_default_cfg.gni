@@ -18,10 +18,6 @@ declare_args() {
   sys_installer_absolutely_path = "//base/update/sys_installer"
 }
 
-if (sys_installer_cfg_file != "") {
-  import("${sys_installer_cfg_file}")
-}
-
 template("sys_installer_gen") {
   if (sys_installer_cfg_file != "") {
     ohos_static_library(target_name) {
