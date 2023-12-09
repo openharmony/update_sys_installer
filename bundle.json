@@ -105,15 +105,6 @@
           }
         },
         {
-          "name": "//base/update/sys_installer/services/module_update/service:module_update_service",
-          "header": {
-            "header_files": [],
-            "header_base": [
-              "//base/update/sys_installer/services/module_update/service/include"
-            ]
-          }
-        },
-        {
           "name": "//base/update/sys_installer/services/module_update:module_update_utils",
           "header": {
             "header_files": [],
