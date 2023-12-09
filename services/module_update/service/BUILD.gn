@@ -16,8 +16,6 @@ import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 module_update_service_gen("module_update_service") {
-  install_enable = true
-
   sources = [
     "${sys_installer_path}/frameworks/ipc_server/src/module_update_service.cpp",
     "${sys_installer_path}/frameworks/ipc_server/src/module_update_stub.cpp",
