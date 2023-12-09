@@ -16,7 +16,7 @@ import("//base/update/updater/updater_default_cfg.gni")
 import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
-ohos_shared_library("sys_installer") {
+sys_installer_gen("sys_installer") {
   defines = [ "SYS_INSTALLER_SERVICE" ]
 
   sources = [

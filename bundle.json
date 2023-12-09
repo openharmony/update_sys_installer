@@ -31,7 +31,6 @@
         "access_token",
         "hisysevent",
         "selinux_adapter",
-        "sys_installer_ext",
         "init"
       ],
       "third_party": [

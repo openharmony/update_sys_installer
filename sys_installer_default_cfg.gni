@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
+
 declare_args() {
   sys_installer_cfg_file = ""
   sys_installer_absolutely_path = "//base/update/sys_installer"
@@ -18,4 +20,45 @@ declare_args() {
 
 if (sys_installer_cfg_file != "") {
   import("${sys_installer_cfg_file}")
+}
+
+template("sys_installer_gen") {
+  if (sys_installer_cfg_file != "") {
+    ohos_static_library(target_name) {
+      forward_variables_from(invoker, "*")
+    }
+  } else {
+    ohos_shared_library(target_name) {
+      forward_variables_from(invoker, "*")
+    }
+  }
+}
+
+template("module_update_gen") {
+  if (sys_installer_cfg_file != "") {
+    ohos_static_library(target_name) {
+      forward_variables_from(invoker, "*")
+    }
+  } else {
+    ohos_shared_library(target_name) {
+      forward_variables_from(invoker, "*")
+
+      innerapi_tags = [
+        "platformsdk",
+        "sasdk",
+      ]
+    }
+  }
+}
+
+template("module_update_service_gen") {
+  if (sys_installer_cfg_file != "") {
+    ohos_static_library(target_name) {
+      forward_variables_from(invoker, "*")
+    }
+  } else {
+    ohos_executable(target_name) {
+      forward_variables_from(invoker, "*")
+    }
+  }
 }
