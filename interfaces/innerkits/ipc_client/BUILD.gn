@@ -67,6 +67,11 @@ ohos_shared_library("libsysinstaller_shared") {
     "updater:libutils",
   ]
 
+  innerapi_tags = [
+    "platformsdk",
+    "sasdk",
+  ]
+
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
@@ -142,11 +147,6 @@ module_update_gen("module_update") {
 
   public_configs = [ ":exported_header_files" ]
 
-  innerapi_tags = [
-    "platformsdk",
-    "sasdk",
-  ]
-
   if (defined(module_update_custom_external_deps)) {
     external_deps = module_update_custom_external_deps
   }
@@ -218,6 +218,11 @@ ohos_shared_library("libmodule_update_share") {
     "ipc:ipc_core",
     "samgr:samgr_proxy",
     "updater:libupdaterlog",
+  ]
+
+  innerapi_tags = [
+    "platformsdk",
+    "sasdk",
   ]
 
   part_name = "sys_installer"
