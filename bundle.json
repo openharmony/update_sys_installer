@@ -49,8 +49,7 @@
         "//base/update/sys_installer/frameworks/ipc_server/etc:sys_installer_sa.rc",
         "//base/update/sys_installer/frameworks/ipc_server/sa_profile:sys_installer_sa_profile",
         "//base/update/sys_installer/interfaces/innerkits/ipc_client:module_update",
-        "//base/update/sys_installer/services/module_update/service:module_update_service",
-        "//base/update/sys_installer/tools/module_update_tool:module_update_tool"
+        "//base/update/sys_installer/services/module_update/service:module_update_service"
       ],
       "inner_kits": [
         {
@@ -67,6 +66,18 @@
         },
         {
           "name": "//base/update/sys_installer/interfaces/innerkits/ipc_client:libsysinstaller_shared",
+          "header": {
+            "header_files": [],
+            "header_base": [
+               "//base/update/sys_installer/interfaces/innerkits/inner_api/include",
+               "//base/update/sys_installer/interfaces/innerkits/ipc_client/include",
+               "//base/update/sys_installer/interfaces/innerkits",
+               "//base/update/sys_installer/common/include"
+            ]
+          }
+        },
+        {
+          "name": "//base/update/sys_installer/interfaces/innerkits/ipc_client:libmodule_update_share",
           "header": {
             "header_files": [],
             "header_base": [
