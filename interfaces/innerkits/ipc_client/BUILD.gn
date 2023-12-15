@@ -195,7 +195,7 @@ ohos_static_library("module_update_client") {
   subsystem_name = "updater"
 }
 
-ohos_shared_library("libmodule_update_share") {
+ohos_shared_library("libmodule_update_shared") {
   sources = [
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_kits_impl.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_proxy.cpp",
