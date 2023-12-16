@@ -77,7 +77,7 @@
           }
         },
         {
-          "name": "//base/update/sys_installer/interfaces/innerkits/ipc_client:libmodule_update_share",
+          "name": "//base/update/sys_installer/interfaces/innerkits/ipc_client:libmodule_update_shared",
           "header": {
             "header_files": [],
             "header_base": [
