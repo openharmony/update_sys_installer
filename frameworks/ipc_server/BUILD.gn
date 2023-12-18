@@ -40,7 +40,6 @@ sys_installer_gen("sys_installer") {
     "${sys_installer_path}/frameworks/status_manager:libstatusmanager",
     "//third_party/bounds_checking_function:libsec_static",
     "//third_party/cJSON:cjson",
-    "//third_party/curl:curl",
     "//third_party/lz4:liblz4_static",
   ]
 
