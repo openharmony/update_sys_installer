@@ -35,7 +35,7 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 constexpr int GROUP_UPDATE_AUTHORITY = 6666;
-constexpr int LOAD_SA_TIMEOUT_MS = 3000;
+constexpr int LOAD_SA_TIMEOUT_MS = 3;
 
 SysInstallerKitsImpl &SysInstallerKitsImpl::GetInstance()
 {
