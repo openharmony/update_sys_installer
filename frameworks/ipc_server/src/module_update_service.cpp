@@ -177,6 +177,7 @@ int32_t ModuleUpdateService::ReallyInstallModulePackage(const std::string &pkgPa
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
     CANCEL_SCOPE_EXIT_GUARD(rmdir);
+    sync();
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
 }
 
