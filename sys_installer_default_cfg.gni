@@ -49,7 +49,7 @@ template("module_update_gen") {
 
 template("module_update_service_gen") {
   if (sys_installer_cfg_file != "") {
-    ohos_static_library(target_name) {
+    ohos_source_set(target_name) {
       forward_variables_from(invoker, "*")
     }
   } else {
