@@ -123,6 +123,15 @@
                "//base/update/sys_installer/services/module_update/utils/include"
             ]
           }
+        },
+        {
+          "name": "//base/update/sys_installer/services/module_updateservice:libmodule_update_service",
+          "header": {
+            "header_files": [],
+            "header_base": [
+               "//base/update/sys_installer/services/module_update/service/include"
+            ]
+          }
         }
       ],
       "test": [
