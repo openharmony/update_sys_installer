@@ -125,7 +125,7 @@
           }
         },
         {
-          "name": "//base/update/sys_installer/services/module_updateservice:libmodule_update_service",
+          "name": "//base/update/sys_installer/services/module_update/service:libmodule_update_service",
           "header": {
             "header_files": [],
             "header_base": [
