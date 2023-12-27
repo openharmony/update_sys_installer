@@ -38,6 +38,9 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     SysInstallerKitsImpl::GetInstance().GetUpdateStatus();
     SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(pkgPath,
         location, std::string(reinterpret_cast<const char*>(data), size));
+    SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
+        pkgPath, std::string(reinterpret_cast<const char*>(data), size), 1);
+    SysInstallerKitsImpl::GetInstance().AccDeleteDir(std::string(reinterpret_cast<const char*>(data), size));
 }
 }
 
