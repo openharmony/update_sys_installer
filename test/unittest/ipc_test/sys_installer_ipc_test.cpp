@@ -23,6 +23,8 @@
 #include "isys_installer_callback.h"
 #include "system_ability_definition.h"
 #include "sys_installer_kits_impl.h"
+#include "sys_installer_proxy.h"
+#include "sys_installer_load_callback.h"
 
 using namespace testing::ext;
 using namespace std;
@@ -130,6 +132,65 @@ HWTEST_F(SysInstallerIpcUnitTest, AccUpdatePkgTest001, TestSize.Level1)
 
     ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("");
     ASSERT_NE(ret, 0);
+}
+
+// StartUpdateParaZip test
+HWTEST_F(SysInstallerIpcUnitTest, StartUpdateParaZipTest, TestSize.Level1)
+{
+    cout << " StartUpdateParaZip start " << std::endl;
+    SysInstallerLoadCallback sysInstallerLoadCallback {};
+    sysInstallerLoadCallback.OnLoadSystemAbilityFail(0);
+    sysInstallerLoadCallback.OnLoadSystemAbilityFail(4101); // 4041 : SYS_INSTALLER_DISTRIBUTED_SERVICE_ID
+    sptr<IRemoteObject> callback {};
+    SysInstallerProxy env(callback);
+    auto ret = env.StartUpdateParaZip("", "", "");
+    ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
+}
+
+// StartDeleteParaZip test
+HWTEST_F(SysInstallerIpcUnitTest, StartDeleteParaZipTest, TestSize.Level1)
+{
+    cout << " StartDeleteParaZip start " << std::endl;
+    sptr<IRemoteObject> callback {};
+    SysInstallerProxy env(callback);
+    auto ret = env.StartDeleteParaZip("", "");
+    ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
+}
+
+// AccDecompressAndVerifyPkg test
+HWTEST_F(SysInstallerIpcUnitTest, AccDecompressAndVerifyPkgTest, TestSize.Level1)
+{
+    cout << " AccDecompressAndVerifyPkgTest start " << std::endl;
+    sptr<IRemoteObject> callback {};
+    SysInstallerProxy env(callback);
+    auto ret = env.AccDecompressAndVerifyPkg("", "", 0);
+    ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
+}
+
+// AccDeleteDir test
+HWTEST_F(SysInstallerIpcUnitTest, AccDeleteDirTest, TestSize.Level1)
+{
+    cout << " AccDeleteDirTest start " << std::endl;
+    sptr<IRemoteObject> callback {};
+    SysInstallerProxy env(callback);
+    auto ret = env.AccDeleteDir("");
+    ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
+}
+
+// SysInstallerKitsImpl test
+HWTEST_F(SysInstallerIpcUnitTest, SysInstallerKitsImplTest, TestSize.Level1)
+{
+    cout << " SysInstallerKitsImplTest start " << std::endl;
+    wptr<IRemoteObject> remote;
+    SysInstallerKitsImpl::GetInstance().ResetService(remote);
+    auto ret = SysInstallerKitsImpl::GetInstance().StartUpdateParaZip("", "", "");
+    ASSERT_EQ(ret, -1);
+    ret = SysInstallerKitsImpl::GetInstance().StartDeleteParaZip("", "");
+    ASSERT_EQ(ret, -1);
+    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg("", "", 0);
+    ASSERT_EQ(ret, -1);
+    ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("");
+    ASSERT_EQ(ret, -1);
 }
 } // SysInstaller
 } // OHOS
