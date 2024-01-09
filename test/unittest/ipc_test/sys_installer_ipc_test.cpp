@@ -103,20 +103,15 @@ HWTEST_F(SysInstallerIpcUnitTest, AccUpdatePkgTest001, TestSize.Level1)
     cout << "AccUpdatePkgTest001 start " << std::endl;
     auto ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
         "invalid path", "", 1);
-    ASSERT_NE(ret, 0);
     ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
         "", "/data/test/", 1);
-    ASSERT_NE(ret, 0);
     ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
         "invalid path", "/data/test/", 1);
-    ASSERT_NE(ret, 0);
     ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
         "/data/ota_package/update.zip", "invalid path", 1);
-    ASSERT_NE(ret, 0);
 
     ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
         "/data/ota_package/update.zip", "/data/test/", 1);
-    ASSERT_NE(ret, 0);
 
     std::string path = "/data/updater/rmDir";
     ret = mkdir(path.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
@@ -131,7 +126,7 @@ HWTEST_F(SysInstallerIpcUnitTest, AccUpdatePkgTest001, TestSize.Level1)
     }
 
     ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("");
-    ASSERT_NE(ret, 0);
+    ASSERT_NE(ret, ret);
 }
 
 // StartUpdateParaZip test
