@@ -203,7 +203,7 @@ int32_t SysInstallerKitsImpl::StartUpdateParaZip(const std::string &pkgPath,
     }
     int32_t ret = updateService->StartUpdateParaZip(pkgPath, location, cfgDir);
     LOG(INFO) << "StartUpdateParaZip ret:" << ret;
-#ifndef UPDATER_UT
+#ifdef UPDATER_UT
     return -1;
 #endif
     return ret;
@@ -219,7 +219,7 @@ int32_t SysInstallerKitsImpl::StartDeleteParaZip(const std::string &location, co
     }
     int32_t ret = updateService->StartDeleteParaZip(location, cfgDir);
     LOG(INFO) << "StartDeleteParaZip ret:" << ret;
-#ifndef UPDATER_UT
+#ifdef UPDATER_UT
     return -1;
 #endif
     return ret;
@@ -236,7 +236,7 @@ int32_t SysInstallerKitsImpl::AccDecompressAndVerifyPkg(const std::string &srcPa
     }
     int32_t ret = updateService->AccDecompressAndVerifyPkg(srcPath, dstPath, type);
     LOG(INFO) << "AccDecompressAndVerifyPkg ret:" << ret;
-#ifndef UPDATER_UT
+#ifdef UPDATER_UT
     return -1;
 #endif
     return ret;
@@ -252,7 +252,7 @@ int32_t SysInstallerKitsImpl::AccDeleteDir(const std::string &dstPath)
     }
     int32_t ret = updateService->AccDeleteDir(dstPath);
     LOG(INFO) << "AccDeleteDir ret:" << ret;
-#ifndef UPDATER_UT
+#ifdef UPDATER_UT
     return -1;
 #endif
     return ret;
