@@ -54,9 +54,7 @@ ohos_unittest("sys_installer_unittest") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [
-    "updater:libupdaterlog",
-  ]
+  external_deps = [ "updater:libupdaterlog" ]
 
   cflags_cc = [ "-fexceptions" ]
 
