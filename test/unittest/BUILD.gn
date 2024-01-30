@@ -34,8 +34,8 @@ ohos_unittest("sys_installer_unittest") {
   testonly = true
   module_out_path = module_output_path
   sources = [
-    "ipc_test/sys_installer_ipc_test.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_kits_impl.cpp",
+    "ipc_test/sys_installer_ipc_test.cpp",
   ]
 
   include_dirs = [
