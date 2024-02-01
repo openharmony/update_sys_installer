@@ -79,7 +79,7 @@ bool CreateDmDevice(const OHOS::SysInstaller::ModuleFile &moduleFile, std::strin
         LOG(ERROR) << "create dm verity device error " << ret;
         goto exit;
     }
-    ret = FsDmInitDmDev(devPath);
+    ret = FsDmInitDmDev(devPath, false);
     if (ret != 0) {
         LOG(ERROR) << "init dm device error " << ret;
         goto exit;
