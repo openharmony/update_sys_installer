@@ -60,11 +60,8 @@ ohos_shared_library("libsysinstaller_shared") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "updater:libfsmanager",
-    "updater:libmiscinfo",
     "updater:libupdaterlog",
-    "updater:libupdaterpackage",
-    "updater:libutils",
+    "updater:libutils_fs",
   ]
 
   innerapi_tags = [
