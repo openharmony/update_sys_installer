@@ -150,11 +150,11 @@ sptr<ISystemAbilityManager> &ModuleUpdateMain::GetSystemAbilityManager()
     }
     int32_t times = RETRY_TIMES_FOR_SAMGR;
     constexpr int32_t duration = std::chrono::microseconds(MILLISECONDS_WAITING_SAMGR_ONE_TIME).count();
+    LOG(INFO) << "waiting for samgr";
     while (times > 0) {
         times--;
         samgr_ = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgr_ == nullptr) {
-            LOG(INFO) << "waiting for samgr";
             usleep(duration);
         } else {
             break;
