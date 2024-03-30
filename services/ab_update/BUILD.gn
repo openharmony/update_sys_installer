@@ -36,6 +36,17 @@ ohos_static_library("libabupdate") {
     "updater:libupdater",
     "updater:libutils",
   ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
