@@ -106,6 +106,13 @@ ohos_static_library("libsysinstallerkits") {
     "updater:libutils",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
@@ -130,6 +137,14 @@ ohos_executable("sys_installer_client") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   install_enable = true
   part_name = "sys_installer"
   subsystem_name = "updater"
