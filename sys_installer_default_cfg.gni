@@ -36,7 +36,6 @@ template("sys_installer_gen") {
         cfi_cross_dso = true
         debug = false
       }
-
     }
   }
 }
