@@ -57,9 +57,9 @@ ohos_static_library("libinstallermanager") {
     "hilog:libhilog",
     "updater:libpackageExt",
     "updater:libringbuffer",
+    "updater:libupdater",
     "updater:libupdaterlog",
     "updater:libupdaterpackage",
-    "updater:libupdater",
   ]
   branch_protector_ret = "pac_ret"
   sanitize = {
