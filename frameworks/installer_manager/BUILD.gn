@@ -34,7 +34,6 @@ ohos_static_library("libinstallermanager") {
   ]
 
   include_dirs = [
-    "../../../updater/services",
     "${sys_installer_path}/common/include",
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
@@ -58,6 +57,7 @@ ohos_static_library("libinstallermanager") {
     "hilog:libhilog",
     "updater:libpackageExt",
     "updater:libringbuffer",
+    "updater:libupdater",
     "updater:libupdaterlog",
     "updater:libupdaterpackage",
   ]
