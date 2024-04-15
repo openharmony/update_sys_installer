@@ -453,7 +453,7 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
         ret = ModuleErrorCode::ERR_INVALID_PATH;
         return ret;
     }
-    
+
     updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, 0, "");
     if (VerifyModulePackageSign(path) != 0) {
         LOG(ERROR) << "Verify sign failed " << path;
