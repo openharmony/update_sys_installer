@@ -442,8 +442,10 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
     int32_t ret = -1;
     ON_SCOPE_EXIT(saveResult) {
         SaveInstallerResult(path, ret, std::to_string(ret));
-        updateCallback->OnUpgradeProgress(ret == 0 ? UPDATE_STATE_SUCCESSFUL : UPDATE_STATE_FAILED,
-            100, ""); // 100 : 100% percent
+        if (updateCallback != nullptr) {
+            updateCallback->OnUpgradeProgress(ret == 0 ? UPDATE_STATE_SUCCESSFUL : UPDATE_STATE_FAILED,
+                100, ""); // 100 : 100% percent
+        }
     };
     LOG(INFO) << "StartUpdateHmpPackage " << path;
     if (updateCallback == nullptr) {
