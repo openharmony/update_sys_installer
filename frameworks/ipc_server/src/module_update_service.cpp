@@ -440,18 +440,19 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
     const sptr<ISysInstallerCallback> &updateCallback)
 {
     int32_t ret = -1;
+    ON_SCOPE_EXIT(saveResult) {
+        SaveInstallerResult(path, ret, std::to_string(ret));
+        if (updateCallback != nullptr) {
+            updateCallback->OnUpgradeProgress(ret == 0 ? UPDATE_STATE_SUCCESSFUL : UPDATE_STATE_FAILED,
+                100, ""); // 100 : 100% percent
+        }
+    };
+    LOG(INFO) << "StartUpdateHmpPackage " << path;
     if (updateCallback == nullptr) {
         LOG(ERROR) << "StartUpdateHmpPackage updateCallback null";
         ret = ModuleErrorCode::ERR_INVALID_PATH;
         return ret;
     }
-    ON_SCOPE_EXIT(saveResult) {
-        SaveInstallerResult(path, ret, std::to_string(ret));
-        updateCallback->OnUpgradeProgress(ret == 0 ? UPDATE_STATE_SUCCESSFUL : UPDATE_STATE_FAILED,
-            100, ""); // 100 : 100% percent
-    };
-    LOG(INFO) << "StartUpdateHmpPackage " << path;
-
     updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, 0, "");
     if (VerifyModulePackageSign(path) != 0) {
         LOG(ERROR) << "Verify sign failed " << path;
