@@ -61,12 +61,6 @@ ohos_static_library("libinstallermanager") {
     "updater:libupdaterlog",
     "updater:libupdaterpackage",
   ]
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
