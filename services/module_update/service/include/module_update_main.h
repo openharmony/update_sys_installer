@@ -19,6 +19,7 @@
 #include "iservice_registry.h"
 #include "module_update_service.h"
 #include "singleton.h"
+#include "sys_event_service_listener.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -43,6 +44,7 @@ private:
 
     sptr<ISystemAbilityManager> samgr_ = nullptr;
     sptr<ModuleUpdateService> moduleUpdate_ = nullptr;
+    sptr<SysEventServiceListener> sysEventListener_ = nullptr;
     std::shared_ptr<CrashSysEventListener> crashListener_ = nullptr;
 };
 } // namespace SysInstaller
