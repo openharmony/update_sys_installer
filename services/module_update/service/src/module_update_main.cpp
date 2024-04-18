@@ -69,7 +69,12 @@ bool ModuleUpdateMain::WaitForSysEventService()
         LOG(ERROR) << "Failed to get system ability manager";
         return false;
     }
-    int32_t ret = samgr->SubscribeSystemAbility(DFX_SYS_EVENT_SERVICE_ABILITY_ID, new SysEventServiceListener());
+    sysEventListener_ = new SysEventServiceListener();
+    if (sysEventListener_ == nullptr) {
+        LOG(ERROR) << "Failed to new SysEventServiceListener";
+        return false;
+    }
+    int32_t ret = samgr->SubscribeSystemAbility(DFX_SYS_EVENT_SERVICE_ABILITY_ID, sysEventListener_);
     if (ret != 0) {
         LOG(ERROR) << "SubscribeSystemAbility error " << ret;
         return false;
@@ -138,6 +143,12 @@ void ModuleUpdateMain::OnBootCompleted()
         int32_t ret = HiSysEventManager::RemoveListener(crashListener_);
         if (ret != 0) {
             LOG(ERROR) << "HiSysEventManager::RemoveListener error " << ret;
+        }
+    }
+    if (sysEventListener_ != nullptr) {
+        int32_t ret = samgr_->UnSubscribeSystemAbility(DFX_SYS_EVENT_SERVICE_ABILITY_ID, sysEventListener_);
+        if (ret != 0) {
+            LOG(ERROR) << "UnSubscribeSystemAbility sysEventListener failed, ret is  " << ret;
         }
     }
     moduleUpdate_->OnBootCompleted();
