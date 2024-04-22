@@ -57,6 +57,7 @@ public:
 
 private:
     bool logInit_ = false;
+    std::mutex sysInstallerServerLock_;
 };
 } // namespace SysInstaller
 } // namespace OHOS
