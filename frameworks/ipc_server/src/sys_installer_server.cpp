@@ -38,6 +38,7 @@ SysInstallerServer::~SysInstallerServer()
 
 int32_t SysInstallerServer::SysInstallerInit()
 {
+    std::lock_guard<std::mutex> lock(sysInstallerServerLock_);
     LOG(INFO) << "SysInstallerInit";
     if (!logInit_) {
         (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0777); // 0777 : rwxrwxrwx
