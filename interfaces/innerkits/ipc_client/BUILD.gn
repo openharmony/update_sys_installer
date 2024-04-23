@@ -116,7 +116,9 @@ ohos_executable("sys_installer_client") {
     "${sys_installer_path}/interfaces/inner_api/include",
   ]
 
-  deps = [ "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits" ]
+  deps = [
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits",
+  ]
   external_deps = [
     "bounds_checking_function:libsec_static",
     "c_utils:utils",
