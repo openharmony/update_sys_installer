@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace SysInstaller {
 struct HmpVersionInfo : public Parcelable {
-    std::string name {}; 
-    std::string laneCode {}; 
+    std::string name {};
+    std::string laneCode {};
     std::string compatibleVersion {};
     std::string version {};
 
