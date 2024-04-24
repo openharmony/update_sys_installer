@@ -17,12 +17,7 @@ import("//build/ohos.gni")
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 config("utils_exported_header") {
   visibility = [ ":*" ]
-  include_dirs = [
-    "${sys_installer_path}/services/module_update/util/include",
-    "//third_party/cJSON",
-    "//third_party/zlib",
-    "//third_party/zlib/contrib/minizip",
-  ]
+  include_dirs = [ "${sys_installer_path}/services/module_update/util/include" ]
 }
 
 ohos_static_library("module_update_utils") {
@@ -33,6 +28,11 @@ ohos_static_library("module_update_utils") {
   ]
 
   public_configs = [ ":utils_exported_header" ]
+
+  public_external_deps = [
+    "cJSON:cjson",
+    "zlib:shared_libz",
+  ]
 
   external_deps = [
     "c_utils:utils",

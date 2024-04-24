@@ -39,15 +39,14 @@ ohos_static_library("libverifyaction") {
     "${sys_installer_path}/frameworks/status_manager/include",
   ]
 
-  deps = [
-    "//third_party/openssl:libcrypto_shared",
-    "//third_party/openssl:libssl_shared",
-  ]
+  deps = []
   public_configs = [ ":libverifyaction_exported_headers" ]
 
   external_deps = [
     "hilog:libhilog",
     "ipc:ipc_core",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
     "updater:libpackageExt",
     "updater:libringbuffer",
     "updater:libupdaterlog",

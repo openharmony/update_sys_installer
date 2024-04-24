@@ -31,16 +31,15 @@
         "access_token",
         "hisysevent",
         "selinux_adapter",
-        "init"
-      ],
-      "third_party": [
-        "curl",
-        "zlib",
-        "cJSON",
+        "init",
         "bounds_checking_function",
+        "cJSON",
+        "curl",
         "lz4",
-        "openssl"
-      ]
+        "openssl",
+        "zlib"
+      ],
+      "third_party": []
     },
     "build": {
       "sub_component": [

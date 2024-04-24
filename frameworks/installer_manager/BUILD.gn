@@ -49,12 +49,12 @@ ohos_static_library("libinstallermanager") {
     "${sys_installer_path}/frameworks/action_processer:libactionprocesser",
     "${sys_installer_path}/frameworks/actions/verify_action:libverifyaction",
     "${sys_installer_path}/services/ab_update:libabupdate",
-    "//third_party/openssl:libcrypto_shared",
-    "//third_party/openssl:libssl_shared",
   ]
   public_configs = [ ":libinstallermanager_exported_headers" ]
   external_deps = [
     "hilog:libhilog",
+    "openssl:libcrypto_shared",
+    "openssl:libssl_shared",
     "updater:libpackageExt",
     "updater:libringbuffer",
     "updater:libupdater",

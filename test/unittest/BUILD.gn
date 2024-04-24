@@ -80,10 +80,10 @@ ohos_executable("sys_installer_client_test") {
 
   deps = [
     "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits",
-    "//third_party/bounds_checking_function:libsec_static",
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_static",
     "c_utils:utils",
     "init:libbegetutil",
     "ipc:ipc_core",
