@@ -21,6 +21,8 @@
 
 #include "directory_ex.h"
 #include "init_reboot.h"
+#include "ipc_skeleton.h"
+#include "iservice_registry.h"
 #include "json_node.h"
 #include "log/log.h"
 #include "module_constants.h"
@@ -324,7 +326,15 @@ int32_t ModuleUpdateService::ReportModuleUpdateStatus(const ModuleUpdateStatus &
 int32_t ModuleUpdateService::ExitModuleUpdate()
 {
     LOG(INFO) << "ExitModuleUpdate";
-    exit(0);
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOG(INFO) << "GetSystemAbilityManager samgr object null";
+        return -1;
+    }
+    int32_t ret = samgr->RemoveSystemAbility(MODULE_UPDATE_SERVICE_ID);
+    LOG(INFO) << "RemoveSystemAbility ret: " << ret;
+    IPCSkeleton::StopWorkThread();
+    return 0;
 }
 
 bool ModuleUpdateService::GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo)
