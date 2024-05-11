@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
-
+static constexpr const char *PATCH_PACKAGE_NAME = "/updater.zip";
 UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
 {
     LOG(INFO) << "StartABUpdate start";
@@ -60,6 +60,11 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
     }
     LOG(INFO) << "Install package successfully!";
     STAGE(UPDATE_STAGE_SUCCESS) << "Install package success";
+
+    // app hot patch need remount patch partition
+    if (pkgPath.find(PATCH_PACKAGE_NAME) != std::string::npos) {
+        SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_APP_QUICKFIX_EVENT);
+    }
     Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
     if (!DeleteUpdaterPath(GetWorkPath()) || !DeleteUpdaterPath(std::string(UPDATER_PATH))) {
         LOG(WARNING) << "Delete Work Path fail.";
