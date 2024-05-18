@@ -88,6 +88,7 @@ ohos_static_library("module_update_static") {
     external_deps += [
       "hvb:libhvb_static",
       "init:libfsmanager_static_real",
+      "hilog:libhilog",
     ]
   }
 
