@@ -86,9 +86,9 @@ ohos_static_library("module_update_static") {
     defines = [ "SUPPORT_HVB" ]
 
     external_deps += [
+      "hilog:libhilog",
       "hvb:libhvb_static",
       "init:libfsmanager_static",
-      "hilog:libhilog",
     ]
   }
 
