@@ -48,6 +48,7 @@ ohos_static_library("libmodule_update_service") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
+    "hilog:libhilog",
     "hisysevent:libhisyseventmanager",
     "init:libbeget_proxy",
     "ipc:ipc_core",
