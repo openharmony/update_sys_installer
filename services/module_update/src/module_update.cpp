@@ -146,7 +146,14 @@ void ModuleUpdate::ProcessSaFile(const std::string &saFile, ModuleUpdateStatus &
         return;
     }
     int32_t saId = moduleFile->GetSaId();
-    if (CheckMountComplete(saId)) {
+    if (IsHotSa(saId)) {
+        std::string mountPoint = string(MODULE_ROOT_DIR) + "/" + std::to_string(saId);
+        int ret = rmdir(mountPoint.c_str());
+        if (ret != 0) {
+            LOG(WARNING) << "Could not rmdir " << mountPoint << " errno: " << errno;
+            return;
+        }
+    } else if (CheckMountComplete(saId)) {
         LOG(INFO) << "Check mount complete, saId=" << saId;
         return;
     }
