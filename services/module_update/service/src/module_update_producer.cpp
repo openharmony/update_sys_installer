@@ -57,11 +57,9 @@ void ModuleUpdateProducer::AddAbnormalSa()
                 LOG(ERROR) << "Failed to get parameter " << BOOT_COMPLETE_PARAM;
                 continue;
             }
-            if (strcmp(saStatus, UNLOAD) == 0) {
-                if (strcmp(bootValue, BOOT_SUCCESS_VALUE) == 0 && IsHotSa(saId)) {
-                    queue_.Put(saStatusPair);
-                }
-            } else {
+            if (strcmp(saStatus, UNLOAD) != 0 || (strcmp(saStatus, UNLOAD) == 0 &&
+                strcmp(bootValue, BOOT_SUCCESS_VALUE) == 0 &&
+                IsHotSa(saId))) {
                 queue_.Put(saStatusPair);
             }
             SetParameter(attr.c_str(), "");
