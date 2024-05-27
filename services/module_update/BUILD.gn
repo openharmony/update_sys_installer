@@ -15,9 +15,27 @@ import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
+updater_path = "//base/update/updater"
 config("utils_exported_header") {
   visibility = [ ":*" ]
-  include_dirs = [ "${sys_installer_path}/services/module_update/util/include" ]
+
+  include_dirs = [
+    "${sys_installer_path}/frameworks/installer_manager/include",
+    "${sys_installer_path}/interfaces/innerkits",
+    "${sys_installer_path}/interfaces/inner_api/include",
+    "${sys_installer_path}/services/module_update/util/include",
+    "${updater_path}/services/include",
+    "${updater_path}/services/include/package",
+    "${updater_path}/services/common",
+    "${updater_path}/services/package/pkg_verify",
+    "${updater_path}/utils/include",
+    "${updater_path}/interfaces/kits/include",
+    "//third_party/cJSON",
+    "//third_party/zlib",
+    "//third_party/zlib/contrib/minizip",
+    "//third_party/openssl/include",
+  ]
+
 }
 
 ohos_static_library("module_update_utils") {
@@ -25,6 +43,7 @@ ohos_static_library("module_update_utils") {
     "${sys_installer_path}/services/module_update/util/src/module_file.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_utils.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_zip_helper.cpp",
+    "${sys_installer_path}/services/module_update/util/src/module_update_verify.cpp"
   ]
 
   public_configs = [ ":utils_exported_header" ]
@@ -34,12 +53,21 @@ ohos_static_library("module_update_utils") {
     "zlib:shared_libz",
   ]
 
+  deps = []
+
   external_deps = [
     "c_utils:utils",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "updater:libmiscinfo",
     "updater:libpackageExt",
     "updater:libupdaterlog",
     "updater:libutils",
+    "bounds_checking_function:libsec_shared",
+    "openssl:libcrypto_shared",
+    "cJSON:cjson",
   ]
 
   if (defined(global_parts_info.startup_hvb)) {
@@ -68,6 +96,7 @@ ohos_static_library("module_update_static") {
     "${sys_installer_path}/services/module_update/src/module_file_repository.cpp",
     "${sys_installer_path}/services/module_update/src/module_loop.cpp",
     "${sys_installer_path}/services/module_update/src/module_update.cpp",
+    "${sys_installer_path}/services/module_update/src/module_update_task.cpp",
   ]
 
   public_configs = [ ":module_update_exported_header" ]
@@ -86,7 +115,6 @@ ohos_static_library("module_update_static") {
     defines = [ "SUPPORT_HVB" ]
 
     external_deps += [
-      "hilog:libhilog",
       "hvb:libhvb_static",
       "init:libfsmanager_static",
     ]

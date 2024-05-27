@@ -134,12 +134,18 @@ ohos_executable("sys_installer_client") {
 }
 
 module_update_gen("module_update") {
-  sources = [ "./src/check_module_update.cpp" ]
+  sources = [ "./src/main.cpp" ]
 
   include_dirs = [ "./include" ]
 
   deps = [ "${sys_installer_path}/services/module_update:module_update_static" ]
-  external_deps = [ "hilog:libhilog" ]
+
+  external_deps = [
+    "updater:libupdaterlog",
+    "updater:libutils",
+    "c_utils:utils",
+    "hilog:libhilog"
+  ]
 
   public_configs = [ ":exported_header_files" ]
 

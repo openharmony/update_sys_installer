@@ -12,12 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "check_module_update.h"
-
 #include <cstring>
 #include "module_update.h"
+#include "log/log.h"
 #include "securec.h"
+
+using namespace OHOS;
+using namespace Updater;
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -26,30 +27,19 @@ extern "C" {
 #endif
 
 namespace {
-constexpr int SA_ARG_COUNT = 2;
-constexpr const char *SA_PATH = "/system/bin/sa_main";
+constexpr int SA_ARG_COUNT = 1;
+constexpr const char *MODULE_UPDATE_PATH = "/system/bin/check_module_update";
 }
 
-char *CheckModuleUpdate(int argc, char **argv)
+int main(int argc, char **argv)
 {
-    if (argc >= SA_ARG_COUNT && std::strcmp(argv[0], SA_PATH) == 0) {
-        OHOS::SysInstaller::ModuleUpdate update;
-        std::string updateResult = update.CheckModuleUpdate(argv[1]);
-        if (updateResult.empty()) {
-            return nullptr;
-        }
-        size_t length = updateResult.size() + 1;
-        char *result = new (std::nothrow) char[length];
-        if (result == nullptr) {
-            return nullptr;
-        }
-        errno_t ret = strcpy_s(result, length, updateResult.c_str());
-        if (ret != EOK) {
-            return nullptr;
-        }
-        return result;
+    if (argc >= SA_ARG_COUNT && std::strcmp(argv[0], MODULE_UPDATE_PATH) == 0) {
+        LOG(INFO) << "enter module update main";
+        auto &instance = OHOS::SysInstaller::ModuleUpdate::GetInstance();
+        instance.CheckModuleUpdate();
+        return 0;
     }
-    return nullptr;
+    return 0;
 }
 
 #ifdef __cplusplus

@@ -19,7 +19,13 @@
 #include <cstdio>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <thread>
+#include <fcntl.h>
+#include "init_reboot.h"
+#include "if_system_ability_manager.h"
+#include "iremote_object.h"
+#include "iservice_registry.h"
 
 #include "directory_ex.h"
 #include "log/log.h"
@@ -32,6 +38,7 @@ using namespace Updater;
 namespace {
 constexpr std::chrono::milliseconds WAIT_FOR_FILE_TIME(5);
 constexpr uint32_t BYTE_SIZE = 8;
+constexpr mode_t ALL_PERMISSIONS = 0777;
 constexpr const char *PREFIXES[] = {UPDATE_INSTALL_DIR, UPDATE_ACTIVE_DIR, UPDATE_BACKUP_DIR, MODULE_PREINSTALL_DIR};
 }
 
@@ -192,6 +199,76 @@ std::string GetRealPath(const std::string &filePath)
     }
     std::string realPath(path);
     return realPath;
+}
+
+void Revert(const std::string &hmpName, bool reboot)
+{
+    LOG(INFO) << "RevertAndReboot";
+    if (!CheckPathExists(UPDATE_BACKUP_DIR)) {
+        LOG(ERROR) << UPDATE_BACKUP_DIR << " does not exist";
+        return;
+    }
+    struct stat statData;
+    int ret = stat(UPDATE_ACTIVE_DIR, &statData);
+    if (ret != 0) {
+        LOG(ERROR) << "Failed to access " << UPDATE_ACTIVE_DIR << " err=" << errno;
+        return;
+    }
+    if (!ForceRemoveDirectory(UPDATE_ACTIVE_DIR)) {
+        LOG(ERROR) << "Failed to remove " << UPDATE_ACTIVE_DIR;
+        return;
+    }
+
+    ret = rename(UPDATE_BACKUP_DIR, UPDATE_ACTIVE_DIR);
+    if (ret != 0) {
+        LOG(ERROR) << "Failed to rename " << UPDATE_BACKUP_DIR << " to " << UPDATE_ACTIVE_DIR << " err=" << errno;
+        return;
+    }
+    ret = chmod(UPDATE_ACTIVE_DIR, statData.st_mode & ALL_PERMISSIONS);
+    if (ret != 0) {
+        LOG(ERROR) << "Failed to restore original permissions for " << UPDATE_ACTIVE_DIR << " err=" << errno;
+        return;
+    }
+    sync();
+    if (reboot) {
+        LOG(INFO) << "Rebooting";
+        DoReboot("");
+    }
+}
+
+bool IsHotSa(const int32_t &saId)
+{
+    std::vector<int32_t> onDemandSaIds;
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOG(ERROR) << "get system ability manager error";
+        return false;
+    }
+    samgr->GetOnDemandSystemAbilityIds(onDemandSaIds);
+    if (onDemandSaIds.empty()) {
+        LOG(ERROR) << "get ondemand saIds fail";
+        return false;
+    }
+    if (find(onDemandSaIds.begin(), onDemandSaIds.end(), saId) == onDemandSaIds.end()) {
+        LOG(INFO) << "this is not an ondemand sa, saId=" << saId;
+        return false;
+    }
+    return true;
+}
+
+bool IsRunning(const int32_t &saId)
+{
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOG(ERROR) << "get system ability manager error";
+        return false;
+    }
+    auto object = samgr->CheckSystemAbility(saId);
+    if (object == nullptr) {
+        LOG(INFO) << "sa not exists, saId=" << saId;
+        return false;
+    }
+    return true;
 }
 } // namespace SysInstaller
 } // namespace OHOS

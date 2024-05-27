@@ -15,37 +15,24 @@
 #ifndef SYS_INSTALLER_MODULE_UPDATE_MAIN_H
 #define SYS_INSTALLER_MODULE_UPDATE_MAIN_H
 
-#include "crash_sys_event_listener.h"
-#include "iservice_registry.h"
 #include "module_update_service.h"
+#include "iservice_registry.h"
 #include "singleton.h"
-#include "sys_event_service_listener.h"
 
 namespace OHOS {
 namespace SysInstaller {
-using namespace HiviewDFX;
-
 class ModuleUpdateMain final : public Singleton<ModuleUpdateMain> {
     DECLARE_SINGLETON(ModuleUpdateMain);
-
 public:
+    void Start();
     bool RegisterModuleUpdateService();
-    bool WaitForSysEventService();
-    bool CheckBootComplete() const;
-    void WatchBootComplete() const;
-    bool RegisterSysEventListener();
-    void OnSysEventServiceDied();
-    void OnProcessCrash(const std::string &processName);
 
 private:
-    static void BootCompleteCallback(const char *key, const char *value, void *context);
-    void OnBootCompleted();
+    void BuildSaIdHmpMap(std::unordered_map<int32_t, std::string> &saIdHmpMap);
     sptr<ISystemAbilityManager> &GetSystemAbilityManager();
 
     sptr<ISystemAbilityManager> samgr_ = nullptr;
     sptr<ModuleUpdateService> moduleUpdate_ = nullptr;
-    sptr<SysEventServiceListener> sysEventListener_ = nullptr;
-    std::shared_ptr<CrashSysEventListener> crashListener_ = nullptr;
 };
 } // namespace SysInstaller
 } // namespace OHOS

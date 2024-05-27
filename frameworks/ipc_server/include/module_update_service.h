@@ -34,7 +34,6 @@ public:
     int32_t UninstallModulePackage(const std::string &hmpName) override;
     int32_t GetModulePackageInfo(const std::string &hmpName,
         std::list<ModulePackageInfo> &modulePackageInfos) override;
-    int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status) override;
     int32_t ExitModuleUpdate() override;
 
     std::vector<HmpVersionInfo> GetHmpVersionInfo() override;
@@ -43,8 +42,6 @@ public:
     std::vector<HmpUpdateInfo> GetHmpUpdateResult() override;
 
     void ScanPreInstalledHmp();
-    void OnProcessCrash(const std::string &processName);
-    void OnBootCompleted();
 
 #ifndef UPDATER_UT
 protected:
@@ -56,9 +53,6 @@ private:
     int32_t InstallModuleFile(const std::string &hmpName, const std::string &file) const;
     void CollectModulePackageInfo(const std::string &hmpName, std::list<ModulePackageInfo> &modulePackageInfos) const;
     bool BackupActiveModules() const;
-    bool RevertAndReboot() const;
-    void OnHmpError(const std::string &hmpName);
-    void ProcessSaStatus(const SaStatus &status, std::unordered_set<std::string> &hmpSet);
     bool GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo);
     void SaveInstallerResult(const std::string &hmpPath, int result, const std::string &resultInfo);
     int32_t ReallyInstallModulePackage(const std::string &pkgPath, const sptr<ISysInstallerCallback> &updateCallback);
@@ -67,7 +61,6 @@ private:
 
     std::unordered_set<std::string> hmpSet_;
     std::unordered_map<int32_t, std::string> saIdHmpMap_;
-    std::unordered_map<std::string, std::unordered_set<std::string>> processHmpMap_;
 };
 } // namespace SysInstaller
 } // namespace OHOS

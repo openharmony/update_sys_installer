@@ -33,7 +33,6 @@ public:
     int32_t UninstallModulePackage(const std::string &hmpName) final;
     int32_t GetModulePackageInfo(const std::string &hmpName,
         std::list<ModulePackageInfo> &modulePackageInfos) final;
-    int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status) final;
     int32_t ExitModuleUpdate() final;
 
     std::vector<HmpVersionInfo> GetHmpVersionInfo() final;

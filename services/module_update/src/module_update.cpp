@@ -19,6 +19,7 @@
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <thread>
 
 #include "directory_ex.h"
 #include "log/log.h"
@@ -28,6 +29,7 @@
 #include "module_file_repository.h"
 #include "module_loop.h"
 #include "module_update_kits.h"
+#include "module_update_task.h"
 #include "module_utils.h"
 #include "parse_util.h"
 #include "scope_guard.h"
@@ -42,8 +44,6 @@ using std::string;
 namespace {
 constexpr mode_t MOUNT_POINT_MODE = 0755;
 constexpr int32_t LOOP_DEVICE_SETUP_ATTEMPTS = 3;
-constexpr int32_t RETRY_TIMES_FOR_MODULE_UPDATE_SERVICE = 10;
-constexpr std::chrono::milliseconds MILLISECONDS_WAITING_MODULE_UPDATE_SERVICE(100);
 
 bool CreateLoopDevice(const string &path, const ImageStat &imageStat, Loop::LoopbackDeviceUniqueFd &loopbackDevice)
 {
@@ -98,12 +98,18 @@ bool StageUpdateModulePackage(const string &updatePath, const string &stagePath)
     LOG(INFO) << "success to link " << updatePath << " to " << stagePath;
     return true;
 }
+}
 
-std::unique_ptr<ModuleFile> GetLatestUpdateModulePackage(const int32_t saId)
+ModuleUpdate &ModuleUpdate::GetInstance()
 {
-    auto &instance = ModuleFileRepository::GetInstance();
-    std::unique_ptr<ModuleFile> activeModuleFile = instance.GetModuleFile(UPDATE_ACTIVE_DIR, saId);
-    std::unique_ptr<ModuleFile> updateModuleFile = instance.GetModuleFile(UPDATE_INSTALL_DIR, saId);
+    static ModuleUpdate instance;
+    return instance;
+}
+
+std::unique_ptr<ModuleFile> ModuleUpdate::GetLatestUpdateModulePackage(const int32_t saId)
+{
+    std::unique_ptr<ModuleFile> activeModuleFile = repository_.GetModuleFile(UPDATE_ACTIVE_DIR, saId);
+    std::unique_ptr<ModuleFile> updateModuleFile = repository_.GetModuleFile(UPDATE_INSTALL_DIR, saId);
     std::unique_ptr<ModuleFile> ret = nullptr;
     if (updateModuleFile != nullptr) {
         if (activeModuleFile == nullptr || ModuleFile::CompareVersion(*updateModuleFile, *activeModuleFile)) {
@@ -125,106 +131,102 @@ std::unique_ptr<ModuleFile> GetLatestUpdateModulePackage(const int32_t saId)
     return ret;
 }
 
-string GetSuccessSaIdString(const ModuleUpdateStatus &status)
+bool ModuleUpdate::CheckMountComplete(int32_t saId) const
 {
-    string ret = "";
-    for (const SaStatus &saStatus : status.saStatusList) {
-        if (saStatus.isMountSuccess) {
-            ret += std::to_string(saStatus.saId) + " ";
-        }
-    }
-    return ret;
-}
+    string path = std::string(MODULE_ROOT_DIR) + "/" + std::to_string(saId);
+    return CheckPathExists(path);
 }
 
-bool ModuleUpdate::CheckMountComplete(string &status) const
+void ModuleUpdate::ProcessSaFile(const std::string &saFile, ModuleUpdateStatus &status)
 {
-    bool mountStatus = false;
-    for (int32_t saId : saIdSet_) {
-        string path = std::string(MODULE_ROOT_DIR) + "/" + std::to_string(saId);
-        if (CheckPathExists(path)) {
-            mountStatus = true;
-            status += std::to_string(saId) + " ";
-        }
+    LOG(INFO) << "process sa file=" << saFile;
+    std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(saFile);
+    if (moduleFile == nullptr) {
+        LOG(ERROR) << "Process sa file fail, module file is null";
+        return;
     }
-    return mountStatus;
+    int32_t saId = moduleFile->GetSaId();
+    if (CheckMountComplete(saId)) {
+        LOG(INFO) << "Check mount complete, saId=" << saId;
+        return;
+    }
+    repository_.InitRepository(saId);
+    PrepareModuleFileList(saId, status);
 }
 
-string ModuleUpdate::CheckModuleUpdate(const string &path)
+bool ModuleUpdate::DoModuleUpdate(ModuleUpdateStatus &status)
 {
-    LOG(INFO) << "CheckModuleUpdate path=" << path;
-    Timer timer;
-    string ret = "";
-    if (!ParseSaProfiles(path)) {
-        LOG(ERROR) << "Failed to parse sa profile";
-        return ret;
-    }
-    if (CheckMountComplete(ret)) {
-        LOG(INFO) << "CheckMountComplete ret=" << ret;
-        return ret;
-    }
-
-    ModuleFileRepository::GetInstance().InitRepository(saIdSet_);
+    LOG(INFO) << "enter domoduleupdate";
+    std::string hmpPackagePath = std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName;
+    LOG(INFO) << "DoModuleUpdate hmp package path=" << hmpPackagePath;
+    std::vector<std::string> files;
+    GetDirFiles(hmpPackagePath, files);
     ON_SCOPE_EXIT(clear) {
-        ModuleFileRepository::GetInstance().Clear();
+        repository_.Clear();
+        moduleFileList_.clear();
     };
-    PrepareModuleFileList();
+    for (auto &file : files) {
+        std::string saPackage = GetFileName(file);
+        if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX) || saPackage.empty()) {
+            continue;
+        }
+        ProcessSaFile(file, status);
+    }
     if (moduleFileList_.empty()) {
-        LOG(INFO) << "No module needs to activate";
-        return ret;
+        LOG(INFO) << "No module needs to activate, hmp package name=" << status.hmpName;
+        return false;
     }
     if (!Loop::PreAllocateLoopDevices(moduleFileList_.size())) {
-        LOG(ERROR) << "Failed to pre allocate loop devices";
-        return ret;
-    }
-    if (!ActivateModules()) {
-        LOG(ERROR) << "Failed to activate modules";
-        return ret;
-    }
-    ret = GetSuccessSaIdString(status_);
-    LOG(INFO) << "CheckModuleUpdate done, duration=" << timer << ", ret=" << ret;
-    return ret;
-}
-
-bool ModuleUpdate::ParseSaProfiles(const string &path)
-{
-    string realProfilePath = "";
-    if (!PathToRealPath(path, realProfilePath)) {
-        LOG(ERROR) << "Failed to get real path " << path;
+        LOG(ERROR) << "Failed to pre allocate loop devices, hmp package name=" << status.hmpName;
         return false;
     }
-    ParseUtil parser;
-    if (!parser.ParseSaProfiles(realProfilePath)) {
-        LOG(ERROR) << "ParseSaProfiles failed! path=" << realProfilePath;
+    if (!ActivateModules(status)) {
+        LOG(ERROR) << "Failed to activate modules, hmp package name=" << status.hmpName;
         return false;
     }
-    status_.process = Str16ToStr8(parser.GetProcessName());
-    auto saInfos = parser.GetAllSaProfiles();
-    for (const auto &saInfo : saInfos) {
-        saIdSet_.insert(saInfo.saId);
-    }
+    LOG(INFO) << "Success to activate modules, hmp package name=" << status.hmpName;
     return true;
 }
 
-void ModuleUpdate::PrepareModuleFileList()
+void ModuleUpdate::CheckModuleUpdate()
 {
-    for (int32_t saId : saIdSet_) {
-        auto &instance = ModuleFileRepository::GetInstance();
-        std::unique_ptr<ModuleFile> systemModuleFile = instance.GetModuleFile(MODULE_PREINSTALL_DIR, saId);
-        if (systemModuleFile == nullptr) {
-            LOG(ERROR) << "Failed to get preinstalled sa " << saId;
+    LOG(INFO) << "CheckModuleUpdate begin";
+    Timer timer;
+    std::vector<std::string> files;
+    GetDirFiles(OTA_PACKAGE_DIR, files);
+    auto &instance = ModuleUpdateTaskManager::GetInstance();
+    ON_SCOPE_EXIT(clear) {
+        instance.ClearTask();
+    };
+    for (auto &file : files) {
+        std::string hmpPackageName = GetFileName(file);
+        if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX) || hmpPackageName.empty()) {
             continue;
         }
-        std::unique_ptr<ModuleFile> latestModuleFile = GetLatestUpdateModulePackage(saId);
-        if (latestModuleFile != nullptr && ModuleFile::CompareVersion(*latestModuleFile, *systemModuleFile)) {
-            moduleFileList_.emplace_back(std::move(*latestModuleFile));
-        } else {
-            moduleFileList_.emplace_back(std::move(*systemModuleFile));
-        }
+        instance.AddTask(hmpPackageName);
+    }
+    while (instance.GetCurTaskNum() != 0) {
+        sleep(1);
+    }
+    LOG(INFO) << "CheckModuleUpdate done, duration=" << timer;
+}
+
+void ModuleUpdate::PrepareModuleFileList(int32_t saId, ModuleUpdateStatus &status)
+{
+    std::unique_ptr<ModuleFile> systemModuleFile = repository_.GetModuleFile(MODULE_PREINSTALL_DIR, saId);
+    if (systemModuleFile == nullptr) {
+        LOG(ERROR) << "Failed to get preinstalled sa " << saId;
+        return;
+    }
+    std::unique_ptr<ModuleFile> latestModuleFile = GetLatestUpdateModulePackage(saId);
+    if (latestModuleFile != nullptr && ModuleFile::CompareVersion(*latestModuleFile, *systemModuleFile)) {
+        moduleFileList_.emplace_back(std::move(*latestModuleFile));
+    } else {
+        moduleFileList_.emplace_back(std::move(*systemModuleFile));
     }
 }
 
-bool ModuleUpdate::ActivateModules()
+bool ModuleUpdate::ActivateModules(ModuleUpdateStatus &status)
 {
     bool activateSuccess = true;
     for (const auto &moduleFile : moduleFileList_) {
@@ -234,18 +236,19 @@ bool ModuleUpdate::ActivateModules()
         }
         SaStatus saStatus;
         saStatus.saId = moduleFile.GetSaId();
-        saStatus.isPreInstalled = ModuleFileRepository::GetInstance().IsPreInstalledModule(moduleFile);
+        saStatus.isPreInstalled = repository_.IsPreInstalledModule(moduleFile);
         saStatus.isMountSuccess = MountModulePackage(moduleFile, !saStatus.isPreInstalled);
         if (!saStatus.isMountSuccess) {
             LOG(ERROR) << "Failed to mount module package " << moduleFile.GetPath();
             activateSuccess = false;
-            ModuleFileRepository::GetInstance().SaveInstallerResult(moduleFile.GetPath(),
+            repository_.SaveInstallerResult(moduleFile.GetPath(),
                 GetHmpName(moduleFile.GetPath()), ERR_INSTALL_FAIL, "mount fail");
         }
-        status_.saStatusList.emplace_back(std::move(saStatus));
+        status.saStatusList.emplace_back(std::move(saStatus));
     }
-    LOG(INFO) << "ActivateModules activateSuccess:" << activateSuccess;
-    ReportMountStatus(status_);
+    status.isAllMountSuccess = activateSuccess;
+    ReportModuleUpdateStatus(status);
+    LOG(INFO) << "ActivateModules activateSuccess:" << activateSuccess << ", hmp package name:" << status.hmpName;
     return activateSuccess;
 }
 
@@ -311,24 +314,19 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
     return true;
 }
 
-void ModuleUpdate::ReportMountStatus(const ModuleUpdateStatus &status) const
+void ModuleUpdate::ReportModuleUpdateStatus(const ModuleUpdateStatus &status) const
 {
-    int32_t times = RETRY_TIMES_FOR_MODULE_UPDATE_SERVICE;
-    constexpr int32_t duration = std::chrono::microseconds(MILLISECONDS_WAITING_MODULE_UPDATE_SERVICE).count();
-    while (times > 0) {
-        times--;
-        int32_t ret = ModuleUpdateKits::GetInstance().ReportModuleUpdateStatus(status);
-        if (ret == ModuleErrorCode::ERR_SERVICE_NOT_FOUND) {
-            LOG(INFO) << "retry to report mount failed";
-            usleep(duration);
-        } else {
-            if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
-                LOG(ERROR) << "Failed to report mount failed";
-            }
-            return;
-        }
+    auto &instance = ModuleUpdateTaskManager::GetInstance();
+    if (!instance.GetTaskResult()) {
+        LOG(ERROR) << "ReportModuleUpdateStatus, module update fail";
+        instance.ClearTask();
     }
-    LOG(ERROR) << "Report mount failed timeout";
+    if (!status.isAllMountSuccess) {
+        LOG(ERROR) << "ReportModuleUpdateStatus mount fail, hmp name=" << status.hmpName;
+        Revert(status.hmpName, !status.isHotInstall);
+        return;
+    }
+    LOG(INFO) << "ReportModuleUpdateStatus mount success, hmp name=" << status.hmpName;
 }
 } // namespace SysInstaller
 } // namespace OHOS

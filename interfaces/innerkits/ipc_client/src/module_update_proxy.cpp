@@ -110,34 +110,6 @@ int32_t ModuleUpdateProxy::GetModulePackageInfo(const std::string &hmpName,
     return reply.ReadInt32();
 }
 
-int32_t ModuleUpdateProxy::ReportModuleUpdateStatus(const ModuleUpdateStatus &status)
-{
-    LOG(INFO) << "ReportModuleUpdateStatus process=" << status.process;
-    auto remote = Remote();
-    if (remote == nullptr) {
-        LOG(ERROR) << "Can not get remote";
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(GetDescriptor())) {
-        LOG(ERROR) << "WriteInterfaceToken error";
-        return ERR_FLATTEN_OBJECT;
-    }
-    ModuleIpcHelper::WriteModuleUpdateStatus(data, status);
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(ModuleUpdateInterfaceCode::REPORT_MODULE_UPDATE_STATUS), data, reply, option);
-    if (ret != ERR_OK) {
-        LOG(ERROR) << "SendRequest error";
-        return ERR_FLATTEN_OBJECT;
-    }
-
-    return reply.ReadInt32();
-}
-
 int32_t ModuleUpdateProxy::ExitModuleUpdate()
 {
     LOG(INFO) << "ExitModuleUpdate";

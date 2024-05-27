@@ -27,7 +27,8 @@ enum ModuleErrorCode {
     ERR_VERIFY_SIGN_FAIL,
     ERR_INSTALL_FAIL,
     ERR_UNINSTALL_FAIL,
-    ERR_REPORT_STATUS_FAIL
+    ERR_REPORT_STATUS_FAIL,
+    MODULE_UPDATE_FAIL
 };
 } // namespace SysInstaller
 } // namespace OHOS

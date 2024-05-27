@@ -34,7 +34,6 @@ ohos_fuzztest("ImoduleUpdateFuzzTest") {
   deps = [
     "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits",
     "${sys_installer_path}/services/module_update:module_update_utils",
-    "//third_party/bounds_checking_function:libsec_static",
   ]
 
   external_deps = [
@@ -46,6 +45,7 @@ ohos_fuzztest("ImoduleUpdateFuzzTest") {
     "samgr:samgr_proxy",
     "updater:libupdaterlog",
     "updater:libutils",
+    "bounds_checking_function:libsec_static",
   ]
 
   cflags = [

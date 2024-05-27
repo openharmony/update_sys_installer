@@ -28,14 +28,7 @@ int main()
         LOG(ERROR) << "Failed to register module update service";
         return -1;
     }
-    if (!moduleUpdate.CheckBootComplete()) {
-        if (!moduleUpdate.WaitForSysEventService()) {
-            LOG(ERROR) << "Failed to wait for sysevent service";
-            return -1;
-        }
-        moduleUpdate.WatchBootComplete();
-    }
-
+    moduleUpdate.Start();
     IPCSkeleton::JoinWorkThread();
     return 0;
 }

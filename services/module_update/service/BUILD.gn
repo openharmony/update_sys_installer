@@ -28,10 +28,11 @@ ohos_static_library("libmodule_update_service") {
     "${sys_installer_path}/frameworks/ipc_server/src/module_update_stub.cpp",
     "${sys_installer_path}/frameworks/ipc_server/src/sys_installer_callback_proxy.cpp",
     "${sys_installer_path}/services/module_update/service/main.cpp",
-    "${sys_installer_path}/services/module_update/service/src/crash_sys_event_listener.cpp",
     "${sys_installer_path}/services/module_update/service/src/module_update_main.cpp",
-    "${sys_installer_path}/services/module_update/service/src/sys_event_service_listener.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
+    "${sys_installer_path}/services/module_update/service/src/module_update_consumer.cpp",
+    "${sys_installer_path}/services/module_update/service/src/module_update_producer.cpp",
+    "${sys_installer_path}/services/module_update/service/src/module_update_queue.cpp"
   ]
 
   include_dirs = [
@@ -41,14 +42,17 @@ ohos_static_library("libmodule_update_service") {
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
     "${sys_installer_path}/services/module_update/service/include",
+    "${sys_installer_path}/services/module_update/include"
   ]
 
-  deps = [ "${sys_installer_path}/services/module_update:module_update_utils" ]
+  deps = [
+    "${sys_installer_path}/services/module_update:module_update_utils",
+    "${sys_installer_path}/services/module_update:module_update_static"
+  ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
-    "hilog:libhilog",
     "hisysevent:libhisyseventmanager",
     "init:libbeget_proxy",
     "ipc:ipc_core",
