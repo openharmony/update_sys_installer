@@ -140,12 +140,12 @@ module_update_gen("module_update") {
 
   deps = [ "${sys_installer_path}/services/module_update:module_update_static" ]
 
-  external_deps = [ "bounds_checking_function:libsec_static" ]
+  external_deps += [ "bounds_checking_function:libsec_static" ]
 
   public_configs = [ ":exported_header_files" ]
 
   if (defined(module_update_custom_external_deps)) {
-    external_deps += module_update_custom_external_deps
+    external_deps = module_update_custom_external_deps
   }
 
   part_name = "sys_installer"
