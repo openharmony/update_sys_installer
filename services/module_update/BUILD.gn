@@ -54,6 +54,7 @@ ohos_static_library("module_update_utils") {
     "samgr:samgr_proxy",
     "updater:libmiscinfo",
     "updater:libpackageExt",
+    "updater:libringbuffer",
     "updater:libupdaterlog",
     "updater:libutils",
   ]
