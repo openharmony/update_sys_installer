@@ -78,6 +78,7 @@ ohos_static_library("module_update_static") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_static",
     "samgr:samgr_common",
     "updater:libupdaterlog",
   ]
