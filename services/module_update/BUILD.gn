@@ -24,15 +24,14 @@ config("utils_exported_header") {
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/services/module_update/util/include",
   ]
-
 }
 
 ohos_static_library("module_update_utils") {
   sources = [
     "${sys_installer_path}/services/module_update/util/src/module_file.cpp",
+    "${sys_installer_path}/services/module_update/util/src/module_update_verify.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_utils.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_zip_helper.cpp",
-    "${sys_installer_path}/services/module_update/util/src/module_update_verify.cpp"
   ]
 
   public_configs = [ ":utils_exported_header" ]
@@ -45,18 +44,18 @@ ohos_static_library("module_update_utils") {
   deps = []
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
+    "cJSON:cjson",
     "c_utils:utils",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "updater:libmiscinfo",
     "updater:libpackageExt",
     "updater:libupdaterlog",
     "updater:libutils",
-    "bounds_checking_function:libsec_shared",
-    "openssl:libcrypto_shared",
-    "cJSON:cjson",
   ]
 
   if (defined(global_parts_info.startup_hvb)) {
