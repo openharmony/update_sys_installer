@@ -21,7 +21,8 @@ namespace {
 constexpr int MAX_SIZE = 100;
 }
 
-ModuleUpdateQueue::ModuleUpdateQueue() : size_(0), head_(0), tail_(0) {
+ModuleUpdateQueue::ModuleUpdateQueue() : size_(0), head_(0), tail_(0)
+{
     queue_.resize(MAX_SIZE);
 }
 
