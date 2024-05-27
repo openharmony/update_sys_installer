@@ -141,10 +141,10 @@ module_update_gen("module_update") {
   deps = [ "${sys_installer_path}/services/module_update:module_update_static" ]
 
   external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
     "updater:libupdaterlog",
     "updater:libutils",
-    "c_utils:utils",
-    "hilog:libhilog"
   ]
 
   public_configs = [ ":exported_header_files" ]
