@@ -34,6 +34,7 @@ ohos_fuzztest("SysInstallerFuzzTest") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_static",
     "c_utils:utils",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -42,7 +43,6 @@ ohos_fuzztest("SysInstallerFuzzTest") {
     "samgr:samgr_proxy",
     "updater:libupdaterlog",
     "updater:libutils",
-    "bounds_checking_function:libsec_static",
   ]
 
   cflags = [
