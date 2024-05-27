@@ -15,7 +15,6 @@ import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
-updater_path = "//base/update/updater"
 config("utils_exported_header") {
   visibility = [ ":*" ]
 
