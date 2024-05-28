@@ -34,9 +34,6 @@ void FuzzModuleUpdate(const uint8_t* data, size_t size)
     moduleUpdateKits.UninstallModulePackage(std::string(reinterpret_cast<const char*>(data), size));
     std::list<ModulePackageInfo> infos;
     moduleUpdateKits.GetModulePackageInfo(std::string(reinterpret_cast<const char*>(data), size), infos);
-    ModuleUpdateStatus updateStatus;
-    updateStatus.process = std::string(reinterpret_cast<const char*>(data), size);
-    moduleUpdateKits.ReportModuleUpdateStatus(updateStatus);
     moduleUpdateKits.ExitModuleUpdate();
 }
 

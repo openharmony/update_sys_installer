@@ -37,23 +37,17 @@ ModuleFileRepository::~ModuleFileRepository()
     Clear();
 }
 
-ModuleFileRepository &ModuleFileRepository::GetInstance()
-{
-    static ModuleFileRepository instance;
-    return instance;
-}
-
-void ModuleFileRepository::InitRepository(const std::unordered_set<int32_t> &saIdSet)
+void ModuleFileRepository::InitRepository(const int32_t saId)
 {
     string allPath[] = {MODULE_PREINSTALL_DIR, UPDATE_INSTALL_DIR, UPDATE_ACTIVE_DIR};
+    std::unordered_map<std::string, ModuleFile> fileMap;
     for (string &path : allPath) {
         std::vector<string> files;
         GetDirFiles(path, files);
-        std::unordered_map<int32_t, ModuleFile> fileMap;
         for (string &file : files) {
-            ProcessFile(saIdSet, path, file, fileMap);
+            ProcessFile(saId, path, file, fileMap);
+            moduleFileMap_[saId] = fileMap;
         }
-        moduleFileMap_.emplace(path, std::move(fileMap));
     }
 }
 
@@ -85,14 +79,14 @@ void ModuleFileRepository::SaveInstallerResult(const std::string &path, const st
     fsync(fd.Get());
 }
 
-void ModuleFileRepository::ProcessFile(const std::unordered_set<int32_t> &saIdSet, const string &path,
-    const string &file, std::unordered_map<int32_t, ModuleFile> &fileMap) const
+void ModuleFileRepository::ProcessFile(const int32_t saId, const string &path,
+    const string &file, std::unordered_map<std::string, ModuleFile> &fileMap) const
 {
     if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
         return;
     }
     std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
-    if (moduleFile == nullptr || saIdSet.find(moduleFile->GetSaId()) == saIdSet.end()) {
+    if (moduleFile == nullptr || moduleFile->GetSaId() != saId) {
         return;
     }
     string pubkey = moduleFile->GetPublicKey();
@@ -118,18 +112,18 @@ void ModuleFileRepository::ProcessFile(const std::unordered_set<int32_t> &saIdSe
         return;
     }
     LOG(INFO) << "ProcessFile  " << file << " successful";
-    fileMap.emplace(moduleFile->GetSaId(), std::move(*moduleFile));
+    fileMap.insert(std::make_pair(path, std::move(*moduleFile)));
 }
 
 std::unique_ptr<ModuleFile> ModuleFileRepository::GetModuleFile(const std::string &pathPrefix, const int32_t saId) const
 {
-    auto mapIter = moduleFileMap_.find(pathPrefix);
+    auto mapIter = moduleFileMap_.find(saId);
     if (mapIter == moduleFileMap_.end()) {
-        LOG(ERROR) << "Invalid path prefix " << pathPrefix;
+        LOG(ERROR) << "Invalid path saId= " << saId;
         return nullptr;
     }
-    std::unordered_map<int32_t, ModuleFile> fileMap = mapIter->second;
-    auto fileIter = fileMap.find(saId);
+    std::unordered_map<std::string, ModuleFile> fileMap = mapIter->second;
+    auto fileIter = fileMap.find(pathPrefix);
     if (fileIter == fileMap.end()) {
         LOG(INFO) << saId << " not found in " << pathPrefix;
         return nullptr;
@@ -171,7 +165,7 @@ bool ModuleFileRepository::CheckFilePath(const ModuleFile &moduleFile, const str
 void ModuleFileRepository::Clear()
 {
     for (auto mapIter = moduleFileMap_.begin(); mapIter != moduleFileMap_.end(); ++mapIter) {
-        std::unordered_map<int32_t, ModuleFile> &fileMap = mapIter->second;
+        std::unordered_map<std::string, ModuleFile> &fileMap = mapIter->second;
         for (auto fileIter = fileMap.begin(); fileIter != fileMap.end(); ++fileIter) {
             fileIter->second.ClearVerifiedData();
         }

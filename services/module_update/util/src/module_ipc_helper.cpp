@@ -87,14 +87,16 @@ int32_t ModuleIpcHelper::WriteModulePackageInfos(MessageParcel &data, const std:
 
 int32_t ModuleIpcHelper::ReadModuleUpdateStatus(MessageParcel &reply, ModuleUpdateStatus &status)
 {
-    status.process = Str16ToStr8(reply.ReadString16());
+    status.hmpName = Str16ToStr8(reply.ReadString16());
+    status.isAllMountSuccess = reply.ReadBool();
     ReadList<SaStatus>(reply, status.saStatusList, ReadSaStatus);
     return 0;
 }
 
 int32_t ModuleIpcHelper::WriteModuleUpdateStatus(MessageParcel &data, const ModuleUpdateStatus &status)
 {
-    data.WriteString16(Str8ToStr16(status.process));
+    data.WriteString16(Str8ToStr16(status.hmpName));
+    data.WriteBool(status.isAllMountSuccess);
     WriteList<SaStatus>(data, status.saStatusList, WriteSaStatus);
     return 0;
 }

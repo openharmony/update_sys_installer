@@ -17,12 +17,19 @@ import("//build/ohos.gni")
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 config("utils_exported_header") {
   visibility = [ ":*" ]
-  include_dirs = [ "${sys_installer_path}/services/module_update/util/include" ]
+
+  include_dirs = [
+    "${sys_installer_path}/frameworks/installer_manager/include",
+    "${sys_installer_path}/interfaces/innerkits",
+    "${sys_installer_path}/interfaces/inner_api/include",
+    "${sys_installer_path}/services/module_update/util/include",
+  ]
 }
 
 ohos_static_library("module_update_utils") {
   sources = [
     "${sys_installer_path}/services/module_update/util/src/module_file.cpp",
+    "${sys_installer_path}/services/module_update/util/src/module_update_verify.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_utils.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_zip_helper.cpp",
   ]
@@ -34,10 +41,20 @@ ohos_static_library("module_update_utils") {
     "zlib:shared_libz",
   ]
 
+  deps = []
+
   external_deps = [
+    "bounds_checking_function:libsec_shared",
+    "cJSON:cjson",
     "c_utils:utils",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "openssl:libcrypto_shared",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "updater:libmiscinfo",
     "updater:libpackageExt",
+    "updater:libringbuffer",
     "updater:libupdaterlog",
     "updater:libutils",
   ]
@@ -68,6 +85,7 @@ ohos_static_library("module_update_static") {
     "${sys_installer_path}/services/module_update/src/module_file_repository.cpp",
     "${sys_installer_path}/services/module_update/src/module_loop.cpp",
     "${sys_installer_path}/services/module_update/src/module_update.cpp",
+    "${sys_installer_path}/services/module_update/src/module_update_task.cpp",
   ]
 
   public_configs = [ ":module_update_exported_header" ]

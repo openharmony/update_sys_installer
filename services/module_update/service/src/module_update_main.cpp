@@ -13,26 +13,24 @@
  * limitations under the License.
  */
 
-#include "module_update_main.h"
-
+#include "directory_ex.h"
 #include "hisysevent_manager.h"
 #include "log/log.h"
+#include "module_constants.h"
+#include "module_update_consumer.h"
+#include "module_update_producer.h"
+#include "module_update_main.h"
 #include "module_update_service.h"
+#include "module_utils.h"
 #include "parameter.h"
-#include "sys_event_service_listener.h"
 #include "system_ability_definition.h"
-
 #include <unistd.h>
 
 namespace OHOS {
 namespace SysInstaller {
-using namespace HiviewDFX;
 using namespace Updater;
 
 namespace {
-constexpr const char *BOOT_COMPLETE_PARAM = "bootevent.boot.completed";
-constexpr const char *BOOT_SUCCESS_VALUE = "true";
-constexpr int32_t PARAM_VALUE_SIZE = 10;
 constexpr int32_t RETRY_TIMES_FOR_SAMGR = 10;
 constexpr std::chrono::milliseconds MILLISECONDS_WAITING_SAMGR_ONE_TIME(100);
 }
@@ -61,99 +59,6 @@ bool ModuleUpdateMain::RegisterModuleUpdateService()
     return true;
 }
 
-bool ModuleUpdateMain::WaitForSysEventService()
-{
-    LOG(INFO) << "WaitForSysEventService";
-    auto samgr = GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        LOG(ERROR) << "Failed to get system ability manager";
-        return false;
-    }
-    sysEventListener_ = new SysEventServiceListener();
-    if (sysEventListener_ == nullptr) {
-        LOG(ERROR) << "Failed to new SysEventServiceListener";
-        return false;
-    }
-    int32_t ret = samgr->SubscribeSystemAbility(DFX_SYS_EVENT_SERVICE_ABILITY_ID, sysEventListener_);
-    if (ret != 0) {
-        LOG(ERROR) << "SubscribeSystemAbility error " << ret;
-        return false;
-    }
-    return true;
-}
-
-bool ModuleUpdateMain::CheckBootComplete() const
-{
-    char value[PARAM_VALUE_SIZE] = "";
-    int ret = GetParameter(BOOT_COMPLETE_PARAM, "", value, PARAM_VALUE_SIZE);
-    if (ret < 0) {
-        LOG(ERROR) << "Failed to get parameter " << BOOT_COMPLETE_PARAM;
-        return false;
-    }
-    return strcmp(value, BOOT_SUCCESS_VALUE) == 0;
-}
-
-void ModuleUpdateMain::WatchBootComplete() const
-{
-    LOG(INFO) << "WatchBootComplete";
-    int ret = WatchParameter(BOOT_COMPLETE_PARAM, BootCompleteCallback, nullptr);
-    if (ret == -1) {
-        LOG(ERROR) << "Failed to watch parameter " << BOOT_COMPLETE_PARAM;
-    }
-}
-
-bool ModuleUpdateMain::RegisterSysEventListener()
-{
-    LOG(INFO) << "RegisterSysEventListener";
-    crashListener_ = std::make_shared<CrashSysEventListener>();
-    std::vector<ListenerRule> rules;
-    rules.emplace_back(CRASH_DOMAIN, CRASH_NAME, "", RuleType::WHOLE_WORD, static_cast<uint32_t>(CRASH_TYPE));
-    int32_t ret = HiSysEventManager::AddListener(crashListener_, rules);
-    if (ret != 0) {
-        LOG(ERROR) << "HiSysEventManager::AddListener error " << ret;
-        return false;
-    }
-    return true;
-}
-
-void ModuleUpdateMain::OnSysEventServiceDied()
-{
-    crashListener_ = nullptr;
-}
-
-void ModuleUpdateMain::OnProcessCrash(const std::string &processName)
-{
-    LOG(INFO) << "OnProcessCrash " << processName;
-    moduleUpdate_->OnProcessCrash(processName);
-}
-
-void ModuleUpdateMain::BootCompleteCallback(const char *key, const char *value, void *context)
-{
-    LOG(INFO) << "BootCompleteCallback key=" << key << ", value=" << value;
-    if (strcmp(key, BOOT_COMPLETE_PARAM) != 0 || strcmp(value, BOOT_SUCCESS_VALUE) != 0) {
-        return;
-    }
-    ModuleUpdateMain::GetInstance().OnBootCompleted();
-}
-
-void ModuleUpdateMain::OnBootCompleted()
-{
-    LOG(INFO) << "OnBootCompleted";
-    if (crashListener_ != nullptr) {
-        int32_t ret = HiSysEventManager::RemoveListener(crashListener_);
-        if (ret != 0) {
-            LOG(ERROR) << "HiSysEventManager::RemoveListener error " << ret;
-        }
-    }
-    if (sysEventListener_ != nullptr) {
-        int32_t ret = samgr_->UnSubscribeSystemAbility(DFX_SYS_EVENT_SERVICE_ABILITY_ID, sysEventListener_);
-        if (ret != 0) {
-            LOG(ERROR) << "UnSubscribeSystemAbility sysEventListener failed, ret is  " << ret;
-        }
-    }
-    moduleUpdate_->OnBootCompleted();
-}
-
 sptr<ISystemAbilityManager> &ModuleUpdateMain::GetSystemAbilityManager()
 {
     if (samgr_ != nullptr) {
@@ -161,17 +66,52 @@ sptr<ISystemAbilityManager> &ModuleUpdateMain::GetSystemAbilityManager()
     }
     int32_t times = RETRY_TIMES_FOR_SAMGR;
     constexpr int32_t duration = std::chrono::microseconds(MILLISECONDS_WAITING_SAMGR_ONE_TIME).count();
-    LOG(INFO) << "waiting for samgr";
     while (times > 0) {
         times--;
         samgr_ = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgr_ == nullptr) {
+            LOG(INFO) << "waiting for samgr";
             usleep(duration);
         } else {
             break;
         }
     }
     return samgr_;
+}
+
+void ModuleUpdateMain::BuildSaIdHmpMap(std::unordered_map<int32_t, std::string> &saIdHmpMap)
+{
+    std::vector<std::string> files;
+    GetDirFiles(MODULE_PREINSTALL_DIR, files);
+    for (auto &file : files) {
+        if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
+            continue;
+        }
+        std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
+        if (moduleFile == nullptr) {
+            continue;
+        }
+        std::string hmpName = GetHmpName(file);
+        if (hmpName.empty()) {
+            continue;
+        }
+        saIdHmpMap.emplace(moduleFile->GetSaId(), hmpName);
+    }
+}
+
+void ModuleUpdateMain::Start()
+{
+    LOG(INFO) << "ModuleUpdateMain Start";
+    std::unordered_map<int32_t, std::string> saIdHmpMap;
+    BuildSaIdHmpMap(saIdHmpMap);
+    ModuleUpdateQueue queue;
+    ModuleUpdateProducer producer(queue, saIdHmpMap);
+    ModuleUpdateConsumer consumer(queue, saIdHmpMap);
+    std::thread produceThread(std::bind(&ModuleUpdateProducer::Run, &producer));
+    std::thread consumeThread(std::bind(&ModuleUpdateConsumer::Run, &consumer));
+    consumeThread.join();
+    produceThread.join();
+    LOG(INFO) << "module update main exit";
 }
 } // namespace SysInstaller
 } // namespace OHOS

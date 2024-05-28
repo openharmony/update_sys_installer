@@ -21,28 +21,30 @@
 #include <unordered_set>
 
 #include "module_file.h"
+#include "module_file_repository.h"
 #include "module_ipc_helper.h"
 
 namespace OHOS {
 namespace SysInstaller {
 class ModuleUpdate {
 public:
-    ModuleUpdate() = default;
+    static ModuleUpdate &GetInstance();
     virtual ~ModuleUpdate() = default;
+    void CheckModuleUpdate();
+    bool DoModuleUpdate(ModuleUpdateStatus &status);
 
-    std::string CheckModuleUpdate(const std::string &path);
 private:
-    bool ParseSaProfiles(const std::string &path);
-    void PrepareModuleFileList();
-    bool ActivateModules();
+    void PrepareModuleFileList(int32_t saId, ModuleUpdateStatus &status);
+    bool ActivateModules(ModuleUpdateStatus &status);
     bool MountModulePackage(const ModuleFile &moduleFile, const bool mountOnVerity) const;
-    void ReportMountStatus(const ModuleUpdateStatus &status) const;
+    void ReportModuleUpdateStatus(const ModuleUpdateStatus &status) const;
     void WaitDevice(const std::string &blockDevice) const;
-    bool CheckMountComplete(std::string &status) const;
+    bool CheckMountComplete(int32_t saId) const;
+    void ProcessSaFile(const std::string &saFile, ModuleUpdateStatus &status);
+    std::unique_ptr<ModuleFile> GetLatestUpdateModulePackage(const int32_t saId);
 
-    std::unordered_set<int32_t> saIdSet_;
     std::list<ModuleFile> moduleFileList_;
-    ModuleUpdateStatus status_;
+    ModuleFileRepository repository_;
 };
 } // SysInstaller
 } // namespace OHOS

@@ -33,8 +33,10 @@ struct SaStatus {
 };
 
 struct ModuleUpdateStatus {
-    std::string process;
+    std::string hmpName;
     std::list<SaStatus> saStatusList;
+    bool isAllMountSuccess;
+    bool isHotInstall;
 };
 
 struct SaInfo {

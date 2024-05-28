@@ -30,6 +30,7 @@
 #include "module_file.h"
 #include "module_utils.h"
 #include "package/package.h"
+#include "init_reboot.h"
 #include "scope_guard.h"
 #include "system_ability_definition.h"
 #include "utils.h"
@@ -44,7 +45,6 @@ using namespace Updater;
 
 namespace {
 constexpr mode_t DIR_MODE = 0750;
-constexpr mode_t ALL_PERMISSIONS = 0777;
 
 int32_t CreateModuleDirs(const std::string &hmpName)
 {
@@ -308,21 +308,6 @@ void ModuleUpdateService::CollectModulePackageInfo(const std::string &hmpName,
     modulePackageInfos.emplace_back(std::move(info));
 }
 
-int32_t ModuleUpdateService::ReportModuleUpdateStatus(const ModuleUpdateStatus &status)
-{
-    LOG(INFO) << "ReportModuleUpdateStatus process=" << status.process;
-    if (status.process.empty()) {
-        LOG(ERROR) << "empty process name";
-        return ModuleErrorCode::ERR_REPORT_STATUS_FAIL;
-    }
-    std::unordered_set<std::string> hmpSet;
-    for (const auto &iter : status.saStatusList) {
-        ProcessSaStatus(iter, hmpSet);
-    }
-    processHmpMap_.emplace(status.process, hmpSet);
-    return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
-}
-
 int32_t ModuleUpdateService::ExitModuleUpdate()
 {
     LOG(INFO) << "ExitModuleUpdate";
@@ -516,18 +501,6 @@ std::vector<HmpUpdateInfo> ModuleUpdateService::GetHmpUpdateResult()
     return updateInfo;
 }
 
-void ModuleUpdateService::ProcessSaStatus(const SaStatus &status, std::unordered_set<std::string> &hmpSet)
-{
-    if (saIdHmpMap_.find(status.saId) == saIdHmpMap_.end()) {
-        return;
-    }
-    std::string hmpName = saIdHmpMap_.at(status.saId);
-    hmpSet.emplace(hmpName);
-    if (!status.isMountSuccess) {
-        OnHmpError(hmpName);
-    }
-}
-
 void ModuleUpdateService::OnStart()
 {
     LOG(INFO) << "OnStart";
@@ -536,42 +509,6 @@ void ModuleUpdateService::OnStart()
 void ModuleUpdateService::OnStop()
 {
     LOG(INFO) << "OnStop";
-}
-
-void ModuleUpdateService::OnProcessCrash(const std::string &processName)
-{
-    if (processHmpMap_.find(processName) == processHmpMap_.end()) {
-        return;
-    }
-    std::unordered_set<std::string> &hmpSet = processHmpMap_.at(processName);
-    for (auto &hmp : hmpSet) {
-        OnHmpError(hmp);
-    }
-}
-
-void ModuleUpdateService::OnBootCompleted()
-{
-    LOG(INFO) << "Deleting " << UPDATE_INSTALL_DIR;
-    if (!ForceRemoveDirectory(UPDATE_INSTALL_DIR)) {
-        LOG(ERROR) << "Failed to remove " << UPDATE_INSTALL_DIR << " err=" << errno;
-    }
-    ExitModuleUpdate();
-}
-
-void ModuleUpdateService::OnHmpError(const std::string &hmpName)
-{
-    LOG(INFO) << "OnHmpError hmpName=" << hmpName;
-    std::string activePath = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
-    if (!CheckPathExists(activePath)) {
-        LOG(INFO) << "No update package in " << hmpName;
-        return;
-    }
-    std::string errPath = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
-    if (CheckPathExists(errPath) && !ForceRemoveDirectory(errPath)) {
-        LOG(ERROR) << "Failed to remove " << errPath;
-        return;
-    }
-    RevertAndReboot();
 }
 
 bool ModuleUpdateService::BackupActiveModules() const
@@ -605,41 +542,6 @@ bool ModuleUpdateService::BackupActiveModules() const
     }
 
     CANCEL_SCOPE_EXIT_GUARD(rmdir);
-    return true;
-}
-
-bool ModuleUpdateService::RevertAndReboot() const
-{
-    LOG(INFO) << "RevertAndReboot";
-    if (!CheckPathExists(UPDATE_BACKUP_DIR)) {
-        LOG(ERROR) << UPDATE_BACKUP_DIR << " does not exist";
-        return false;
-    }
-    struct stat statData;
-    int ret = stat(UPDATE_ACTIVE_DIR, &statData);
-    if (ret != 0) {
-        LOG(ERROR) << "Failed to access " << UPDATE_ACTIVE_DIR << " err=" << errno;
-        return false;
-    }
-    if (!ForceRemoveDirectory(UPDATE_ACTIVE_DIR)) {
-        LOG(ERROR) << "Failed to remove " << UPDATE_ACTIVE_DIR;
-        return false;
-    }
-
-    ret = rename(UPDATE_BACKUP_DIR, UPDATE_ACTIVE_DIR);
-    if (ret != 0) {
-        LOG(ERROR) << "Failed to rename " << UPDATE_BACKUP_DIR << " to " << UPDATE_ACTIVE_DIR << " err=" << errno;
-        return false;
-    }
-    ret = chmod(UPDATE_ACTIVE_DIR, statData.st_mode & ALL_PERMISSIONS);
-    if (ret != 0) {
-        LOG(ERROR) << "Failed to restore original permissions for " << UPDATE_ACTIVE_DIR << " err=" << errno;
-        return false;
-    }
- 
-    sync();
-    LOG(INFO) << "Rebooting";
-    DoReboot("");
     return true;
 }
 

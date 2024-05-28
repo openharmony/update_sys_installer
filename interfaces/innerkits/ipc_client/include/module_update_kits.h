@@ -36,7 +36,6 @@ public:
     virtual int32_t UninstallModulePackage(const std::string &hmpName) = 0;
     virtual int32_t GetModulePackageInfo(const std::string &hmpName,
         std::list<ModulePackageInfo> &modulePackageInfos) = 0;
-    virtual int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status) = 0;
     virtual int32_t ExitModuleUpdate() = 0;
 
     virtual std::vector<HmpVersionInfo> GetHmpVersionInfo() = 0;

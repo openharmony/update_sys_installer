@@ -129,17 +129,6 @@ int32_t ModuleUpdateKitsImpl::GetModulePackageInfo(const std::string &hmpName,
     return moduleUpdate->GetModulePackageInfo(hmpName, modulePackageInfos);
 }
 
-int32_t ModuleUpdateKitsImpl::ReportModuleUpdateStatus(const ModuleUpdateStatus &status)
-{
-    LOG(INFO) << "ReportModuleUpdateStatus process=" << status.process;
-    auto moduleUpdate = GetService();
-    if (moduleUpdate == nullptr) {
-        LOG(ERROR) << "Get moduleUpdate failed";
-        return ModuleErrorCode::ERR_SERVICE_NOT_FOUND;
-    }
-    return moduleUpdate->ReportModuleUpdateStatus(status);
-}
-
 int32_t ModuleUpdateKitsImpl::ExitModuleUpdate()
 {
     LOG(INFO) << "ExitModuleUpdate";

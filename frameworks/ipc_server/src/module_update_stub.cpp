@@ -39,8 +39,6 @@ ModuleUpdateStub::ModuleUpdateStub()
         bind(&ModuleUpdateStub::UninstallModulePackageStub, this, _1, _2, _3, _4));
     requestFuncMap_.emplace(ModuleUpdateInterfaceCode::GET_MODULE_PACKAGE_INFO,
         bind(&ModuleUpdateStub::GetModulePackageInfoStub, this, _1, _2, _3, _4));
-    requestFuncMap_.emplace(ModuleUpdateInterfaceCode::REPORT_MODULE_UPDATE_STATUS,
-        bind(&ModuleUpdateStub::ReportModuleUpdateStatusStub, this, _1, _2, _3, _4));
     requestFuncMap_.emplace(ModuleUpdateInterfaceCode::EXIT_MODULE_UPDATE,
         bind(&ModuleUpdateStub::ExitModuleUpdateStub, this, _1, _2, _3, _4));
 
@@ -94,20 +92,6 @@ int32_t ModuleUpdateStub::GetModulePackageInfoStub(ModuleUpdateStub *service,
     std::list<ModulePackageInfo> infos;
     int32_t ret = service->GetModulePackageInfo(hmpName, infos);
     ModuleIpcHelper::WriteModulePackageInfos(reply, infos);
-    reply.WriteInt32(ret);
-    return 0;
-}
-
-int32_t ModuleUpdateStub::ReportModuleUpdateStatusStub(ModuleUpdateStub *service,
-    MessageParcel &data, MessageParcel &reply, MessageOption &option) const
-{
-    if (service == nullptr) {
-        LOG(ERROR) << "Invalid param";
-        return -1;
-    }
-    ModuleUpdateStatus status;
-    ModuleIpcHelper::ReadModuleUpdateStatus(data, status);
-    int32_t ret = service->ReportModuleUpdateStatus(status);
     reply.WriteInt32(ret);
     return 0;
 }

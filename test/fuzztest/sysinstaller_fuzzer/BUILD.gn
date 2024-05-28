@@ -31,10 +31,10 @@ ohos_fuzztest("SysInstallerFuzzTest") {
 
   deps = [
     "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits",
-    "//third_party/bounds_checking_function:libsec_static",
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_static",
     "c_utils:utils",
     "hilog:libhilog",
     "init:libbegetutil",

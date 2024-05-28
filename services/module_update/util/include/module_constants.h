@@ -30,6 +30,15 @@ static constexpr const char *IMG_FILE_NAME = "module.img";
 static constexpr const char *PUBLIC_KEY_NAME = "pub_key.pem";
 static constexpr const char *PACK_INFO_NAME = "pack.info";
 static constexpr const char *MODULE_RESULT_PATH = "/data/updater/module_update_result";
+static constexpr const char *OTA_PACKAGE_DIR = "/data/update/ota_package";
+static constexpr const char *HASH_SIGN_FILE_NAME = "hash_signed_data";
+static constexpr const char *SA_ABNORMAL = "true";
+static constexpr const char *SA_NORMAL = "false";
+static constexpr const char *SA_START = "persist.samgr.moduleupdate.start";
+static constexpr const char *SA_START_PREFIX = "persist.samgr.moduleupdate";
+static constexpr const char *UNLOAD = "unload";
+static constexpr const char *LOAD_FAIL = "loadfail";
+static constexpr const char *CRASH = "crash";
 } // namespace SysInstaller
 } // namespace OHOS
 #endif // SYS_INSTALLER_MODULE_CONSTANTS_H

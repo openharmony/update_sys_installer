@@ -35,6 +35,9 @@ bool ReadFullyAtOffset(int fd, uint8_t *data, size_t count, off_t offset);
 uint16_t ReadLE16(const uint8_t *buff);
 uint32_t ReadLE32(const uint8_t *buff);
 std::string GetRealPath(const std::string &path);
+void Revert(const std::string &hmpName, bool reboot);
+bool IsHotSa(const int32_t &saId);
+bool IsRunning(const int32_t &saId);
 
 class Timer {
 public:

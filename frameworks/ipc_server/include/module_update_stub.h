@@ -42,8 +42,6 @@ private:
         MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
     int32_t GetModulePackageInfoStub(ModuleUpdateStub *service,
         MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
-    int32_t ReportModuleUpdateStatusStub(ModuleUpdateStub *service,
-        MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
     int32_t ExitModuleUpdateStub(ModuleUpdateStub *service,
         MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
 
