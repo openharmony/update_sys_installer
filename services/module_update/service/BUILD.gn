@@ -45,8 +45,8 @@ ohos_static_library("libmodule_update_service_static") {
   ]
 
   deps = [
-    "${sys_installer_path}/services/module_update/src:module_update_static",
     "${sys_installer_path}/services/module_update:module_update_utils",
+    "${sys_installer_path}/services/module_update/src:module_update_static",
   ]
 
   external_deps = [

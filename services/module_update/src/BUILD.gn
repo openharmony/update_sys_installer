@@ -20,7 +20,9 @@ check_module_update_gen("check_module_update") {
 
   include_dirs = [ "./include" ]
 
-  deps = [ "${sys_installer_path}/services/module_update/src:module_update_static" ]
+  deps = [
+    "${sys_installer_path}/services/module_update/src:module_update_static",
+  ]
 
   external_deps = [ "updater:libupdaterlog" ]
 
@@ -44,7 +46,8 @@ ohos_static_library("module_update_static") {
 
   public_configs = [ ":module_update_exported_header" ]
 
-  public_deps = [ "${sys_installer_path}/services/module_update:module_update_utils" ]
+  public_deps =
+      [ "${sys_installer_path}/services/module_update:module_update_utils" ]
 
   external_deps = [
     "bounds_checking_function:libsec_static",
@@ -64,4 +67,3 @@ ohos_static_library("module_update_static") {
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
-

@@ -50,8 +50,9 @@
         "//base/update/sys_installer/frameworks/ipc_server/sa_profile:sys_installer_sa_profile",
         "//base/update/sys_installer/frameworks/ipc_server/sa_profile:module_update_sa_profile",
         "//base/update/sys_installer/interfaces/innerkits/ipc_client:module_update",
+        "//base/update/sys_installer/interfaces/innerkits/ipc_client:module_update_client",
         "//base/update/sys_installer/services/module_update/service:module_update_service",
-        "//base/update/sys_installer/interfaces/innerkits/ipc_client:module_update_client"
+        "//base/update/sys_installer/services/module_update/src:check_module_update"
       ],
       "inner_kits": [
         {
@@ -96,6 +97,15 @@
             "header_files": [],
             "header_base": [
               "//base/update/sys_installer/interfaces/innerkits/inner_api/include"
+            ]
+          }
+        },
+        {
+          "name": "//base/update/sys_installer/services/module_update/src:check_module_update",
+          "header": {
+            "header_files": [],
+            "header_base": [
+              "//base/update/sys_installer/services/module_update/include"
             ]
           }
         },
