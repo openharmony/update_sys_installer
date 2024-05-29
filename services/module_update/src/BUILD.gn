@@ -24,7 +24,10 @@ check_module_update_gen("check_module_update") {
     "${sys_installer_path}/services/module_update/src:module_update_static",
   ]
 
-  external_deps = [ "updater:libupdaterlog" ]
+  external_deps = [
+    "bounds_checking_function:libsec_static",
+    "updater:libupdaterlog",
+  ]
 
   part_name = "sys_installer"
   subsystem_name = "updater"

@@ -134,8 +134,6 @@ ohos_executable("sys_installer_client") {
 }
 
 module_update_gen("module_update") {
-  sources = [ "./src/main.cpp" ]
-
   include_dirs = [ "./include" ]
 
   deps = [ "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update_client_static" ]
