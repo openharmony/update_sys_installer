@@ -150,9 +150,7 @@ int32_t ModuleUpdateKitsImpl::Init()
     }
 
     LOG(INFO) << "InitModuleUpdate Init start";
-    // 构造步骤1的SystemAbilityLoadCallbackStub子类的实例
     sptr<ModuleUpdateLoadCallback> loadCallback_ = new ModuleUpdateLoadCallback();
-    // 调用LoadSystemAbility方法
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
         LOG(ERROR) << "GetSystemAbilityManager samgr object null";
