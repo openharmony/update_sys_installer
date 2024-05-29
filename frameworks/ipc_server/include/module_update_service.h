@@ -15,9 +15,6 @@
 #ifndef SYS_INSTALLER_MODULE_UPDATE_SERVICE_H
 #define SYS_INSTALLER_MODULE_UPDATE_SERVICE_H
 
-#include <unordered_map>
-#include <unordered_set>
-
 #include "module_update_stub.h"
 #include "system_ability.h"
 
@@ -27,8 +24,9 @@ class ModuleUpdateService : public SystemAbility, public ModuleUpdateStub {
     DECLARE_SYSTEM_ABILITY(ModuleUpdateService);
 
 public:
-    ModuleUpdateService();
-    ~ModuleUpdateService();
+    ModuleUpdateService(int32_t systemAbilityId, bool runOnCreate = false);
+    ~ModuleUpdateService() override;
+
 
     int32_t InstallModulePackage(const std::string &pkgPath) override;
     int32_t UninstallModulePackage(const std::string &hmpName) override;
@@ -41,26 +39,11 @@ public:
         const sptr<ISysInstallerCallback> &updateCallback) override;
     std::vector<HmpUpdateInfo> GetHmpUpdateResult() override;
 
-    void ScanPreInstalledHmp();
-
 #ifndef UPDATER_UT
 protected:
 #endif
-    void OnStart() override;
-    void OnStop() override;
-
-private:
-    int32_t InstallModuleFile(const std::string &hmpName, const std::string &file) const;
-    void CollectModulePackageInfo(const std::string &hmpName, std::list<ModulePackageInfo> &modulePackageInfos) const;
-    bool BackupActiveModules() const;
-    bool GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo);
-    void SaveInstallerResult(const std::string &hmpPath, int result, const std::string &resultInfo);
-    int32_t ReallyInstallModulePackage(const std::string &pkgPath, const sptr<ISysInstallerCallback> &updateCallback);
-    void ParseHmpVersionInfo(std::vector<HmpVersionInfo> &versionInfos, const HmpVersionInfo &preInfo,
-        const HmpVersionInfo &actInfo);
-
-    std::unordered_set<std::string> hmpSet_;
-    std::unordered_map<int32_t, std::string> saIdHmpMap_;
+    void OnStart(const SystemAbilityOnDemandReason &startReason) override;
+    void OnStop(const SystemAbilityOnDemandReason &stopReason) override;
 };
 } // namespace SysInstaller
 } // namespace OHOS

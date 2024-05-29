@@ -26,3 +26,10 @@ ohos_prebuilt_etc("module_update_cfg") {
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
+
+ohos_prebuilt_etc("module_update_sa_cfg") {
+  source = "module_update_sa.cfg"
+  relative_install_dir = "init"
+  part_name = "sys_installer"
+  subsystem_name = "updater"
+}

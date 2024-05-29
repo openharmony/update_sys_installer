@@ -92,7 +92,7 @@ ohos_static_library("module_update_static") {
 
   public_deps = [
     ":module_update_utils",
-    "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update_client",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update_client_static",
   ]
 
   external_deps = [
