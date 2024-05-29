@@ -169,19 +169,17 @@ config("exported_header_files") {
 }
 
 ohos_executable("module_update_client") {
-  sources = [
-    "${sys_installer_path}/services/module_update/service/main.cpp",
-  ]
+  sources = [ "${sys_installer_path}/services/module_update/service/main.cpp" ]
 
   include_dirs = [ "./include" ]
   deps = [ "${sys_installer_path}/interfaces/innerkits/ipc_client:libmodule_update_shared" ]
   public_configs = [ ":exported_header_files" ]
 
   external_deps = [
-    "updater:libupdaterlog",
     "c_utils:utils",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "updater:libupdaterlog",
     "updater:libupdaterlog",
   ]
 
