@@ -27,7 +27,6 @@ public:
     ModuleUpdateService(int32_t systemAbilityId, bool runOnCreate = false);
     ~ModuleUpdateService() override;
 
-
     int32_t InstallModulePackage(const std::string &pkgPath) override;
     int32_t UninstallModulePackage(const std::string &hmpName) override;
     int32_t GetModulePackageInfo(const std::string &hmpName,
