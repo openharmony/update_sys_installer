@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <unistd.h>
+
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "log/log.h"

@@ -138,7 +138,7 @@ module_update_gen("module_update") {
 
   include_dirs = [ "./include" ]
 
-  deps = [ "${sys_installer_path}/services/module_update:module_update_static" ]
+  deps = [ "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update_client_static" ]
 
   external_deps = [
     "c_utils:utils",

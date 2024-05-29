@@ -39,9 +39,6 @@ public:
     int32_t InstallModuleFile(const std::string &hmpName, const std::string &file) const;
     void CollectModulePackageInfo(const std::string &hmpName, std::list<ModulePackageInfo> &modulePackageInfos) const;
     bool BackupActiveModules() const;
-    bool RevertAndReboot() const;
-    void OnHmpError(const std::string &hmpName);
-    void ProcessSaStatus(const SaStatus &status, std::unordered_set<std::string> &hmpSet);
     bool GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo);
     void SaveInstallerResult(const std::string &hmpPath, int result, const std::string &resultInfo);
     int32_t ReallyInstallModulePackage(const std::string &pkgPath, const sptr<ISysInstallerCallback> &updateCallback);
@@ -49,7 +46,6 @@ public:
         const HmpVersionInfo &actInfo);
 
     void ScanPreInstalledHmp();
-    void OnProcessCrash(const std::string &processName);
     void Start();
 
 private:

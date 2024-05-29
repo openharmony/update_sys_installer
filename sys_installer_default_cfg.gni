@@ -53,7 +53,7 @@ template("module_update_service_gen") {
       forward_variables_from(invoker, "*")
     }
   } else {
-    ohos_executable(target_name) {
+    ohos_shared_library(target_name) {
       forward_variables_from(invoker, "*")
     }
   }

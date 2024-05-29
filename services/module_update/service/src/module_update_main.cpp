@@ -319,46 +319,6 @@ void ModuleUpdateMain::ExitModuleUpdate()
     }
 }
 
-void ModuleUpdateMain::OnProcessCrash(const std::string &processName)
-{
-    LOG(INFO) << "OnProcessCrash " << processName;
-    if (processHmpMap_.find(processName) == processHmpMap_.end()) {
-        return;
-    }
-    std::unordered_set<std::string> &hmpSet = processHmpMap_.at(processName);
-    for (auto &hmp : hmpSet) {
-        OnHmpError(hmp);
-    }
-}
-
-void ModuleUpdateMain::OnHmpError(const std::string &hmpName)
-{
-    LOG(INFO) << "OnHmpError hmpName=" << hmpName;
-    std::string activePath = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
-    if (!CheckPathExists(activePath)) {
-        LOG(INFO) << "No update package in " << hmpName;
-        return;
-    }
-    std::string errPath = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
-    if (CheckPathExists(errPath) && !ForceRemoveDirectory(errPath)) {
-        LOG(ERROR) << "Failed to remove " << errPath;
-        return;
-    }
-    RevertAndReboot();
-}
-
-void ModuleUpdateMain::ProcessSaStatus(const SaStatus &status, std::unordered_set<std::string> &hmpSet)
-{
-    if (saIdHmpMap_.find(status.saId) == saIdHmpMap_.end()) {
-        return;
-    }
-    std::string hmpName = saIdHmpMap_.at(status.saId);
-    hmpSet.emplace(hmpName);
-    if (!status.isMountSuccess) {
-        OnHmpError(hmpName);
-    }
-}
-
 bool ModuleUpdateMain::GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo)
 {
     LOG(INFO) << "GetHmpVersion " << hmpPath;
