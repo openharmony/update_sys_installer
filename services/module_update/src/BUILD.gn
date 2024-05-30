@@ -18,9 +18,7 @@ sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 check_module_update_gen("check_module_update") {
   include_dirs = [ "./include" ]
 
-  deps = [
-    "${sys_installer_path}/services/module_update/src:check_module_update_staic",
-  ]
+  deps = [ "${sys_installer_path}/services/module_update/src:check_module_update_staic" ]
 
   external_deps = [
     "bounds_checking_function:libsec_static",
