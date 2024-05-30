@@ -138,19 +138,10 @@ module_update_gen("module_update") {
 
   deps = [ "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update_client_static" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "hilog:libhilog",
-    "updater:libupdaterlog",
-    "updater:libutils",
-  ]
-
-  external_deps += [ "bounds_checking_function:libsec_static" ]
-
   public_configs = [ ":exported_header_files" ]
 
   if (defined(module_update_custom_external_deps)) {
-    external_deps += module_update_custom_external_deps
+    external_deps = module_update_custom_external_deps
   }
 
   part_name = "sys_installer"
@@ -177,7 +168,6 @@ ohos_executable("module_update_client") {
     "c_utils:utils",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
-    "updater:libupdaterlog",
     "updater:libupdaterlog",
   ]
 
