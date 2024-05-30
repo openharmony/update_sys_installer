@@ -101,7 +101,7 @@
           }
         },
         {
-          "name": "//base/update/sys_installer/services/module_update/src:check_module_update",
+          "name": "//base/update/sys_installer/services/module_update/src:check_module_update_staic",
           "header": {
             "header_files": [],
             "header_base": [
