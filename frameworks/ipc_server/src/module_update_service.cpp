@@ -177,14 +177,13 @@ void ModuleUpdateService::OnStart(const SystemAbilityOnDemandReason &startReason
     InitUpdaterLogger("ModuleUpdaterServer", "", "", "");
     LOG(INFO) << "OnStart, startReason name: " << startReason.GetName() << ", id: " <<
         static_cast<int32_t>(startReason.GetId()) << ", value: " << startReason.GetValue();
-    SysInstaller::ModuleUpdateMain& moduleUpdate = SysInstaller::ModuleUpdateMain::GetInstance();
-    moduleUpdate.ScanPreInstalledHmp();
-    if (!moduleUpdate.CheckBootComplete()) {
-    }
     bool res = Publish(this);
     if (!res) {
         LOG(ERROR) << "OnStart failed";
     }
+    SysInstaller::ModuleUpdateMain& moduleUpdate = SysInstaller::ModuleUpdateMain::GetInstance();
+    moduleUpdate.ScanPreInstalledHmp();
+    LOG(INFO) << "OnStart done";
 }
 
 void ModuleUpdateService::OnStop(const SystemAbilityOnDemandReason &stopReason)
