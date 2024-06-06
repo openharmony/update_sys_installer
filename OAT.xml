@@ -69,6 +69,7 @@ Note:If the text contains special characters, please escape them according to th
         <filefilterlist>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies" >
                 <filteritem type="filepath" name="frameworks/etc/sys_installer_sa.cfg" desc="升级服务应用的资源文件"/>
+                <filteritem type="filepath" name="services/module_update/figures/*.*" desc="模块独立升级文档资源文件"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>
