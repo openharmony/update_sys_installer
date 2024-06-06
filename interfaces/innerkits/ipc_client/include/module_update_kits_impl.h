@@ -40,9 +40,13 @@ public:
         sptr<ISysInstallerCallbackFunc> callback) final;
     std::vector<HmpUpdateInfo> GetHmpUpdateResult() final;
 
+    void LoadServiceSuccess() final;
+    void LoadServiceFail() final;
+
 #ifndef UPDATER_UT
 private:
 #endif
+    int32_t Init();
     // For death event procession
     class DeathRecipient final : public IRemoteObject::DeathRecipient {
     public:
@@ -59,6 +63,8 @@ private:
     sptr<IModuleUpdate> moduleUpdate_ {};
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {};
     sptr<ISysInstallerCallback> updateCallBack_ {};
+    std::mutex serviceMutex_;
+    std::condition_variable serviceCv_;
 };
 } // namespace SysInstaller
 } // namespace OHOS

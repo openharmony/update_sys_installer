@@ -28,7 +28,6 @@
 #include "module_error_code.h"
 #include "module_file_repository.h"
 #include "module_loop.h"
-#include "module_update_kits.h"
 #include "module_update_task.h"
 #include "module_utils.h"
 #include "parse_util.h"

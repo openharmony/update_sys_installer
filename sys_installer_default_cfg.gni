@@ -47,13 +47,25 @@ template("module_update_gen") {
   }
 }
 
+template("check_module_update_gen") {
+  if (sys_installer_cfg_file != "") {
+    ohos_static_library(target_name) {
+      forward_variables_from(invoker, "*")
+    }
+  } else {
+    ohos_executable(target_name) {
+      forward_variables_from(invoker, "*")
+    }
+  }
+}
+
 template("module_update_service_gen") {
   if (sys_installer_cfg_file != "") {
     ohos_source_set(target_name) {
       forward_variables_from(invoker, "*")
     }
   } else {
-    ohos_executable(target_name) {
+    ohos_shared_library(target_name) {
       forward_variables_from(invoker, "*")
     }
   }

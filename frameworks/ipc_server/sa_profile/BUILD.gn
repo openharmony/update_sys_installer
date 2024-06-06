@@ -18,3 +18,9 @@ ohos_sa_profile("sys_installer_sa_profile") {
 
   part_name = "sys_installer"
 }
+
+ohos_sa_profile("module_update_sa_profile") {
+  sources = [ "4103.json" ]
+
+  part_name = "sys_installer"
+}

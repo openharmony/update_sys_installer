@@ -13,22 +13,41 @@
  * limitations under the License.
  */
 
-#include "ipc_skeleton.h"
+#include <unistd.h>
+
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
 #include "log/log.h"
-#include "module_update_main.h"
+#include "module_update_kits.h"
+#include "module_update_kits_impl.h"
 
 using namespace OHOS;
 using namespace Updater;
 
 int main()
 {
-    LOG(INFO) << "ModuleUpdateService main called";
-    SysInstaller::ModuleUpdateMain& moduleUpdate = SysInstaller::ModuleUpdateMain::GetInstance();
-    if (!moduleUpdate.RegisterModuleUpdateService()) {
-        LOG(ERROR) << "Failed to register module update service";
+    InitUpdaterLogger("ModuleUpdaterClient", "", "", "");
+    sptr<ISystemAbilityManager> samgr = nullptr;
+    int32_t times = 30;
+    const int32_t wiat_time_ms = 100 * 1000;
+    int32_t duration = std::chrono::microseconds(wiat_time_ms).count();
+    LOG(INFO) << "waiting for samgr...";
+    while (times > 0) {
+        times--;
+        samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgr == nullptr) {
+            usleep(duration);
+        } else {
+            break;
+        }
+    }
+
+    if (samgr == nullptr) {
+        LOG(ERROR) <<"ModuleUpdateInit wait samgr fail";
         return -1;
     }
-    moduleUpdate.Start();
-    IPCSkeleton::JoinWorkThread();
-    return 0;
+
+    int32_t ret = OHOS::SysInstaller::ModuleUpdateKits::GetInstance().InitModuleUpdate();
+    LOG(INFO) << "ModuleUpdateInit ret: " << ret;
+    return ret;
 }

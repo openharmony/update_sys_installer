@@ -56,6 +56,7 @@ ohos_fuzztest("ImoduleUpdateFuzzTest") {
   ]
   sources = [
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_kits_impl.cpp",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_load_callback.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_proxy.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
     "imodule_update_fuzzer.cpp",

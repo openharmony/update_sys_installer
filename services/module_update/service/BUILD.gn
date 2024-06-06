@@ -16,18 +16,17 @@ import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 module_update_service_gen("module_update_service") {
-  deps = [ "${sys_installer_path}/services/module_update/service:libmodule_update_service" ]
+  deps = [ "${sys_installer_path}/services/module_update/service:libmodule_update_service_static" ]
 
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
 
-ohos_static_library("libmodule_update_service") {
+ohos_static_library("libmodule_update_service_static") {
   sources = [
     "${sys_installer_path}/frameworks/ipc_server/src/module_update_service.cpp",
     "${sys_installer_path}/frameworks/ipc_server/src/module_update_stub.cpp",
     "${sys_installer_path}/frameworks/ipc_server/src/sys_installer_callback_proxy.cpp",
-    "${sys_installer_path}/services/module_update/service/main.cpp",
     "${sys_installer_path}/services/module_update/service/src/module_update_consumer.cpp",
     "${sys_installer_path}/services/module_update/service/src/module_update_main.cpp",
     "${sys_installer_path}/services/module_update/service/src/module_update_producer.cpp",
@@ -46,8 +45,8 @@ ohos_static_library("libmodule_update_service") {
   ]
 
   deps = [
-    "${sys_installer_path}/services/module_update:module_update_static",
     "${sys_installer_path}/services/module_update:module_update_utils",
+    "${sys_installer_path}/services/module_update/src:module_update_static",
   ]
 
   external_deps = [

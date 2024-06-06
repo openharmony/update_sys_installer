@@ -19,6 +19,7 @@
 #include "iservice_registry.h"
 #include "log/log.h"
 #include "module_error_code.h"
+#include "module_update_load_callback.h"
 #include "module_update_proxy.h"
 #include "service_control.h"
 #include "system_ability_definition.h"
@@ -29,7 +30,7 @@ namespace SysInstaller {
 using namespace Updater;
 
 namespace {
-constexpr const char *SERVICE_NAME = "module_update_service";
+constexpr int LOAD_SA_TIMEOUT_MS = 3;
 }
 
 ModuleUpdateKits &ModuleUpdateKits::GetInstance()
@@ -140,13 +141,49 @@ int32_t ModuleUpdateKitsImpl::ExitModuleUpdate()
     return moduleUpdate->ExitModuleUpdate();
 }
 
+int32_t ModuleUpdateKitsImpl::Init()
+{
+    std::lock_guard<std::mutex> lock(moduleUpdateLock_);
+    if (moduleUpdate_ != nullptr) {
+        LOG(INFO) << "already init";
+        return 0;
+    }
+
+    LOG(INFO) << "InitModuleUpdate Init start";
+    sptr<ModuleUpdateLoadCallback> loadCallback_ = new ModuleUpdateLoadCallback();
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sm == nullptr) {
+        LOG(ERROR) << "GetSystemAbilityManager samgr object null";
+        return -1;
+    }
+    LOG(INFO) << "InitModuleUpdate Init GetSystemAbilityManager done";
+    int32_t result = sm->LoadSystemAbility(MODULE_UPDATE_SERVICE_ID, loadCallback_);
+    if (result != ERR_OK) {
+        LOG(ERROR) << "systemAbilityId " << MODULE_UPDATE_SERVICE_ID <<
+            " load failed, result code:" << result;
+        return -1;
+    }
+
+    LOG(INFO) << "InitModuleUpdate Init Load done";
+    std::unique_lock<std::mutex> callbackLock(serviceMutex_);
+    serviceCv_.wait_for(callbackLock, std::chrono::seconds(LOAD_SA_TIMEOUT_MS));
+    return 0;
+}
+
 int32_t ModuleUpdateKitsImpl::InitModuleUpdate()
 {
+    InitUpdaterLogger("ModuleUpdaterClient", "", "", "");
     LOG(INFO) << "InitModuleUpdate";
-    int ret = ServiceControl(SERVICE_NAME, ServiceAction::START);
+    int ret = Init();
     if (ret != 0) {
-        LOG(ERROR) << "Failed to start service";
-        return ModuleErrorCode::ERR_SERVICE_NOT_FOUND;
+        LOG(ERROR) << "Init failed";
+        return ret;
+    }
+
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
     }
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
 }
@@ -198,6 +235,16 @@ std::vector<HmpUpdateInfo> ModuleUpdateKitsImpl::GetHmpUpdateResult()
     }
     updateInfo = moduleUpdate->GetHmpUpdateResult();
     return updateInfo;
+}
+
+void ModuleUpdateKitsImpl::LoadServiceSuccess()
+{
+    serviceCv_.notify_all();
+}
+
+void ModuleUpdateKitsImpl::LoadServiceFail()
+{
+    serviceCv_.notify_all();
 }
 }
 } // namespace OHOS

@@ -42,6 +42,9 @@ public:
     virtual int32_t StartUpdateHmpPackage(const std::string &path,
         sptr<ISysInstallerCallbackFunc> callback) = 0;
     virtual std::vector<HmpUpdateInfo> GetHmpUpdateResult() = 0;
+
+    virtual void LoadServiceSuccess() = 0;
+    virtual void LoadServiceFail() = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS
