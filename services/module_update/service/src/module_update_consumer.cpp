@@ -26,7 +26,10 @@ namespace SysInstaller {
 using namespace Updater;
 
 ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
-    std::unordered_map<int32_t, std::string> &saIdHmpMap) : queue_(queue), saIdHmpMap_(saIdHmpMap) {}
+    std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit)
+    : queue_(queue),
+      saIdHmpMap_(saIdHmpMap),
+      exit_(exit) {}
 
 void ModuleUpdateConsumer::DoRevert(const std::string &hmpName, const int32_t &saId)
 {
@@ -56,6 +59,11 @@ void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, const int32_t &s
 void ModuleUpdateConsumer::Run()
 {
     do {
+        if (exit_ == 1 && queue_.IsEmpty()) {
+            LOG(INFO) << "producer and consumer stop";
+            queue_.Stop();
+            break;
+        }
         std::pair<int32_t, std::string> saStatusPair = queue_.Pop();
         int32_t saId = saStatusPair.first;
         std::string saStatus = saStatusPair.second;

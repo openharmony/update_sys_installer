@@ -17,6 +17,7 @@
 #define MODULE_UPDATE_CONSUMER_H
 
 #include "module_update_queue.h"
+#include <csignal>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -24,12 +25,13 @@ namespace OHOS {
 namespace SysInstaller {
 class ModuleUpdateConsumer {
 public:
-    ModuleUpdateConsumer(ModuleUpdateQueue &queue, std::unordered_map<int32_t, std::string> &saIdHmpMap);
+    ModuleUpdateConsumer(ModuleUpdateQueue &queue, std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit);
     void Run();
 
 private:
     ModuleUpdateQueue &queue_;
     std::unordered_map<int32_t, std::string> &saIdHmpMap_;
+    volatile sig_atomic_t &exit_;
     std::unordered_set<std::string> hmpSet_;
     std::unordered_set<std::string> unLoadHmpSet_;
     void DoRevert(const std::string &hmpName, const int32_t &saId);

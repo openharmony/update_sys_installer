@@ -47,6 +47,7 @@ public:
 
     void ScanPreInstalledHmp();
     void Start();
+    void Stop();
 
 private:
     void BuildSaIdHmpMap(std::unordered_map<int32_t, std::string> &saIdHmpMap);

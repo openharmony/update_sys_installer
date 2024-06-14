@@ -53,6 +53,8 @@ constexpr int32_t RETRY_TIMES_FOR_SAMGR = 10;
 constexpr std::chrono::milliseconds MILLISECONDS_WAITING_SAMGR_ONE_TIME(100);
 constexpr mode_t DIR_MODE = 0750;
 
+static volatile sig_atomic_t g_exit = 0;
+
 int32_t CreateModuleDirs(const std::string &hmpName)
 {
     if (!CreateDirIfNeeded(UPDATE_INSTALL_DIR, DIR_MODE)) {
@@ -536,6 +538,12 @@ void ModuleUpdateMain::Start()
     consumeThread.join();
     produceThread.join();
     LOG(INFO) << "module update main exit";
+}
+
+void ModuleUpdateMain::Stop()
+{
+    LOG(INFO) << "ModuleUpdateMain Stop";
+    g_exit = true;
 }
 } // namespace SysInstaller
 } // namespace OHOS

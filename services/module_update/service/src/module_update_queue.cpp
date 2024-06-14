@@ -62,5 +62,12 @@ bool ModuleUpdateQueue::IsFull()
     std::unique_lock<std::mutex> locker(mtx_);
     return size_ == MAX_SIZE;
 }
+
+void Stop()
+{
+    isStop_ = true;
+    notEmpty_.notify_all;
+    notFull_.notify_all;
+}
 } // SysInstaller
 } // namespace OHOS
