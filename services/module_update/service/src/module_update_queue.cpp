@@ -26,10 +26,20 @@ ModuleUpdateQueue::ModuleUpdateQueue() : size_(0), head_(0), tail_(0)
     queue_.resize(MAX_SIZE);
 }
 
+void ModuleUpdateQueue::Stop()
+{
+    isStop_ = true;
+    notFull_.notify_all();
+    notEmpty_.notify_all();
+}
+
 void ModuleUpdateQueue::Put(std::pair<int32_t, std::string> &saStatus)
 {
     while (IsFull()) {
         std::unique_lock<std::mutex> locker(mtx_);
+        if (isStop_) {
+            return;
+        }
         notFull_.wait(locker);
     }
     queue_[tail_] = saStatus;
@@ -42,6 +52,9 @@ std::pair<int32_t, std::string> ModuleUpdateQueue::Pop()
 {
     while (IsEmpty()) {
         std::unique_lock<std::mutex> locker(mtx_);
+        if (isStop_) {
+            return std::make_pair(0, "");
+        }
         notEmpty_.wait(locker);
     }
     std::pair<int32_t, std::string> saStatus = std::move(queue_[head_]);
@@ -61,13 +74,6 @@ bool ModuleUpdateQueue::IsFull()
 {
     std::unique_lock<std::mutex> locker(mtx_);
     return size_ == MAX_SIZE;
-}
-
-void Stop()
-{
-    isStop_ = true;
-    notEmpty_.notify_all;
-    notFull_.notify_all;
 }
 } // SysInstaller
 } // namespace OHOS
