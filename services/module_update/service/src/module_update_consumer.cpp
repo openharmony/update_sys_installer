@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "directory_ex.h"
 #include "log/log.h"
 #include "module_constants.h"
 #include "module_update.h"
@@ -25,17 +26,38 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 
+bool ClearModuleDirs(const std::string &hmpName)
+{
+    std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
+    return ForceRemoveDirectory(hmpInstallDir);
+}
+
 ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
     std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit)
     : queue_(queue),
       saIdHmpMap_(saIdHmpMap),
       exit_(exit) {}
 
+void ModuleUpdateConsumer::DoInstall(ModuleUpdateStatus &status)
+{
+    if (ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
+        if (!ClearModuleDirs(status.hmpName)) {
+            LOG(ERROR) << "failed to remove " << status.hmpName;
+        }
+        LOG(INFO) << "hmp package successful install, hmp name=" << status.hmpName;
+    } else {
+        LOG(ERROR) << "hmp package fail install, hmp name=" << status.hmpName;
+    }
+}
+
 void ModuleUpdateConsumer::DoRevert(const std::string &hmpName, const int32_t &saId)
 {
     LOG(INFO) << "hmp package revert,hmp name=" << hmpName << "; said=" << saId;
-    hmpSet_.insert(hmpName);
     Revert(hmpName, !IsHotSa(saId));
+    ModuleUpdateStatus status;
+    status.hmpName = hmpName;
+    status.isHotInstall = IsHotSa(saId);
+    DoInstall(status);
 }
 
 void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, const int32_t &saId)
@@ -48,23 +70,21 @@ void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, const int32_t &s
         LOG(INFO) << "sa is running, saId=" << saId;
         return;
     }
-    if (ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
-        unLoadHmpSet_.insert(hmpName);
-        LOG(INFO) << "hmp package successful install, hmp name=" << hmpName << "; said=" << saId;
-    } else {
-        LOG(ERROR) << "hmp package fail install, hmp name=" << hmpName << "; said=" << saId;
-    }
+    DoInstall(status);
 }
 
 void ModuleUpdateConsumer::Run()
 {
     do {
         if (exit_ == 1 && queue_.IsEmpty()) {
-            LOG(INFO) << "producer and consumer stop";
             queue_.Stop();
             break;
         }
         std::pair<int32_t, std::string> saStatusPair = queue_.Pop();
+        if (saStatusPair.first == 0 && saStatusPair.second == "") {
+            LOG(INFO) << "producer and consumer stop";
+            break;
+        }
         int32_t saId = saStatusPair.first;
         std::string saStatus = saStatusPair.second;
         auto it = saIdHmpMap_.find(saId);
@@ -73,10 +93,6 @@ void ModuleUpdateConsumer::Run()
             continue;
         }
         std::string hmpName = it->second;
-        if (hmpSet_.find(hmpName) != hmpSet_.end() || unLoadHmpSet_.find(hmpName) != unLoadHmpSet_.end()) {
-            LOG(INFO) << "hmp has been reverted or unloaded, hmp name=" << hmpName << "; said=" << saId;
-            continue;
-        }
         if (strcmp(saStatus.c_str(), LOAD_FAIL) == 0 || strcmp(saStatus.c_str(), CRASH) == 0) {
             DoRevert(hmpName, saId);
         } else if (IsHotSa(saId) && strcmp(saStatus.c_str(), UNLOAD) == 0) {
