@@ -34,10 +34,9 @@ private:
     ModuleUpdateQueue &queue_;
     std::unordered_map<int32_t, std::string> &saIdHmpMap_;
     volatile sig_atomic_t &exit_;
-    std::unordered_set<std::string> hmpSet_;
-    std::unordered_set<std::string> unLoadHmpSet_;
     void DoRevert(const std::string &hmpName, const int32_t &saId);
     void DoUnload(const std::string &hmpName, const int32_t &saId);
+    void DoInstall(ModuleUpdateStatus &status);
 };
 } // SysInstaller
 } // namespace OHOS
