@@ -16,6 +16,7 @@
 #ifndef MODULE_UPDATE_CONSUMER_H
 #define MODULE_UPDATE_CONSUMER_H
 
+#include "module_ipc_helper.h"
 #include "module_update_queue.h"
 #include <csignal>
 #include <unordered_map>
@@ -25,7 +26,8 @@ namespace OHOS {
 namespace SysInstaller {
 class ModuleUpdateConsumer {
 public:
-    ModuleUpdateConsumer(ModuleUpdateQueue &queue, std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit);
+    ModuleUpdateConsumer(
+        ModuleUpdateQueue &queue, std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit);
     void Run();
 
 private:
