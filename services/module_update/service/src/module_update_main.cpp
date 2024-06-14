@@ -531,8 +531,8 @@ void ModuleUpdateMain::Start()
     std::unordered_map<int32_t, std::string> saIdHmpMap;
     BuildSaIdHmpMap(saIdHmpMap);
     ModuleUpdateQueue queue;
-    ModuleUpdateProducer producer(queue, saIdHmpMap);
-    ModuleUpdateConsumer consumer(queue, saIdHmpMap);
+    ModuleUpdateProducer producer(queue, saIdHmpMap, g_exit);
+    ModuleUpdateConsumer consumer(queue, saIdHmpMap, g_exit);
     std::thread produceThread(std::bind(&ModuleUpdateProducer::Run, &producer));
     std::thread consumeThread(std::bind(&ModuleUpdateConsumer::Run, &consumer));
     consumeThread.join();
