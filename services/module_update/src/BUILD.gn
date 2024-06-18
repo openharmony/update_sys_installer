@@ -21,8 +21,8 @@ check_module_update_gen("check_module_update") {
   deps = [ "${sys_installer_path}/services/module_update/src:check_module_update_staic" ]
 
   external_deps = [
-    "bounds_checking_function:libsec_static",
-    "updater:libupdaterlog",
+    "bounds_checking_function:libsec_shared",
+    "updater:libupdaterlog_shared",
   ]
 
   part_name = "sys_installer"
@@ -39,8 +39,8 @@ ohos_static_library("check_module_update_staic") {
   ]
 
   external_deps = [
-    "bounds_checking_function:libsec_static",
-    "updater:libupdaterlog",
+    "bounds_checking_function:libsec_shared",
+    "updater:libupdaterlog_shared",
   ]
 
   part_name = "sys_installer"
@@ -67,9 +67,9 @@ ohos_static_library("module_update_static") {
       [ "${sys_installer_path}/services/module_update:module_update_utils" ]
 
   external_deps = [
-    "bounds_checking_function:libsec_static",
+    "bounds_checking_function:libsec_shared",
     "samgr:samgr_common",
-    "updater:libupdaterlog",
+    "updater:libupdaterlog_shared",
   ]
 
   if (defined(global_parts_info.startup_hvb)) {

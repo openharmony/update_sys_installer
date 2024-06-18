@@ -26,7 +26,7 @@ config("utils_exported_header") {
   ]
 }
 
-ohos_static_library("module_update_utils") {
+ohos_shared_library("module_update_utils") {
   sources = [
     "${sys_installer_path}/services/module_update/util/src/module_file.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_update_verify.cpp",
@@ -47,15 +47,17 @@ ohos_static_library("module_update_utils") {
     "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "c_utils:utils",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
     "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "updater:libmiscinfo",
-    "updater:libpackageExt",
+    "updater:libpackage_shared",
     "updater:libringbuffer",
-    "updater:libupdaterlog",
+    "updater:libupdaterlog_shared",
+    "updater:libupdaterpackage_shared",
     "updater:libutils",
   ]
 

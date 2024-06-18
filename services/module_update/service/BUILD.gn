@@ -22,6 +22,15 @@ module_update_service_gen("module_update_service") {
   subsystem_name = "updater"
 }
 
+config("module_update_service_exported_header") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "${sys_installer_path}/services/module_update/include",
+    "${sys_installer_path}/services/module_update/util/include",
+  ]
+}
+
 ohos_static_library("libmodule_update_service_static") {
   sources = [
     "${sys_installer_path}/frameworks/ipc_server/src/module_update_service.cpp",
@@ -44,8 +53,9 @@ ohos_static_library("libmodule_update_service_static") {
     "${sys_installer_path}/services/module_update/include",
   ]
 
+  public_configs = [ ":module_update_service_exported_header" ]
+
   deps = [
-    "${sys_installer_path}/services/module_update:module_update_utils",
     "${sys_installer_path}/services/module_update/src:module_update_static",
   ]
 
@@ -58,9 +68,9 @@ ohos_static_library("libmodule_update_service_static") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "updater:libpackageExt",
-    "updater:libupdaterlog",
-    "updater:libutils",
+    "updater:libpackage_shared",
+    "updater:libupdaterlog_shared",
+    "updater:libutils_fs",
   ]
 
   if (build_selinux) {
