@@ -543,7 +543,7 @@ void ModuleUpdateMain::Start()
 void ModuleUpdateMain::Stop()
 {
     LOG(INFO) << "ModuleUpdateMain Stop";
-    g_exit = true;
+    g_exit = 1;
 }
 } // namespace SysInstaller
 } // namespace OHOS
