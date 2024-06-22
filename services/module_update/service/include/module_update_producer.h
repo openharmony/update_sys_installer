@@ -16,18 +16,22 @@
 #ifndef MODULE_UPDATE_PRODUCER_H
 #define MODULE_UPDATE_PRODUCER_H
 
+#include <csignal>
 #include "module_update_queue.h"
+
 namespace OHOS {
 namespace SysInstaller {
 class ModuleUpdateProducer {
 public:
-    ModuleUpdateProducer(ModuleUpdateQueue &queue, std::unordered_map<int32_t, std::string> &saIdHmpMap);
+    ModuleUpdateProducer(
+        ModuleUpdateQueue &queue, std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit);
     void Run();
 
 private:
     void AddAbnormalSa();
     ModuleUpdateQueue &queue_;
     std::unordered_map<int32_t, std::string> &saIdHmpMap_;
+    volatile sig_atomic_t &exit_;
 };
 } // SysInstaller
 } // namespace OHOS

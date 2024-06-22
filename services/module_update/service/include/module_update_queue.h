@@ -37,6 +37,8 @@ public:
     std::pair<int32_t, std::string> Pop();
     bool IsEmpty();
     bool IsFull();
+    void Stop();
+    bool isStop_ = false;
 
 private:
     std::mutex mtx_;

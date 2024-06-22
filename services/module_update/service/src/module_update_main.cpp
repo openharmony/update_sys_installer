@@ -53,6 +53,8 @@ constexpr int32_t RETRY_TIMES_FOR_SAMGR = 10;
 constexpr std::chrono::milliseconds MILLISECONDS_WAITING_SAMGR_ONE_TIME(100);
 constexpr mode_t DIR_MODE = 0750;
 
+static volatile sig_atomic_t g_exit = 0;
+
 int32_t CreateModuleDirs(const std::string &hmpName)
 {
     if (!CreateDirIfNeeded(UPDATE_INSTALL_DIR, DIR_MODE)) {
@@ -529,13 +531,19 @@ void ModuleUpdateMain::Start()
     std::unordered_map<int32_t, std::string> saIdHmpMap;
     BuildSaIdHmpMap(saIdHmpMap);
     ModuleUpdateQueue queue;
-    ModuleUpdateProducer producer(queue, saIdHmpMap);
-    ModuleUpdateConsumer consumer(queue, saIdHmpMap);
+    ModuleUpdateProducer producer(queue, saIdHmpMap, g_exit);
+    ModuleUpdateConsumer consumer(queue, saIdHmpMap, g_exit);
     std::thread produceThread(std::bind(&ModuleUpdateProducer::Run, &producer));
     std::thread consumeThread(std::bind(&ModuleUpdateConsumer::Run, &consumer));
     consumeThread.join();
     produceThread.join();
     LOG(INFO) << "module update main exit";
+}
+
+void ModuleUpdateMain::Stop()
+{
+    LOG(INFO) << "ModuleUpdateMain Stop";
+    g_exit = 1;
 }
 } // namespace SysInstaller
 } // namespace OHOS

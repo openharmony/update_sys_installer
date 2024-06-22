@@ -35,7 +35,10 @@ constexpr const char *BOOT_SUCCESS_VALUE = "true";
 }
 
 ModuleUpdateProducer::ModuleUpdateProducer(ModuleUpdateQueue &queue,
-    std::unordered_map<int32_t, std::string> &saIdHmpMap) : queue_(queue), saIdHmpMap_(saIdHmpMap) {}
+    std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit)
+    : queue_(queue),
+      saIdHmpMap_(saIdHmpMap),
+      exit_(exit) {}
 
 void ModuleUpdateProducer::AddAbnormalSa()
 {
@@ -81,6 +84,11 @@ void ModuleUpdateProducer::Run()
         return;
     }
     do {
+        if (exit_ == 1) {
+            LOG(INFO) << "producer and consumer stop";
+            queue_.Stop();
+            break;
+        }
         if (strcmp(saValue, SA_ABNORMAL) == 0) {
             SetParameter(SA_START, SA_NORMAL);
             AddAbnormalSa();
