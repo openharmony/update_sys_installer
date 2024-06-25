@@ -30,12 +30,17 @@
 #include "directory_ex.h"
 #include "log/log.h"
 #include "module_constants.h"
+#include "module_file.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 
 namespace {
+constexpr const char *BOOT_COMPLETE_PARAM = "bootevent.boot.completed";
+constexpr const char *BOOT_SUCCESS_VALUE = "true";
+constexpr int32_t PARAM_VALUE_SIZE = 10;
 constexpr std::chrono::milliseconds WAIT_FOR_FILE_TIME(5);
 constexpr uint32_t BYTE_SIZE = 8;
 constexpr mode_t ALL_PERMISSIONS = 0777;
@@ -269,6 +274,35 @@ bool IsRunning(const int32_t &saId)
         return false;
     }
     return true;
+}
+
+bool CheckBootComplete()
+{
+    char value[PARAM_VALUE_SIZE] = "";
+    int ret = GetParameter(BOOT_COMPLETE_PARAM, "", value, PARAM_VALUE_SIZE);
+    if (ret < 0) {
+        LOG(ERROR) << "Failed to get parameter " << BOOT_COMPLETE_PARAM;
+        return false;
+    }
+    return strcmp(value, BOOT_SUCCESS_VALUE) == 0;
+}
+
+bool IsHotHmpPackage(const std::string &hmpName)
+{
+    std::vector<std::string> files;
+    std::vector<std::string> saFiles;
+    std::string hmpDir = std::string(MODULE_PREINSTALL_DIR) + "/" + hmpName;
+    GetDirFiles(hmpDir, files);
+    for (auto &file : files) {
+        if (CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
+            saFiles.emplace_back(file);
+        }
+    }
+    if (saFiles.size() != 1) {
+        return false;
+    }
+    std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(saFiles[0]);
+    return IsHotSa(moduleFile->GetSaId);
 }
 } // namespace SysInstaller
 } // namespace OHOS

@@ -26,7 +26,6 @@
 #include <condition_variable>
 #include <string>
 #include <vector>
-#include <functional>
 
 namespace OHOS {
 namespace SysInstaller {

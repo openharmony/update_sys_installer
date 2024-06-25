@@ -38,6 +38,8 @@ std::string GetRealPath(const std::string &path);
 void Revert(const std::string &hmpName, bool reboot);
 bool IsHotSa(const int32_t &saId);
 bool IsRunning(const int32_t &saId);
+bool IsHotHmpPackage(const std::string &hmpName);
+bool CheckBootComplete();
 
 class Timer {
 public:

@@ -145,12 +145,24 @@ void ModuleUpdate::ProcessSaFile(const std::string &saFile, ModuleUpdateStatus &
         return;
     }
     int32_t saId = moduleFile->GetSaId();
-    if (IsHotSa(saId)) {
+    if (IsHotHmpPackage(status.hmpName) && CheckBootComplete()) {
+        if (IsRunning(saId)) {
+            LOG(INFO) << "ondemand sa is running, saId=" << saId;
+            return;
+        }
         std::string mountPoint = string(MODULE_ROOT_DIR) + "/" + std::to_string(saId);
         int ret = rmdir(mountPoint.c_str());
-        if (ret != 0) {
-            LOG(WARNING) << "Could not rmdir " << mountPoint << " errno: " << errno;
-            return;
+        if (CheckPathExists(mountPoint)) {
+            int ret = umount(mountPoint.c_str());
+            if (ret != 0) {
+                LOG(WARNING) << "Could not umount " << mountPoint << " errno: " << errno;
+                return;
+            }
+            ret = rmdir(mountPoint.c_str());
+            if (ret != 0) {
+                LOG(WARNING) << "Could not rmdir " << mountPoint << " errno: " << errno;
+                return;
+            }
         }
     } else if (CheckMountComplete(saId)) {
         LOG(INFO) << "Check mount complete, saId=" << saId;
@@ -199,17 +211,28 @@ void ModuleUpdate::CheckModuleUpdate()
     LOG(INFO) << "CheckModuleUpdate begin";
     Timer timer;
     std::vector<std::string> files;
-    GetDirFiles(OTA_PACKAGE_DIR, files);
+    std::unordered_set<std::string> hmpNameSet;
+    GetDirFiles(MODULE_PREINSTALL_DIR, files);
+    for (auto &file : files) {
+        if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
+            continue;
+        }
+        std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
+        if (moduleFile == nullptr) {
+            continue;
+        }
+        std::string hmpName = GetHmpName(file);
+        if (hmpName.empty()) {
+            continue;
+        }
+        hmpNameSet.emplace(hmpName);
+    }
     auto &instance = ModuleUpdateTaskManager::GetInstance();
     ON_SCOPE_EXIT(clear) {
         instance.ClearTask();
     };
-    for (auto &file : files) {
-        std::string hmpPackageName = GetFileName(file);
-        if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX) || hmpPackageName.empty()) {
-            continue;
-        }
-        instance.AddTask(hmpPackageName);
+    for (auto &hmpName : hmpNameSet) {
+        instance.AddTask(hmpName);
     }
     while (instance.GetCurTaskNum() != 0) {
         sleep(1);

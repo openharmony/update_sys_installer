@@ -23,16 +23,18 @@
 #include "hisysevent_manager.h"
 #include "json_node.h"
 #include "log/log.h"
+#include "module_update_service.h"
+#include "module_utils.h"
+#include "parameter.h"
+#include "system_ability_definition.h"
 #include "module_constants.h"
 #include "module_update_consumer.h"
 #include "module_update_producer.h"
 #include "module_error_code.h"
 #include "module_file.h"
-#include "module_utils.h"
+#include "module_update.h"
 #include "package/package.h"
-#include "parameter.h"
 #include "scope_guard.h"
-#include "system_ability_definition.h"
 #include "utils.h"
 #include "unique_fd.h"
 
@@ -46,9 +48,6 @@ namespace SysInstaller {
 using namespace Updater;
 
 namespace {
-constexpr const char *BOOT_COMPLETE_PARAM = "bootevent.boot.completed";
-constexpr const char *BOOT_SUCCESS_VALUE = "true";
-constexpr int32_t PARAM_VALUE_SIZE = 10;
 constexpr int32_t RETRY_TIMES_FOR_SAMGR = 10;
 constexpr std::chrono::milliseconds MILLISECONDS_WAITING_SAMGR_ONE_TIME(100);
 constexpr mode_t DIR_MODE = 0750;
@@ -125,23 +124,22 @@ ModuleUpdateMain::ModuleUpdateMain()
 
 ModuleUpdateMain::~ModuleUpdateMain() = default;
 
-bool ModuleUpdateMain::CheckBootComplete() const
+void ModuleUpdateMain::DoHotInstall(ModuleUpdateStatus &status)
 {
-    char value[PARAM_VALUE_SIZE] = "";
-    int ret = GetParameter(BOOT_COMPLETE_PARAM, "", value, PARAM_VALUE_SIZE);
-    if (ret < 0) {
-        LOG(ERROR) << "Failed to get parameter " << BOOT_COMPLETE_PARAM;
-        return false;
+    if (!status.isHotInstall) {
+        return;
     }
-    return strcmp(value, BOOT_SUCCESS_VALUE) == 0;
+    if (!ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
+        LOG(INFO) << "DoHotInstall fail, hmpName=" << status.hmpName;
+        return;
+    }
+    LOG(INFO) << "DoHotInstall success, hmpName=" << status.hmpName;
 }
 
-int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
-    const sptr<ISysInstallerCallback> &updateCallback)
+int32_t ModuleUpdateMain::CheckHmpName(const std::string &hmpName)
 {
-    std::string hmpName = GetFileName(pkgPath);
     if (hmpName.empty()) {
-        LOG(ERROR) << "Failed to get hmp name " << pkgPath;
+        LOG(ERROR) << "Failed to get hmpName=" << hmpName;
         return ModuleErrorCode::ERR_INVALID_PATH;
     }
     if (hmpSet_.find(hmpName) == hmpSet_.end()) {
@@ -151,6 +149,17 @@ int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
     int32_t ret = CreateModuleDirs(hmpName);
     if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
         ClearModuleDirs(hmpName);
+        return ret;
+    }
+    return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
+}
+
+int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
+    const sptr<ISysInstallerCallback> &updateCallback)
+{
+    std::string hmpName = GetFileName(pkgPath);
+    int32_t ret = CheckHmpName(hmpName);
+    if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
         return ret;
     }
     ON_SCOPE_EXIT(rmdir) {
@@ -184,6 +193,10 @@ int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
     CANCEL_SCOPE_EXIT_GUARD(rmdir);
+    ModuleUpdateStatus status;
+    status.hmpName = hmpName;
+    status.isHotInstall = IsHotHmpPackage(hmpName);
+    DoHotInstall(status);
     sync();
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
 }
@@ -315,6 +328,7 @@ void ModuleUpdateMain::CollectModulePackageInfo(const std::string &hmpName,
 void ModuleUpdateMain::ExitModuleUpdate()
 {
     LOG(INFO) << "ExitModuleUpdate";
+    Stop();
     LOG(INFO) << "Deleting " << UPDATE_INSTALL_DIR;
     if (!ForceRemoveDirectory(UPDATE_INSTALL_DIR)) {
         LOG(ERROR) << "Failed to remove " << UPDATE_INSTALL_DIR << " err=" << errno;
@@ -480,6 +494,7 @@ void ModuleUpdateMain::ScanPreInstalledHmp()
         if (hmpName.empty()) {
             continue;
         }
+        std::unique_lock<std::mutex> locker(mlock_);
         hmpSet_.emplace(hmpName);
         saIdHmpMap_.emplace(moduleFile->GetSaId(), hmpName);
     }
