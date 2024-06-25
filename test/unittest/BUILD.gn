@@ -50,11 +50,15 @@ ohos_unittest("sys_installer_unittest") {
   deps += [ "${sys_installer_path}/test/unittest:sys_installer_client_test" ]
   external_deps = [
     "bounds_checking_function:libsec_static",
-    "googletest:gmock_main",
-    "googletest:gtest_main",
     "updater:libupdaterlog",
   ]
 
+  if (sys_installer_googletest_depend) {
+    external_deps += [
+      "googletest:gmock_main",
+      "googletest:gtest_main",
+    ]
+  }
   cflags_cc = [ "-fexceptions" ]
 
   defines = [
