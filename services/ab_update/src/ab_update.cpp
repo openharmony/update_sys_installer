@@ -47,7 +47,9 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
     upParams.updatePackage = {pkgPath};
     upParams.initialProgress = statusManager_->GetUpdateProgress();
     upParams.currentPercentage = 1 - upParams.initialProgress;
-    upParams.callbackProgress = std::bind(&ABUpdate::SetProgress, this, std::placeholders::_1);
+    upParams.callbackProgress = [this](float value) {
+        this-> SetProgress(value);
+        };
     UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, upParams, HOTA_UPDATE);
     if (updateRet != UPDATE_SUCCESS) {
         LOG(INFO) << "Install package failed!";

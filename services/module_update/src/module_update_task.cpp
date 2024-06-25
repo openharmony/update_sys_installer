@@ -70,7 +70,10 @@ bool ModuleUpdateTaskManager::AddTask(std::string hmpName)
         LOG(ERROR) << "add task failed:" << taskNum_;
         return false;
     }
-    pool_.AddTask(std::bind(TaskCallback, ModuleUpdateTask(hmpName)));
+    pool_.AddTask([&hmpName] {
+        ModuleUpdateTask task = ModuleUpdateTask(hmpName);
+        TaskCallback(task);
+        });
     taskNum_++;
     return true;
 }
