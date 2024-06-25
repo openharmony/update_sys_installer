@@ -302,7 +302,7 @@ bool IsHotHmpPackage(const std::string &hmpName)
         return false;
     }
     std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(saFiles[0]);
-    return IsHotSa(moduleFile->GetSaId);
+    return IsHotSa(moduleFile->GetSaId());
 }
 } // namespace SysInstaller
 } // namespace OHOS
