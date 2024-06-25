@@ -151,7 +151,7 @@ void ModuleUpdate::ProcessSaFile(const std::string &saFile, ModuleUpdateStatus &
             return;
         }
         std::string mountPoint = string(MODULE_ROOT_DIR) + "/" + std::to_string(saId);
-        int ret = rmdir(mountPoint.c_str());
+        LOG(INFO) << "Remove old mountpoint " << mountPoint;
         if (CheckPathExists(mountPoint)) {
             int ret = umount(mountPoint.c_str());
             if (ret != 0) {
