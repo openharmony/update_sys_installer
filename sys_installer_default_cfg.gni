@@ -16,6 +16,7 @@ import("//build/ohos.gni")
 declare_args() {
   sys_installer_cfg_file = ""
   sys_installer_absolutely_path = "//base/update/sys_installer"
+  sys_installer_googletest_depend = true
 }
 
 template("sys_installer_gen") {
