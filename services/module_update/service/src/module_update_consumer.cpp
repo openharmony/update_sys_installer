@@ -75,6 +75,7 @@ void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, const int32_t &s
 
 void ModuleUpdateConsumer::Run()
 {
+    LOG(INFO) << "ModuleUpdateConsumer Consume";
     do {
         if (exit_ == 1 && queue_.IsEmpty()) {
             queue_.Stop();

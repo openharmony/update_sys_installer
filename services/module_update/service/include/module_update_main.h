@@ -29,7 +29,8 @@ namespace SysInstaller {
 class ModuleUpdateMain final : public Singleton<ModuleUpdateMain> {
     DECLARE_SINGLETON(ModuleUpdateMain);
 public:
-    bool CheckBootComplete() const;
+    void DoHotInstall(ModuleUpdateStatus &status);
+    int32_t CheckHmpName(const std::string &hmpName);
     int32_t UninstallModulePackage(const std::string &hmpName);
     int32_t GetModulePackageInfo(const std::string &hmpName,
         std::list<ModulePackageInfo> &modulePackageInfos);
@@ -56,7 +57,7 @@ private:
     sptr<ISystemAbilityManager> samgr_ = nullptr;
     std::unordered_set<std::string> hmpSet_;
     std::unordered_map<int32_t, std::string> saIdHmpMap_;
-    std::unordered_map<std::string, std::unordered_set<std::string>> processHmpMap_;
+    std::mutex mlock_;
 };
 } // namespace SysInstaller
 } // namespace OHOS

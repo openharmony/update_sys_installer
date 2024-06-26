@@ -85,6 +85,7 @@ int32_t ModuleUpdateService::GetModulePackageInfo(const std::string &hmpName,
 int32_t ModuleUpdateService::ExitModuleUpdate()
 {
     LOG(INFO) << "ExitModuleUpdate";
+    ModuleUpdateMain::GetInstance().ExitModuleUpdate();
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
         LOG(ERROR) << "GetSystemAbilityManager samgr object null!";
@@ -183,6 +184,10 @@ void ModuleUpdateService::OnStart(const SystemAbilityOnDemandReason &startReason
     }
     SysInstaller::ModuleUpdateMain& moduleUpdate = SysInstaller::ModuleUpdateMain::GetInstance();
     moduleUpdate.ScanPreInstalledHmp();
+    if (strcmp(startReason.GetName().c_str(), SA_START) == 0 &&
+        strcmp(startReason.GetValue().c_str(), SA_ABNORMAL) == 0) {
+        moduleUpdate.Start();
+    }
     LOG(INFO) << "OnStart done";
 }
 
