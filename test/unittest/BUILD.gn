@@ -42,20 +42,16 @@ ohos_unittest("sys_installer_unittest") {
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
     "${sys_installer_path}/test/unitest",
-    "//third_party/googletest/googletest/include",
-    "//third_party/googletest/googlemock/include",
   ]
   deps = [
     "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits",
   ]
 
-  deps += [
-    "${sys_installer_path}/test/unittest:sys_installer_client_test",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps += [ "${sys_installer_path}/test/unittest:sys_installer_client_test" ]
   external_deps = [
     "bounds_checking_function:libsec_static",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "updater:libupdaterlog",
   ]
 
