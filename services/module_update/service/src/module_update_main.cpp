@@ -548,8 +548,12 @@ void ModuleUpdateMain::Start()
     ModuleUpdateQueue queue;
     ModuleUpdateProducer producer(queue, saIdHmpMap, g_exit);
     ModuleUpdateConsumer consumer(queue, saIdHmpMap, g_exit);
-    std::thread produceThread(std::bind(&ModuleUpdateProducer::Run, &producer));
-    std::thread consumeThread(std::bind(&ModuleUpdateConsumer::Run, &consumer));
+    std::thread produceThread([&producer] {
+        producer.Run();
+        });
+    std::thread consumeThread([&consumer] {
+        consumer.Run();
+        });
     consumeThread.join();
     produceThread.join();
     LOG(INFO) << "module update main exit";
