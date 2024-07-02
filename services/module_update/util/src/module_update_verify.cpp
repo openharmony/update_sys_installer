@@ -202,7 +202,7 @@ int32_t CheckPackInfoVer(const std::string &pkgPackInfoPath)
     }
 
     const std::string actPackInfoPath = std::string(UPDATE_ACTIVE_DIR) + "/" + subPackInfoPath;
-    if (pkgPackInfoPath.find(UPDATE_ACTIVE_DIR) != std::string::npos &&
+    if (pkgPackInfoPath.find(UPDATE_ACTIVE_DIR) == std::string::npos &&
         Utils::IsFileExist(actPackInfoPath) &&
         DoCheckPackInfoVer(actPackInfoPath, pkgPackInfoPath) != 0) {
         LOG(ERROR) << "DoCheckPackInfoVer with active fail";

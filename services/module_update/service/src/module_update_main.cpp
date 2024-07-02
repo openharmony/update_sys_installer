@@ -129,6 +129,11 @@ void ModuleUpdateMain::DoHotInstall(ModuleUpdateStatus &status)
     if (!status.isHotInstall) {
         return;
     }
+    ON_SCOPE_EXIT(rmdir) {
+        if (!ClearModuleDirs(status.hmpName)) {
+            LOG(WARNING) << "Failed to remove " << status.hmpName;
+        }
+    };
     if (!ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
         LOG(INFO) << "DoHotInstall fail, hmpName=" << status.hmpName;
         return;

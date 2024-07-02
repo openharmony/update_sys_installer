@@ -42,6 +42,7 @@ void ModuleUpdateQueue::Put(std::pair<int32_t, std::string> &saStatus)
         }
         notFull_.wait(locker);
     }
+    std::unique_lock<std::mutex> locker(mtx_);
     queue_[tail_] = saStatus;
     tail_ = (tail_ + 1) % MAX_SIZE;
     size_++;
@@ -57,6 +58,7 @@ std::pair<int32_t, std::string> ModuleUpdateQueue::Pop()
         }
         notEmpty_.wait(locker);
     }
+    std::unique_lock<std::mutex> locker(mtx_);
     std::pair<int32_t, std::string> saStatus = std::move(queue_[head_]);
     head_ = (head_ + 1) % MAX_SIZE;
     size_--;
