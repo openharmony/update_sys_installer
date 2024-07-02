@@ -26,8 +26,8 @@ namespace OHOS {
 namespace SysInstaller {
 class ModuleUpdateTask {
 public:
-    ModuleUpdateTask(std::string &hmpName);
-    void SetHmpName(std::string &hmpName);
+    ModuleUpdateTask(const std::string &hmpName);
+    void SetHmpName(const std::string &hmpName);
     std::string &GetHmpName();
 private:
     std::string hmpName_;
