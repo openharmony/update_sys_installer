@@ -33,12 +33,12 @@ void TaskCallback(ModuleUpdateTask &task)
 }
 }
 
-ModuleUpdateTask::ModuleUpdateTask(std::string &hmpName)
+ModuleUpdateTask::ModuleUpdateTask(const std::string &hmpName)
 {
     SetHmpName(hmpName);
 }
 
-void ModuleUpdateTask::SetHmpName(std::string &hmpName)
+void ModuleUpdateTask::SetHmpName(const std::string &hmpName)
 {
     hmpName_ = hmpName;
 }
@@ -70,7 +70,7 @@ bool ModuleUpdateTaskManager::AddTask(std::string hmpName)
         LOG(ERROR) << "add task failed:" << taskNum_;
         return false;
     }
-    pool_.AddTask([&hmpName] {
+    pool_.AddTask([hmpName] {
         ModuleUpdateTask task = ModuleUpdateTask(hmpName);
         TaskCallback(task);
         });
