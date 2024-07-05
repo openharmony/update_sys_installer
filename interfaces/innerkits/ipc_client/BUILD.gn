@@ -170,7 +170,7 @@ ohos_executable("module_update_client") {
     "samgr:samgr_proxy",
     "updater:libupdaterlog",
   ]
-
+  install_enable = false
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
