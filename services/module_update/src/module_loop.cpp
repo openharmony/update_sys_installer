@@ -219,7 +219,8 @@ bool SetUpLoopDevice(const int deviceFd, const string &target, const uint32_t im
         if (statfs(realPath.c_str(), &stbuf) != 0 ||
             (stbuf.f_type != EROFS_SUPER_MAGIC_V1 &&
              stbuf.f_type != SQUASHFS_MAGIC &&
-             stbuf.f_type != OVERLAYFS_SUPER_MAGIC)) {
+             stbuf.f_type != OVERLAYFS_SUPER_MAGIC &&
+             stbuf.f_type != EXT4_SUPER_MAGIC)) {
             LOG(ERROR) << "Failed to open " << realPath << " errno=" << savedErrno;
             return false;
         }
