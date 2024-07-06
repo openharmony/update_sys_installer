@@ -79,7 +79,7 @@ bool CreateDmDevice(const OHOS::SysInstaller::ModuleFile &moduleFile, std::strin
         LOG(ERROR) << "create dm verity device error " << ret;
         goto exit;
     }
-    ret = FsDmInitDmDev(devPath, false);
+    ret = FsDmInitDmDev(devPath, true);
     if (ret != 0) {
         LOG(ERROR) << "init dm device error " << ret;
         goto exit;
@@ -95,6 +95,16 @@ exit:
     LOG(INFO) << "do not support hvb";
     return true;
 #endif
+}
+
+bool RemoveDmDevice(std::string deviceName)
+{
+    std::string devName = OHOS::ExtractFileName(deviceName);
+    int ret = FsDmRemoveDevice(devName.c_str());
+    if (ret != 0) {
+        LOG(ERROR) << "fs rm device error, ret=" << ret;
+    }
+    return (ret == 0);
 }
 
 #ifdef __cplusplus

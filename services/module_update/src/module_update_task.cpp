@@ -21,7 +21,7 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 namespace {
-void TaskCallback(ModuleUpdateTask &task)
+void TaskCallback(ModuleUpdateTask task)
 {
     std::string hmpName = task.GetHmpName();
     LOG(INFO) << "module update callback, hmp name=" << hmpName;
@@ -81,6 +81,11 @@ bool ModuleUpdateTaskManager::AddTask(std::string hmpName)
 size_t ModuleUpdateTaskManager::GetCurTaskNum()
 {
     return pool_.GetCurTaskNum();
+}
+
+void ModuleUpdateTaskManager::Stop()
+{
+    pool_.Stop();
 }
 }
 }

@@ -13,7 +13,14 @@
  * limitations under the License.
  */
 
+#include "log/log.h"
 #include "module_loop.h"
+#include "module_dm.h"
+#include "module_utils.h"
+#include "module_constants.h"
+#include "sys/sysmacros.h"
+#include "securec.h"
+#include "string_ex.h"
 
 #include <dirent.h>
 #include <fcntl.h>
@@ -23,15 +30,13 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/statfs.h>
+#include <sys/mount.h>
+#include <sys/types.h>
 #include <vector>
 #include <linux/fs.h>
 #include <linux/loop.h>
 #include <linux/magic.h>
-
-#include "module_utils.h"
-#include "log/log.h"
-#include "securec.h"
-#include "string_ex.h"
+#include <cerrno>
 
 namespace OHOS {
 namespace SysInstaller {
@@ -40,6 +45,8 @@ using namespace Updater;
 using std::string;
 
 namespace {
+const int LOOP_LENGTH = 4;
+const int LOOP_CTL_LENGTH = 12;
 constexpr const char *LOOP_CTL_PATH = "/dev/loop-control";
 constexpr const char *BLOCK_DEV_PATH = "/dev/block";
 constexpr const char *LOOP_PREFIX = "loop";
@@ -54,6 +61,16 @@ const size_t LOOP_DEVICE_RETRY_ATTEMPTS = 6u;
 const uint32_t LOOP_BLOCK_SIZE = 4096;
 const std::chrono::milliseconds WAIT_FOR_DEVICE_TIME(50);
 const std::chrono::seconds WAIT_FOR_LOOP_TIME(50);
+}
+
+static bool IsRealPath(std::string path)
+{
+    char buf[PATH_MAX] = { 0 };
+    if (realpath(path.c_str(), buf) == nullptr) {
+        return false;
+    }
+    std::string tmpPath = buf;
+    return (path == tmpPath);
 }
 
 void LoopbackDeviceUniqueFd::MaybeCloseBad() const
@@ -242,7 +259,6 @@ bool SetUpLoopDevice(const int deviceFd, const string &target, const uint32_t im
     }
     li.lo_offset = imageOffset;
     li.lo_sizelimit = imageSize;
-    li.lo_flags |= LO_FLAGS_AUTOCLEAR;
     return useLoopConfigure ? ConfigureLoopDevice(deviceFd, targetFd.Get(), li, useBufferedIo)
         : SetLoopDeviceStatus(deviceFd, targetFd.Get(), &li);
 }
@@ -303,6 +319,137 @@ std::unique_ptr<LoopbackDeviceUniqueFd> CreateLoopDevice(
         return nullptr;
     }
     return loopDevice;
+}
+
+bool RemoveDmLoopDevice(const std::string &mountPoint, std::string imagePath)
+{
+    struct dirent *ent = nullptr;
+    DIR *dir = nullptr;
+
+    std::string baseLoopPath = "/dev/block";
+    if ((dir = opendir(baseLoopPath.c_str())) == nullptr) {
+        LOG(ERROR) << "Failed to open loop dir";
+        return false;
+    }
+    bool ret = false;
+    std::string loopDevPath = "";
+    while ((ent = readdir(dir)) != nullptr) {
+        if (strncmp(ent->d_name, "loop", LOOP_LENGTH) || !strncmp(ent->d_name, "loop-control", LOOP_CTL_LENGTH)) {
+            continue;
+        }
+
+        loopDevPath = baseLoopPath + "/" + std::string(ent->d_name);
+        if (!IsRealPath(loopDevPath)) {
+            LOG(ERROR) << "Dev is not exist, loopDevPath=" << loopDevPath;
+            loopDevPath = "";
+            continue;
+        }
+        if (!IsLoopDevMatchedImg(loopDevPath, imagePath)) {
+            loopDevPath = "";
+            continue;
+        }
+        if (umount(mountPoint.c_str()) != 0) {
+            LOG(WARNING) << "Could not umount " << mountPoint << " errno: " << errno;
+        }
+        bool clearDm = (imagePath.find(UPDATE_ACTIVE_DIR) != std::string::npos);
+        ret = ClearDmLoopDevice(loopDevPath, clearDm);
+        break;
+    }
+    closedir(dir);
+    return ret;
+}
+
+bool RemoveDmLoopDevice(std::string loopDevPath)
+{
+#ifndef USER_DEBUG_MODE
+    if (!RemoveDmDevice(loopDevPath)) {
+        LOG(ERROR) << "Close dm error, loopDevPath=" << loopDevPath.c_str() << ", errno=" << errno;
+        return false;
+    }
+#endif
+    if (!CloseLoopDev(loopDevPath)) {
+        LOG(ERROR) << "Close loop error, loopDevPath=" << loopDevPath.c_str() << ", errno=" << errno;
+        return false;
+    }
+    return true;
+}
+
+bool ClearDmLoopDevice(std::string loopDevPath, bool clearDm)
+{
+#ifndef USER_DEBUG_MODE
+    if (clearDm) {
+        if (!RemoveDmDevice(loopDevPath)) {
+            LOG(ERROR) << "Close dm error, loopDevPath=" << loopDevPath.c_str() << ", errno=" << errno;
+            return false;
+        }
+    }
+#endif
+    if (!CloseLoopDev(loopDevPath)) {
+        LOG(ERROR) << "Close loop error, loopDevPath=" << loopDevPath.c_str() << ", errno=" << errno;
+        return false;
+    }
+    return true;
+}
+
+bool IsLoopDevMatchedImg(std::string loopPath, std::string imgFilePath)
+{
+    struct loop_info64 info;
+    if (memset_s(&info, sizeof(struct loop_info64), 0, sizeof(struct loop_info64)) != EOK) {
+        LOG(ERROR) << "memset_s failed";
+        return false;
+    }
+
+    int fd = open(loopPath.c_str(), O_RDWR | O_CLOEXEC);
+    if (fd == -1) {
+        LOG(ERROR) << "Open failed, loopPath=" << loopPath.c_str() << ", errno=" << errno;
+        return false;
+    }
+
+    if (ioctl(fd, LOOP_GET_STATUS64, &info) < 0) {
+        close(fd);
+        return false;
+    }
+    close(fd);
+    return (imgFilePath == std::string((char *)info.lo_file_name));
+}
+
+bool CloseLoopDev(std::string loopPath)
+{
+    struct stat st;
+    if (stat(loopPath.c_str(), &st)) {
+        LOG(INFO) << "Stat error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
+        return false;
+    }
+
+    int minorNum = static_cast<int>(minor(st.st_rdev));
+
+    int userFd = open(loopPath.c_str(), O_RDWR);
+    if (userFd < 0) {
+        LOG(ERROR) << "Open error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
+        return false;
+    }
+
+    int ret = ioctl(userFd, LOOP_CLR_FD);
+    close(userFd);
+    if (ret < 0) {
+        LOG(ERROR) << "Clear error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
+    }
+
+    int fd = open("/dev/loop_control", O_RDWR);
+    if (fd < 0) {
+        LOG(ERROR) << "Open loop ctl err, errno=" << errno;
+        return false;
+    }
+
+    ret = ioctl(fd, LOOP_CTL_REMOVE, minorNum);
+    close(fd);
+    if (ret < 0) {
+        LOG(ERROR) << "Remove error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
+    }
+    if (remove(loopPath.c_str()) < 0) {
+        LOG(ERROR) << "Remove dev error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
+    }
+    return (ret == 0);
 }
 } // Loop
 } // SysInstaller

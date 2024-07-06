@@ -15,6 +15,8 @@
 
 #include "module_update_verify.h"
 
+#include "parameters.h"
+
 namespace OHOS {
 namespace SysInstaller {
 using namespace Hpackage;
