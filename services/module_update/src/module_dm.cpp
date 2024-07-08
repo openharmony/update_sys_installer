@@ -99,11 +99,14 @@ exit:
 
 bool RemoveDmDevice(std::string deviceName)
 {
+    int ret = 0;
+#ifdef SUPPORT_HVB
     std::string devName = OHOS::ExtractFileName(deviceName);
-    int ret = FsDmRemoveDevice(devName.c_str());
+    ret = FsDmRemoveDevice(devName.c_str());
     if (ret != 0) {
         LOG(ERROR) << "fs rm device error, ret=" << ret;
     }
+#endif
     return (ret == 0);
 }
 
