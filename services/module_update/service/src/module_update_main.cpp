@@ -123,13 +123,11 @@ void ModuleUpdateMain::DoHotInstall(ModuleUpdateStatus &status)
     if (!status.isHotInstall) {
         return;
     }
-    ON_SCOPE_EXIT(rmdir) {
-        ClearModuleDirs(status.hmpName);
-    };
     if (!ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
         LOG(ERROR) << "DoHotInstall fail, hmpName=" << status.hmpName;
         return;
     }
+    ClearModuleDirs(status.hmpName);
     LOG(INFO) << "DoHotInstall success, hmpName=" << status.hmpName;
 }
 
