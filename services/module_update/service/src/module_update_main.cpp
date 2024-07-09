@@ -78,12 +78,6 @@ int32_t CreateModuleDirs(const std::string &hmpName)
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
 }
 
-bool ClearModuleDirs(const std::string &hmpName)
-{
-    std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
-    return ForceRemoveDirectory(hmpInstallDir);
-}
-
 std::string GetFileAllName(const std::string &path)
 {
     auto pos = path.find_last_of('/');
@@ -129,15 +123,11 @@ void ModuleUpdateMain::DoHotInstall(ModuleUpdateStatus &status)
     if (!status.isHotInstall) {
         return;
     }
-    ON_SCOPE_EXIT(rmdir) {
-        if (!ClearModuleDirs(status.hmpName)) {
-            LOG(WARNING) << "Failed to remove " << status.hmpName;
-        }
-    };
     if (!ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
-        LOG(INFO) << "DoHotInstall fail, hmpName=" << status.hmpName;
+        LOG(ERROR) << "DoHotInstall fail, hmpName=" << status.hmpName;
         return;
     }
+    ClearModuleDirs(status.hmpName);
     LOG(INFO) << "DoHotInstall success, hmpName=" << status.hmpName;
 }
 
@@ -168,9 +158,7 @@ int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
         return ret;
     }
     ON_SCOPE_EXIT(rmdir) {
-        if (!ClearModuleDirs(hmpName)) {
-            LOG(WARNING) << "Failed to remove " << hmpName;
-        }
+        ClearModuleDirs(hmpName);
     };
     std::string hmpDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
     std::string outPath = hmpDir + "/";

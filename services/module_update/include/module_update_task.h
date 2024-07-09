@@ -36,14 +36,12 @@ private:
 class ModuleUpdateTaskManager : public OHOS::Singleton<ModuleUpdateTaskManager> {
     friend class OHOS::Singleton<ModuleUpdateTaskManager>;
 public:
-    ~ModuleUpdateTaskManager() override
-    {
-        pool_.Stop();
-    }
+    ~ModuleUpdateTaskManager() override {}
     void SetTaskResult(bool result);
     bool GetTaskResult();
     bool AddTask(std::string hmpName);
     void ClearTask();
+    void Stop();
     size_t GetCurTaskNum();
 
 private:

@@ -302,7 +302,19 @@ bool IsHotHmpPackage(const std::string &hmpName)
         return false;
     }
     std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(saFiles[0]);
+    if (moduleFile == nullptr) {
+        LOG(ERROR) << "get module file failed, hmpName=" << hmpName;
+        return false;
+    }
     return IsHotSa(moduleFile->GetSaId());
+}
+
+void ClearModuleDirs(const std::string &hmpName)
+{
+    std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
+    if (CheckPathExists(hmpInstallDir) && !ForceRemoveDirectory(hmpInstallDir)) {
+        LOG(WARNING) << "Failed to remove " << hmpName;
+    }
 }
 } // namespace SysInstaller
 } // namespace OHOS

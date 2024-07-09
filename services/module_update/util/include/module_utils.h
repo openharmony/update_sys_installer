@@ -40,6 +40,7 @@ bool IsHotSa(const int32_t &saId);
 bool IsRunning(const int32_t &saId);
 bool IsHotHmpPackage(const std::string &hmpName);
 bool CheckBootComplete();
+void ClearModuleDirs(const std::string &hmpName);
 
 class Timer {
 public:

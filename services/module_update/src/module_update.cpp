@@ -97,6 +97,45 @@ bool StageUpdateModulePackage(const string &updatePath, const string &stagePath)
     LOG(INFO) << "success to link " << updatePath << " to " << stagePath;
     return true;
 }
+
+bool RemoveMountPoint(const std::string &mountPoint, const std::string &saFile, ModuleUpdateStatus &status)
+{
+    std::string saName = GetFileName(saFile);
+    std::string prefixes[] = {MODULE_PREINSTALL_DIR, UPDATE_ACTIVE_DIR};
+    int ret = -1;
+    for (auto prefix : prefixes) {
+        std::string imagePath = prefix + "/" + status.hmpName + "/" + saName + string(MODULE_PACKAGE_SUFFIX);
+        if (Loop::RemoveDmLoopDevice(mountPoint, imagePath)) {
+            ret = 0;
+            LOG(INFO) << "Successful remove dm loop device, mountPoint=" << mountPoint
+                << ", imagePath=" << imagePath;
+            break;
+        }
+    }
+    if (ret != 0) {
+        LOG(ERROR) << "Fail remove dm loop device, mountPoint=" << mountPoint;
+        return false;
+    }
+    ret = rmdir(mountPoint.c_str());
+    if (ret != 0) {
+        LOG(WARNING) << "Could not rmdir " << mountPoint << " errno: " << errno;
+        return false;
+    }
+    return true;
+}
+
+bool CheckModulePackage(const std::string &mountPoint, const ModuleFile &moduleFile)
+{
+    if (!IsEmptyFolder(mountPoint)) {
+        LOG(ERROR) << mountPoint << " is not empty";
+        return false;
+    }
+    if (!moduleFile.GetImageStat().has_value()) {
+        LOG(ERROR) << "Could not mount empty module package " << moduleFile.GetPath();
+        return false;
+    }
+    return true;
+}
 }
 
 ModuleUpdate &ModuleUpdate::GetInstance()
@@ -153,16 +192,10 @@ void ModuleUpdate::ProcessSaFile(const std::string &saFile, ModuleUpdateStatus &
         std::string mountPoint = string(MODULE_ROOT_DIR) + "/" + std::to_string(saId);
         LOG(INFO) << "Remove old mountpoint " << mountPoint;
         if (CheckPathExists(mountPoint)) {
-            int ret = umount(mountPoint.c_str());
-            if (ret != 0) {
-                LOG(WARNING) << "Could not umount " << mountPoint << " errno: " << errno;
+            if (!RemoveMountPoint(mountPoint, saFile, status)) {
                 return;
             }
-            ret = rmdir(mountPoint.c_str());
-            if (ret != 0) {
-                LOG(WARNING) << "Could not rmdir " << mountPoint << " errno: " << errno;
-                return;
-            }
+            LOG(INFO) << "Remove mount point success, mountpoint=" << mountPoint;
         }
     } else if (CheckMountComplete(saId)) {
         LOG(INFO) << "Check mount complete, saId=" << saId;
@@ -237,6 +270,7 @@ void ModuleUpdate::CheckModuleUpdate()
     while (instance.GetCurTaskNum() != 0) {
         sleep(1);
     }
+    instance.Stop();
     LOG(INFO) << "CheckModuleUpdate done, duration=" << timer;
 }
 
@@ -306,15 +340,10 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
             LOG(WARNING) << "Could not rmdir " << mountPoint << " errno: " << errno;
         }
     };
-    if (!IsEmptyFolder(mountPoint)) {
-        LOG(ERROR) << mountPoint << " is not empty";
+    if (!CheckModulePackage(mountPoint, moduleFile)) {
         return false;
     }
     const string &fullPath = moduleFile.GetPath();
-    if (!moduleFile.GetImageStat().has_value()) {
-        LOG(ERROR) << "Could not mount empty module package " << moduleFile.GetPath();
-        return false;
-    }
     const ImageStat &imageStat = moduleFile.GetImageStat().value();
     Loop::LoopbackDeviceUniqueFd loopbackDevice;
     if (!CreateLoopDevice(fullPath, imageStat, loopbackDevice)) {
@@ -322,11 +351,11 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
         return false;
     }
     LOG(INFO) << "Loopback device created: " << loopbackDevice.name << " fsType=" << imageStat.fsType;
-
     string blockDevice = loopbackDevice.name;
     if (mountOnVerity) {
         if (!CreateDmDevice(moduleFile, blockDevice)) {
             LOG(ERROR) << "Could not create dm-verity device on " << blockDevice;
+            Loop::ClearDmLoopDevice(blockDevice, false);
             return false;
         }
     }
@@ -335,6 +364,7 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
     ret = mount(blockDevice.c_str(), mountPoint.c_str(), imageStat.fsType, mountFlags, nullptr);
     if (ret != 0) {
         LOG(ERROR) << "Mounting failed for module package " << fullPath << " errno:" << errno;
+        Loop::ClearDmLoopDevice(blockDevice, true);
         return false;
     }
     LOG(INFO) << "Successfully mounted module package " << fullPath << " on " << mountPoint << " duration=" << timer;
@@ -352,6 +382,7 @@ void ModuleUpdate::ReportModuleUpdateStatus(const ModuleUpdateStatus &status) co
     }
     if (!status.isAllMountSuccess) {
         LOG(ERROR) << "ReportModuleUpdateStatus mount fail, hmp name=" << status.hmpName;
+        ClearModuleDirs(status.hmpName);
         Revert(status.hmpName, !status.isHotInstall);
         return;
     }

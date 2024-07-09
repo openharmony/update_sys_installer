@@ -20,17 +20,12 @@
 #include "module_update_consumer.h"
 #include "module_utils.h"
 #include "parameter.h"
+#include "scope_guard.h"
 #include <vector>
 
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
-
-bool ClearModuleDirs(const std::string &hmpName)
-{
-    std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
-    return ForceRemoveDirectory(hmpInstallDir);
-}
 
 ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
     std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit)
@@ -40,10 +35,10 @@ ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
 
 void ModuleUpdateConsumer::DoInstall(ModuleUpdateStatus &status)
 {
+    ON_SCOPE_EXIT(rmdir) {
+        ClearModuleDirs(status.hmpName);
+    };
     if (ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
-        if (!ClearModuleDirs(status.hmpName)) {
-            LOG(ERROR) << "failed to remove " << status.hmpName;
-        }
         LOG(INFO) << "hmp package successful install, hmp name=" << status.hmpName;
     } else {
         LOG(ERROR) << "hmp package fail install, hmp name=" << status.hmpName;
