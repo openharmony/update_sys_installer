@@ -23,13 +23,13 @@
 #include "init_reboot.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "module_utils.h"
 #include "json_node.h"
 #include "log/log.h"
 #include "module_constants.h"
 #include "module_file.h"
 #include "module_error_code.h"
 #include "module_update_main.h"
-#include "module_utils.h"
 #include "package/package.h"
 #include "init_reboot.h"
 #include "scope_guard.h"
@@ -107,8 +107,9 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
     const sptr<ISysInstallerCallback> &updateCallback)
 {
     int32_t ret = -1;
+    Timer timer;
     ON_SCOPE_EXIT(saveResult) {
-        ModuleUpdateMain::GetInstance().SaveInstallerResult(path, ret, std::to_string(ret));
+        ModuleUpdateMain::GetInstance().SaveInstallerResult(path, ret, std::to_string(ret), timer);
         if (updateCallback != nullptr) {
             updateCallback->OnUpgradeProgress(ret == 0 ? UPDATE_STATE_SUCCESSFUL : UPDATE_STATE_FAILED,
                 100, ""); // 100 : 100% percent
@@ -178,14 +179,16 @@ void ModuleUpdateService::OnStart(const SystemAbilityOnDemandReason &startReason
     InitUpdaterLogger("ModuleUpdaterServer", "", "", "");
     LOG(INFO) << "OnStart, startReason name: " << startReason.GetName() << ", id: " <<
         static_cast<int32_t>(startReason.GetId()) << ", value: " << startReason.GetValue();
+    SysInstaller::ModuleUpdateMain& moduleUpdate = SysInstaller::ModuleUpdateMain::GetInstance();
+    moduleUpdate.ScanPreInstalledHmp();
     bool res = Publish(this);
     if (!res) {
         LOG(ERROR) << "OnStart failed";
     }
-    SysInstaller::ModuleUpdateMain& moduleUpdate = SysInstaller::ModuleUpdateMain::GetInstance();
-    moduleUpdate.ScanPreInstalledHmp();
-    if (strcmp(startReason.GetName().c_str(), SA_START) == 0 &&
-        strcmp(startReason.GetValue().c_str(), SA_ABNORMAL) == 0) {
+    if ((strcmp(startReason.GetName().c_str(), SA_START) == 0 &&
+        strcmp(startReason.GetValue().c_str(), SA_ABNORMAL) == 0) ||
+        (strcmp(startReason.GetName().c_str(), BMS_START_INSTALL) == 0 &&
+        strcmp(startReason.GetValue().c_str(), BMS_REVERT) == 0)) {
         moduleUpdate.Start();
     }
     LOG(INFO) << "OnStart done";

@@ -13,24 +13,19 @@
  * limitations under the License.
  */
 
+#include "module_update_consumer.h"
+#include <vector>
 #include "directory_ex.h"
 #include "log/log.h"
 #include "module_constants.h"
 #include "module_update.h"
-#include "module_update_consumer.h"
 #include "module_utils.h"
 #include "parameter.h"
-#include <vector>
+#include "scope_guard.h"
 
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
-
-bool ClearModuleDirs(const std::string &hmpName)
-{
-    std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
-    return ForceRemoveDirectory(hmpInstallDir);
-}
 
 ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
     std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit)
@@ -40,27 +35,29 @@ ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
 
 void ModuleUpdateConsumer::DoInstall(ModuleUpdateStatus &status)
 {
+    ON_SCOPE_EXIT(rmdir) {
+        ClearModuleDirs(status.hmpName);
+    };
     if (ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
-        if (!ClearModuleDirs(status.hmpName)) {
-            LOG(ERROR) << "failed to remove " << status.hmpName;
-        }
         LOG(INFO) << "hmp package successful install, hmp name=" << status.hmpName;
     } else {
         LOG(ERROR) << "hmp package fail install, hmp name=" << status.hmpName;
     }
 }
 
-void ModuleUpdateConsumer::DoRevert(const std::string &hmpName, const int32_t &saId)
+void ModuleUpdateConsumer::DoRevert(const std::string &hmpName, int32_t saId)
 {
     LOG(INFO) << "hmp package revert,hmp name=" << hmpName << "; said=" << saId;
-    Revert(hmpName, !IsHotSa(saId));
+    bool isHotHmp = IsHotHmpPackage(hmpName);
     ModuleUpdateStatus status;
     status.hmpName = hmpName;
-    status.isHotInstall = IsHotSa(saId);
+    status.isHotInstall = isHotHmp;
+    ModuleUpdate::GetInstance().RemoveMountPoint(hmpName);
+    Revert(hmpName, !isHotHmp);
     DoInstall(status);
 }
 
-void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, const int32_t &saId)
+void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, int32_t saId)
 {
     LOG(INFO) << "hmp package unload,hmp name=" << hmpName << "; said=" << saId;
     ModuleUpdateStatus status;
@@ -70,6 +67,7 @@ void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, const int32_t &s
         LOG(INFO) << "sa is running, saId=" << saId;
         return;
     }
+    // check whether install hmp exists
     DoInstall(status);
 }
 
@@ -85,6 +83,10 @@ void ModuleUpdateConsumer::Run()
         if (saStatusPair.first == 0 && saStatusPair.second == "") {
             LOG(INFO) << "producer and consumer stop";
             break;
+        }
+        if (saStatusPair.first == APP_SERIAL_NUMBER) {
+            DoRevert(saStatusPair.second, APP_SERIAL_NUMBER);
+            continue;
         }
         int32_t saId = saStatusPair.first;
         std::string saStatus = saStatusPair.second;

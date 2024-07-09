@@ -16,38 +16,11 @@
 #ifndef MODULE_UPDATE_VERIFY_H
 #define MODULE_UPDATE_VERIFY_H
 
-#include "cert_verify.h"
-#include "directory_ex.h"
-#include "hash_data_verifier.h"
-#include "module_constants.h"
-#include "module_file.h"
-#include "module_utils.h"
-#include "module_zip_helper.h"
-#include "parameters.h"
-#include "scope_guard.h"
-#include "log/log.h"
-#include "json_node.h"
-#include "utils.h"
+#include <string>
 
 namespace OHOS {
 namespace SysInstaller {
-using namespace Hpackage;
-using namespace Updater;
-
-bool VerifyFileHashSign(PkgManager::PkgManagerPtr pkgManager, HashDataVerifier *verifier,
-    std::string &tagBuffer, const std::string &tagName);
-bool LoadHashSignedData(const std::string &packagePath, HashDataVerifier *verifier,
-    ModuleZipHelper &helper);
-int32_t VerifyPackageHashSign(const std::string &packagePath);
-bool GetPackInfoVer(const std::string &packInfoPath, const std::string &key, const std::string &split,
-    std::vector<std::string> &versionVec);
-bool GetDeviceSdkVer(std::vector<std::string> &sdkVersionVec);
-int32_t DoCheckPackInfoVer(const std::string &prePackInfoPath, const std::string &pkgPackInfoPath);
-int32_t CheckPackInfoVer(const std::string &pkgPackInfoPath);
-int32_t VerifyPackagePackInfo(const std::string &packagePath, const std::string &packinfo,
-    const std::string &hashSignPath);
-int32_t VerifyAndComparePackInfo(const std::string &packagePath, const std::string &packinfo,
-    const std::string &hashSignPath);
+bool CheckPackInfoVer(const std::string &pkgPackInfoPath);
 void CleanErrDir(const std::string &path);
 } // namespace SysInstaller
 } // namespace OHOS

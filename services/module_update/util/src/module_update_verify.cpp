@@ -15,270 +15,102 @@
 
 #include "module_update_verify.h"
 
+#include "module_utils.h"
+#include "cert_verify.h"
+#include "directory_ex.h"
+#include "hash_data_verifier.h"
+#include "log/log.h"
+#include "json_node.h"
+#include "module_constants.h"
+#include "module_file.h"
+#include "parameters.h"
+#include "scope_guard.h"
+#include "utils.h"
+
 namespace OHOS {
 namespace SysInstaller {
 using namespace Hpackage;
 using namespace Updater;
 
-bool VerifyFileHashSign(PkgManager::PkgManagerPtr pkgManager, HashDataVerifier *verifier,
-    std::string &tagBuffer, const std::string &tagName)
+namespace {
+bool GetHmpType(const JsonNode &root, std::string &type)
 {
-    if (pkgManager == nullptr || verifier == nullptr) {
-        LOG(ERROR) << "pkgManager or verifier is nullptr";
+    const JsonNode &typeJson = root["type"];
+    std::optional<std::string> hmpType = typeJson.As<std::string>();
+    if (!hmpType.has_value()) {
+        LOG(ERROR) << "HmpInfo: Failed to get type val";
         return false;
     }
-
-    PkgBuffer buffer(reinterpret_cast<uint8_t *>(tagBuffer.data()), tagBuffer.length());
-    Hpackage::PkgManager::StreamPtr outStream = nullptr;
-    int32_t ret = pkgManager->CreatePkgStream(outStream, tagName, buffer);
-    if (outStream == nullptr || ret == -1) {
-        LOG(ERROR) << "Create PkgStream Falied!";
-        return false;
-    }
-    ON_SCOPE_EXIT(closeStream) {
-        pkgManager->ClosePkgStream(outStream);
-    };
-
-    if (!verifier->VerifyHashData("", tagName, outStream)) {
-        LOG(ERROR) << "VerifyHashData " << tagName << " failed";
-        return false;
-    }
-    LOG(INFO) << "VerifyHashData " << tagName << " successfull";
+    type = hmpType.value();
     return true;
 }
 
-bool LoadHashSignedData(const std::string &packagePath, HashDataVerifier *verifier,
-    ModuleZipHelper &helper)
+bool CheckApiVersion(const std::string &apiVersion)
 {
-    if (verifier == nullptr) {
-        LOG(ERROR) << "verifier is nullptr";
-        return false;
+    int sysApiVersion = GetDeviceApiVersion();
+    int hmpApiVersion = Utils::String2Int<int>(apiVersion);
+    if (hmpApiVersion <= sysApiVersion) {
+        return true;
     }
-    // load pkcs7 from package
-    if (!verifier->LoadPkcs7FromPackage(packagePath)) {
-        LOG(ERROR) << "LoadHashDataAndPkcs7 fail " << packagePath;
-        return false;
-    }
-    std::string hashData {};
-    if (!ExtractZipFile(helper, HASH_SIGN_FILE_NAME, hashData)) {
-        LOG(ERROR) << "Failed to extract hash_signed_data from package " << packagePath;
-        return false;
-    }
-    if (!verifier->LoadHashDataFromPackage(hashData)) {
-        LOG(ERROR) << "LoadHashDataFromPackage fail";
-        return false;
-    }
-    return true;
+    LOG(ERROR) << "sysApiVersion: " << sysApiVersion << "; hmpApiVersion: " << hmpApiVersion;
+    return false;
 }
 
-int32_t VerifyPackageHashSign(const std::string &packagePath)
+bool CheckSaSdkVersion(const std::string &saSdkVersion)
 {
-    LOG(INFO) << "VerifyPackageHashSign packagePath :"<< packagePath;
-    PkgManager::PkgManagerPtr pkgManager = PkgManager::CreatePackageInstance();
-    if (pkgManager == nullptr) {
-        LOG(ERROR) << "CreatePackageInstance fail";
-        return -1;
-    }
-    ON_SCOPE_EXIT(closePkg) {
-        PkgManager::ReleasePackageInstance(pkgManager);
-    };
-
-    std::vector<std::string> components;
-    int32_t ret = pkgManager->LoadPackage(packagePath, Utils::GetCertName(), components);
-    if (ret != PKG_SUCCESS) {
-        LOG(ERROR) << "LoadPackage fail ret :"<< ret;
-        return ret;
-    }
-
-    // 1: init pkcs7
-    HashDataVerifier verifier {pkgManager};
-    ModuleZipHelper helper(packagePath);
-    if (!helper.IsValid()) {
-        LOG(ERROR) << "Failed to open file " << packagePath;
-        return -1;
-    }
-    if (!LoadHashSignedData(packagePath, &verifier, helper)) {
-        LOG(ERROR) << "LoadHashSignedData fail";
-        return -1;
-    }
-
-    // 2: verify config.json
-    std::string tagBuffer {};
-    if (!ExtractZipFile(helper, CONFIG_FILE_NAME, tagBuffer)) {
-        LOG(ERROR) << "Failed to extract " << CONFIG_FILE_NAME << " from package";
-        return -1;
-    }
-    if (!VerifyFileHashSign(pkgManager, &verifier, tagBuffer, CONFIG_FILE_NAME)) {
-        LOG(ERROR) << "VerifyFileHashSign " << CONFIG_FILE_NAME << " fail";
-        return -1;
-    }
-
-    // 3: verify pub key
-    if (!ExtractZipFile(helper, PUBLIC_KEY_NAME, tagBuffer)) {
-        LOG(ERROR) << "Failed to extract " << PUBLIC_KEY_NAME << " from package";
-        return -1;
-    }
-    if (!VerifyFileHashSign(pkgManager, &verifier, tagBuffer, PUBLIC_KEY_NAME)) {
-        LOG(ERROR) << "VerifyFileHashSign " << PUBLIC_KEY_NAME << " fail";
-        return -1;
-    }
-
-    LOG(INFO) << "VerifyPackageHashSign successful packagePath:"<< packagePath;
-    return 0;
-}
-
-bool GetPackInfoVer(const std::string &packInfoPath, const std::string &key, const std::string &split,
-    std::vector<std::string> &versionVec)
-{
-    if (!Utils::IsFileExist(packInfoPath)) {
-        LOG(ERROR) << "GetPackInfoVer " << packInfoPath << " not exist";
+    //sasdk_M.S.F.B
+    std::vector<std::string> saSdkVersionVec {};
+    std::string sysSaSdkVersion = GetDeviceSaSdkVersion();
+    if (!ParseVersion(sysSaSdkVersion, "_", saSdkVersionVec)) {
+        LOG(ERROR) << "ParseVersion sysSaSdkVersion failed: " << sysSaSdkVersion;
         return false;
     }
-    JsonNode root(std::filesystem::path { packInfoPath });
+    std::vector<std::string> hmpVersionVec {};
+    if (!ParseVersion(saSdkVersion, "_", hmpVersionVec)) {
+        LOG(ERROR) << "ParseVersion hmpSaSdkVersion failed: " << saSdkVersion;
+        return false;
+    }
+    return CompareSaSdkVersion(saSdkVersionVec, hmpVersionVec);
+}
+
+bool GetPackInfoVer(const JsonNode &root, const std::string &key, std::string &version)
+{
     const JsonNode &package = root["package"];
     std::optional<std::string> tmpVersion = package[key].As<std::string>();
     if (!tmpVersion.has_value()) {
         LOG(ERROR) << "count get version val";
         return false;
     }
-    if (!ParseVersion(tmpVersion.value(), split, versionVec)) {
-        LOG(ERROR) << "ParseVersion failed";
-        return false;
-    }
-    LOG(INFO) << key << " " << tmpVersion.value();
+    version = tmpVersion.value();
+    LOG(INFO) << key << " " << version;
     return true;
 }
+}
 
-bool GetDeviceSdkVer(std::vector<std::string> &sdkVersionVec)
+bool CheckPackInfoVer(const std::string &pkgPackInfoPath)
 {
-    // sasdk_4.10.7.9
-    std::string sdkVersion = system::GetParameter("const.build.sa_sdk_version", "");
-    if (sdkVersion.length() == 0 || !ParseVersion(sdkVersion, "_", sdkVersionVec)) {
-        LOG(ERROR) << "ParseVersion failed";
+    std::string packInfo = GetContentFromZip(pkgPackInfoPath, PACK_INFO_NAME);
+    JsonNode root(packInfo);
+    std::string type;
+    if (!GetHmpType(root, type)) {
         return false;
     }
-    LOG(INFO) << "sa_sdk_version " << sdkVersion;
-    return true;
-}
-
-int32_t DoCheckPackInfoVer(const std::string &prePackInfoPath, const std::string &pkgPackInfoPath)
-{
-    std::vector<std::string> preVersion;
-    std::vector<std::string> preSdkVersion;
-    // version: DUE-d01 4.5.10.100
-    // SaSdkVersion: SaSdk_4.10.3.2
-    if (!GetPackInfoVer(prePackInfoPath, "version", " ", preVersion) || !GetDeviceSdkVer(preSdkVersion)) {
-        LOG(ERROR) << "GetPackInfoVer failed " << prePackInfoPath;
-        return -1;
+    LOG(INFO) << pkgPackInfoPath << "; type = " << type;
+    std::string apiVersion;
+    if (type == HMP_APP_TYPE && GetPackInfoVer(root, HMP_API_VERSION, apiVersion)) {
+        return CheckApiVersion(apiVersion);
     }
-
-    std::vector<std::string> pkgVersion;
-    std::vector<std::string> pkgSdkVersion;
-    if (!GetPackInfoVer(pkgPackInfoPath, "version", " ", pkgVersion) ||
-        !GetPackInfoVer(pkgPackInfoPath, "SaSdkVersion", "_", pkgSdkVersion)) {
-        LOG(ERROR) << "GetPackInfoVer failed " << pkgPackInfoPath;
-        return -1;
+    std::string saSdkVersion;
+    if ((type == HMP_SA_TYPE || type == HMP_SA_TYPE_OLD) &&
+        GetPackInfoVer(root, HMP_SA_SDK_VERSION, saSdkVersion)) {
+        return CheckSaSdkVersion(saSdkVersion);
     }
-
-    if (!ComparePackInfoVer(preVersion, pkgVersion)) {
-        LOG(ERROR) << "ComparePackInfoVer version failed";
-        return -1;
+    if (type == HMP_MIX_TYPE &&
+        GetPackInfoVer(root, HMP_SA_SDK_VERSION, saSdkVersion) &&
+        GetPackInfoVer(root, HMP_API_VERSION, apiVersion)) {
+        return CheckApiVersion(apiVersion) && CheckSaSdkVersion(saSdkVersion);
     }
-
-    if (!ComparePackInfoVer(pkgSdkVersion, preSdkVersion)) {
-        LOG(ERROR) << "ComparePackInfoVer sdkversion failed";
-        return -1;
-    }
-    return 0;
-}
-
-int32_t CheckPackInfoVer(const std::string &pkgPackInfoPath)
-{
-    std::string subPackInfoPath = GetHmpName(pkgPackInfoPath) + pkgPackInfoPath.substr(pkgPackInfoPath.rfind("/"));
-    const std::string prePackInfoPath = std::string(MODULE_PREINSTALL_DIR) + "/" + subPackInfoPath;
-    if (DoCheckPackInfoVer(prePackInfoPath, pkgPackInfoPath) != 0) {
-        LOG(ERROR) << "DoCheckPackInfoVer with preinstall fail";
-        return -1;
-    }
-
-    const std::string actPackInfoPath = std::string(UPDATE_ACTIVE_DIR) + "/" + subPackInfoPath;
-    if (pkgPackInfoPath.find(UPDATE_ACTIVE_DIR) == std::string::npos &&
-        Utils::IsFileExist(actPackInfoPath) &&
-        DoCheckPackInfoVer(actPackInfoPath, pkgPackInfoPath) != 0) {
-        LOG(ERROR) << "DoCheckPackInfoVer with active fail";
-        return -1;
-    }
-    return 0;
-}
-
-int32_t VerifyPackagePackInfo(const std::string &packagePath, const std::string &packinfo,
-    const std::string &hashSignPath)
-{
-    LOG(INFO) << "VerifyPackagePackInfo packinfo:"<< packinfo << " packagePath:" << packagePath;
-
-    if (!Utils::IsFileExist(packagePath) || !Utils::IsFileExist(packinfo) || !Utils::IsFileExist(hashSignPath)) {
-        LOG(ERROR) << "VerifyPackagePackInfo some file not exist";
-        return -1;
-    }
-
-    PkgManager::PkgManagerPtr manager = PkgManager::CreatePackageInstance();
-    if (manager == nullptr) {
-        LOG(ERROR) << "CreatePackageInstance fail";
-        return -1;
-    }
-    ON_SCOPE_EXIT(closePkg) {
-        PkgManager::ReleasePackageInstance(manager);
-    };
-
-    std::vector<std::string> components;
-    int32_t ret = manager->LoadPackage(packagePath, Utils::GetCertName(), components);
-    if (ret != PKG_SUCCESS) {
-        LOG(ERROR) << "LoadPackage fail ret :"<< ret;
-        return ret;
-    }
-
-    // 1: init pkcs7
-    HashDataVerifier verifier {manager};
-    // load pkcs7 from package
-    if (!verifier.LoadPkcs7FromPackage(packagePath)) {
-        LOG(ERROR) << "LoadHashDataAndPkcs7 fail " << packagePath;
-        return -1;
-    }
-
-    std::ifstream ifs(hashSignPath);
-    std::string hashData {std::istreambuf_iterator<char> {ifs}, {}};
-    if (!verifier.LoadHashDataFromPackage(hashData)) {
-        LOG(ERROR) << "LoadHashDataFromPackage fail";
-        return -1;
-    }
-
-    std::ifstream ifsp(packinfo);
-    std::string tagBuffer {std::istreambuf_iterator<char> {ifsp}, {}};
-    if (!VerifyFileHashSign(manager, &verifier, tagBuffer, PACK_INFO_NAME)) {
-        LOG(ERROR) << "VerifyFileHashSign " << PACK_INFO_NAME << " fail";
-        return -1;
-    }
-
-    LOG(INFO) << "VerifyPackagePackInfo successful packagePath:"<< packagePath;
-    return 0;
-}
-
-int32_t VerifyAndComparePackInfo(const std::string &packagePath, const std::string &packinfo,
-    const std::string &hashSignPath)
-{
-    if (VerifyPackagePackInfo(packagePath, packinfo, hashSignPath) != 0) {
-        LOG(INFO) << "VerifyPackagePackInfo failed";
-        return -1;
-    }
-
-    // 2: check version
-    if (CheckPackInfoVer(packinfo) != 0) {
-        LOG(ERROR) << "CheckPackInfoVer fail";
-        return -1;
-    }
-
-    LOG(INFO) << "VerifyAndComparePackInfo successful packagePath:"<< packagePath;
-    return 0;
+    return false;
 }
 
 void CleanErrDir(const std::string &path)
