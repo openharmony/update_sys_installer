@@ -26,8 +26,6 @@ namespace SysInstaller {
 using namespace Updater;
 using namespace Hpackage;
 
-constexpr const char *CERT_NAME = "/etc/certificate/signing_cert.crt";
-
 void PkgVerify::Init()
 {
     CertVerify::GetInstance().RegisterCertHelper(std::make_unique<SingleCertHelper>());
@@ -52,7 +50,7 @@ int PkgVerify::Verify(const std::string &pkgPath)
     }
 
     statusManager_->SetUpdatePercent(1); // 1 : 1%
-    int ret = VerifyPackage(realPath.c_str(), CERT_NAME, "", nullptr, 0);
+    int ret = VerifyPackage(realPath.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0);
     if (ret != 0) {
         LOG(ERROR) << "VerifyPackage failed:" << ret;
         return ret;
