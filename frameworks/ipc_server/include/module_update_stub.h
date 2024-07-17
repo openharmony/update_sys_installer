@@ -19,6 +19,7 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <mutex>
 
 #include "imodule_update.h"
 #include "iremote_stub.h"
@@ -53,6 +54,7 @@ private:
         MessageParcel &data, MessageParcel &reply, MessageOption &option) const;
 
 private:
+    std::mutex mtx_;
     bool IsPermissionGranted(void);
     bool CheckCallingPerm(void);
 
