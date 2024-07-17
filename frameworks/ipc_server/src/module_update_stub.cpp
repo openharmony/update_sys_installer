@@ -26,7 +26,7 @@
 
 constexpr int USER_UPDATE_AUTHORITY = 6666;
 
-static volatile atomic_long g_request(0);
+static volatile std::atomic_long g_request(0);
 namespace OHOS {
 namespace SysInstaller {
 using namespace std;
