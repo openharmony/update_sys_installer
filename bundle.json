@@ -44,6 +44,7 @@
     "build": {
       "sub_component": [
         "//base/update/sys_installer/frameworks/ipc_server:sys_installer",
+        "//base/update/sys_installer/frameworks/ipc_server/etc:check_module_update_cfg",
         "//base/update/sys_installer/frameworks/ipc_server/etc:module_update_cfg",
         "//base/update/sys_installer/frameworks/ipc_server/etc:module_update_sa_cfg",
         "//base/update/sys_installer/frameworks/ipc_server/etc:sys_installer_sa.rc",
