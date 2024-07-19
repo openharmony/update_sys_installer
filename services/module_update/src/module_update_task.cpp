@@ -21,7 +21,7 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 namespace {
-void TaskCallback(ModuleUpdateTask &task)
+void TaskCallback(ModuleUpdateTask task)
 {
     std::string hmpName = task.GetHmpName();
     LOG(INFO) << "module update callback, hmp name=" << hmpName;
@@ -63,7 +63,7 @@ void ModuleUpdateTaskManager::ClearTask()
     taskNum_ = 0;
 }
 
-bool ModuleUpdateTaskManager::AddTask(std::string hmpName)
+bool ModuleUpdateTaskManager::AddTask(const std::string &hmpName)
 {
     LOG(INFO) << "add task, hmp name=" << hmpName;
     if (taskNum_ >= MAX_TASK_NUM) {
@@ -81,6 +81,11 @@ bool ModuleUpdateTaskManager::AddTask(std::string hmpName)
 size_t ModuleUpdateTaskManager::GetCurTaskNum()
 {
     return pool_.GetCurTaskNum();
+}
+
+void ModuleUpdateTaskManager::Stop()
+{
+    pool_.Stop();
 }
 }
 }

@@ -44,7 +44,9 @@ ohos_shared_library("module_update_utils") {
   deps = []
 
   external_deps = [
+    "ability_runtime:app_manager",
     "bounds_checking_function:libsec_shared",
+    "bundle_framework:appexecfwk_core",
     "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",

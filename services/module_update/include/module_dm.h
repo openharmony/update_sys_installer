@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
 bool CreateDmDevice(const OHOS::SysInstaller::ModuleFile &moduleFile, std::string &deviceName);
+bool RemoveDmDevice(std::string deviceName);
 
 #ifdef __cplusplus
 #if __cplusplus
