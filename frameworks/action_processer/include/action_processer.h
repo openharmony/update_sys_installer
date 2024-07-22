@@ -19,7 +19,7 @@
 #include <deque>
 #include <map>
 #include "iaction.h"
-#include "macros.h"
+#include "macros_updater.h"
 #include "status_manager.h"
 
 namespace OHOS {
