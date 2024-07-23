@@ -14,6 +14,7 @@
  */
 
 #include <csignal>
+#include <mutex>
 #include "module_update_stub.h"
 
 #include "accesstoken_kit.h"
@@ -26,6 +27,7 @@
 
 constexpr int USER_UPDATE_AUTHORITY = 6666;
 
+static std::mutex g_mtx;
 static volatile std::atomic_long g_request(0);
 namespace OHOS {
 namespace SysInstaller {
@@ -108,11 +110,11 @@ int32_t ModuleUpdateStub::ExitModuleUpdateStub(ModuleUpdateStub *service,
     int32_t ret = 0;
     if (--g_request == 0) {
         ret = service->ExitModuleUpdate();
-        std::lock_guard<std::mutex> locker(mtx_);
+        std::lock_guard<std::mutex> locker(g_mtx);
         reply.WriteInt32(ret);
         return 0;
     }
-    std::lock_guard<std::mutex> locker(mtx_);
+    std::lock_guard<std::mutex> locker(g_mtx);
     reply.WriteInt32(ret);
     return 1;
 }
