@@ -261,8 +261,14 @@ void ModuleUpdate::CheckModuleUpdate()
         hmpNameSet.emplace(hmpName);
     }
     auto &instance = ModuleUpdateTaskManager::GetInstance();
+    instance.Start();
     ON_SCOPE_EXIT(clear) {
         instance.ClearTask();
+        instance.Stop();
+        LOG(INFO) << "CheckModuleUpdate done, duration=" << timer;
+        if (!ForceRemoveDirectory(UPDATE_INSTALL_DIR)) {
+            LOG(ERROR) << "Failed to remove " << UPDATE_INSTALL_DIR << " err=" << errno;
+        }
     };
     for (auto &hmpName : hmpNameSet) {
         instance.AddTask(hmpName);
@@ -270,8 +276,6 @@ void ModuleUpdate::CheckModuleUpdate()
     while (instance.GetCurTaskNum() != 0) {
         sleep(1);
     }
-    instance.Stop();
-    LOG(INFO) << "CheckModuleUpdate done, duration=" << timer;
 }
 
 void ModuleUpdate::PrepareModuleFileList(int32_t saId, ModuleUpdateStatus &status)

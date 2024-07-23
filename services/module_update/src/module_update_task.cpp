@@ -87,5 +87,12 @@ void ModuleUpdateTaskManager::Stop()
 {
     pool_.Stop();
 }
+
+void ModuleUpdateTaskManager::Start()
+{
+    pool_.Start(1);
+    pool_.SetMaxTaskNum(MAX_TASK_NUM);
+    taskNum_ = 0;
+}
 }
 }

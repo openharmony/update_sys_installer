@@ -41,16 +41,13 @@ public:
     bool GetTaskResult();
     bool AddTask(std::string hmpName);
     void ClearTask();
+    void Start();
     void Stop();
     size_t GetCurTaskNum();
 
 private:
     static constexpr size_t MAX_TASK_NUM = 100; // 100 is max task number
-    ModuleUpdateTaskManager() : taskNum_(0)
-    {
-        pool_.Start(1);
-        pool_.SetMaxTaskNum(MAX_TASK_NUM);
-    }
+    ModuleUpdateTaskManager() {}
     ModuleUpdateTaskManager(const ModuleUpdateTaskManager&) = delete;
     OHOS::ThreadPool pool_;
     bool taskResult_ = true;

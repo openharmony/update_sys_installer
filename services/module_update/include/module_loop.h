@@ -64,11 +64,11 @@ bool ConfigureReadAhead(const std::string &devicePath);
 bool PreAllocateLoopDevices(const size_t num);
 std::unique_ptr<LoopbackDeviceUniqueFd> CreateLoopDevice(
     const std::string &target, const uint32_t imageOffset, const uint32_t imageSize);
-bool RemoveDmLoopDevice(const std::string &mountPoint, std::string imagePath);
-bool RemoveDmLoopDevice(std::string loopDevPath);
-bool IsLoopDevMatchedImg(std::string loopPath, std::string imgFilePath);
-bool CloseLoopDev(std::string loopPath);
-bool ClearDmLoopDevice(std::string loopDevPath, bool clearDm);
+bool RemoveDmLoopDevice(const std::string &mountPoint, const std::string &imagePath);
+bool RemoveDmLoopDevice(const std::string &loopDevPath);
+bool IsLoopDevMatchedImg(const std::string &loopPath, const std::string &imgFilePath);
+bool CloseLoopDev(const std::string &loopPath);
+bool ClearDmLoopDevice(const std::string &loopDevPath, const bool clearDm);
 } // Loop
 } // SysInstaller
 } // namespace OHOS

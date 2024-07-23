@@ -321,13 +321,12 @@ std::unique_ptr<LoopbackDeviceUniqueFd> CreateLoopDevice(
     return loopDevice;
 }
 
-bool RemoveDmLoopDevice(const std::string &mountPoint, std::string imagePath)
+bool RemoveDmLoopDevice(const std::string &mountPoint, const std::string &imagePath)
 {
     struct dirent *ent = nullptr;
     DIR *dir = nullptr;
 
-    std::string baseLoopPath = "/dev/block";
-    if ((dir = opendir(baseLoopPath.c_str())) == nullptr) {
+    if ((dir = opendir(BLOCK_DEV_PATH)) == nullptr) {
         LOG(ERROR) << "Failed to open loop dir";
         return false;
     }
@@ -338,7 +337,7 @@ bool RemoveDmLoopDevice(const std::string &mountPoint, std::string imagePath)
             continue;
         }
 
-        loopDevPath = baseLoopPath + "/" + std::string(ent->d_name);
+        loopDevPath = std::string(BLOCK_DEV_PATH) + "/" + std::string(ent->d_name);
         if (!IsRealPath(loopDevPath)) {
             LOG(ERROR) << "Dev is not exist, loopDevPath=" << loopDevPath;
             loopDevPath = "";
@@ -359,7 +358,7 @@ bool RemoveDmLoopDevice(const std::string &mountPoint, std::string imagePath)
     return ret;
 }
 
-bool RemoveDmLoopDevice(std::string loopDevPath)
+bool RemoveDmLoopDevice(const std::string &loopDevPath)
 {
 #ifndef USER_DEBUG_MODE
     if (!RemoveDmDevice(loopDevPath)) {
@@ -374,7 +373,7 @@ bool RemoveDmLoopDevice(std::string loopDevPath)
     return true;
 }
 
-bool ClearDmLoopDevice(std::string loopDevPath, bool clearDm)
+bool ClearDmLoopDevice(const std::string &loopDevPath, const bool clearDm)
 {
 #ifndef USER_DEBUG_MODE
     if (clearDm) {
@@ -391,7 +390,7 @@ bool ClearDmLoopDevice(std::string loopDevPath, bool clearDm)
     return true;
 }
 
-bool IsLoopDevMatchedImg(std::string loopPath, std::string imgFilePath)
+bool IsLoopDevMatchedImg(const std::string &loopPath, const std::string &imgFilePath)
 {
     struct loop_info64 info;
     if (memset_s(&info, sizeof(struct loop_info64), 0, sizeof(struct loop_info64)) != EOK) {
@@ -413,7 +412,7 @@ bool IsLoopDevMatchedImg(std::string loopPath, std::string imgFilePath)
     return (imgFilePath == std::string((char *)info.lo_file_name));
 }
 
-bool CloseLoopDev(std::string loopPath)
+bool CloseLoopDev(const std::string &loopPath)
 {
     struct stat st;
     if (stat(loopPath.c_str(), &st)) {
@@ -435,7 +434,7 @@ bool CloseLoopDev(std::string loopPath)
         LOG(ERROR) << "Clear error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
     }
 
-    int fd = open("/dev/loop_control", O_RDWR);
+    int fd = open(LOOP_CTL_PATH, O_RDWR);
     if (fd < 0) {
         LOG(ERROR) << "Open loop ctl err, errno=" << errno;
         return false;
