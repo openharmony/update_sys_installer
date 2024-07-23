@@ -108,11 +108,11 @@ int32_t ModuleUpdateStub::ExitModuleUpdateStub(ModuleUpdateStub *service,
     int32_t ret = 0;
     if (--g_request == 0) {
         ret = service->ExitModuleUpdate();
-        std::unique_lock<std::mutex> locker(mtx_);
+        std::lock_guard<std::mutex> locker(mtx_);
         reply.WriteInt32(ret);
         return 0;
     }
-    std::unique_lock<std::mutex> locker(mtx_);
+    std::lock_guard<std::mutex> locker(mtx_);
     reply.WriteInt32(ret);
     return 1;
 }
