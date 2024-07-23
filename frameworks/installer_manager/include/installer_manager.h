@@ -17,7 +17,7 @@
 #define SYS_INSTALLER_MANAGER_H
 
 #include "installer_manager_helper.h"
-#include "macros.h"
+#include "macros_updater.h"
 #include "status_manager.h"
 
 namespace OHOS {
