@@ -142,7 +142,7 @@
             "header_files": [],
             "header_base": [
                "//base/update/sys_installer/services/module_update/service/include",
-	       "//base/update/sys_installer/services/module_update/utils/include"
+               "//base/update/sys_installer/services/module_update/utils/include"
             ]
           }
         }
