@@ -280,8 +280,11 @@ int32_t ModuleUpdateMain::GetModulePackageInfo(const std::string &hmpName,
         for (auto &hmp : hmpSet_) {
             CollectModulePackageInfo(hmp, modulePackageInfos);
         }
-    } else {
+    } else if (find(hmpSet_.begin(), hmpSet_.end(), hmpName) != hmpSet_.end()){
         CollectModulePackageInfo(hmpName, modulePackageInfos);
+    } else {
+        LOG(ERROR) << hmpName << " not exist in hmpSet";
+        return ModuleErrorCode::MODULE_UPDATE_FAIL;
     }
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
 }
