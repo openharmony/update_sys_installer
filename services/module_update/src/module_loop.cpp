@@ -259,6 +259,7 @@ bool SetUpLoopDevice(const int deviceFd, const string &target, const uint32_t im
     }
     li.lo_offset = imageOffset;
     li.lo_sizelimit = imageSize;
+    li.lo_flags |= LO_FLAGS_AUTOCLEAR;
     return useLoopConfigure ? ConfigureLoopDevice(deviceFd, targetFd.Get(), li, useBufferedIo)
         : SetLoopDeviceStatus(deviceFd, targetFd.Get(), &li);
 }
