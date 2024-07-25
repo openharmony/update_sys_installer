@@ -46,7 +46,7 @@ ohos_static_library("libverifyaction") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "openssl:libcrypto_shared",
-    "openssl:libssl_shared",
+    "openssl:libssl_static",
     "updater:libpackageExt",
     "updater:libringbuffer",
     "updater:libupdaterlog",

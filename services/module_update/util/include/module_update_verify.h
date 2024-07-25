@@ -23,7 +23,6 @@
 #include "module_file.h"
 #include "module_utils.h"
 #include "module_zip_helper.h"
-#include "parameters.h"
 #include "scope_guard.h"
 #include "log/log.h"
 #include "json_node.h"
