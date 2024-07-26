@@ -13,6 +13,7 @@
 
 import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
+import("//build/test.gni")
 
 group("fuzztest") {
   testonly = true
@@ -24,5 +25,7 @@ group("fuzztest") {
 
 group("unittest") {
   testonly = true
-  deps = [ "test/unittest:sys_installer_unittest" ]
+  if (!use_libfuzzer) {
+    deps = [ "test/unittest:sys_installer_unittest" ]
+  }
 }
