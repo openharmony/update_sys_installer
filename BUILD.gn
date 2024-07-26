@@ -24,5 +24,7 @@ group("fuzztest") {
 
 group("unittest") {
   testonly = true
-  deps = [ "test/unittest:sys_installer_unittest" ]
+  if (!use_libfuzzer) {
+    deps = [ "test/unittest:sys_installer_unittest" ]
+  }
 }
