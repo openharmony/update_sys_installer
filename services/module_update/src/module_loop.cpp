@@ -227,8 +227,7 @@ bool SetLoopDeviceStatus(const int deviceFd, const int targetFd, const struct lo
     }
     ret = ioctl(deviceFd, BLKFLSBUF, 0);
     if (ret < 0) {
-        LOG(ERROR) << "Failed to flush buffers on the loop device err=" << errno;
-        return false;
+        LOG(WARNING) << "Failed to flush buffers on the loop device err=" << errno;
     }
     ret = ioctl(deviceFd, LOOP_SET_BLOCK_SIZE, LOOP_BLOCK_SIZE);
     if (ret < 0) {
