@@ -63,7 +63,7 @@ void ModuleUpdateTaskManager::ClearTask()
     taskNum_ = 0;
 }
 
-bool ModuleUpdateTaskManager::AddTask(std::string hmpName)
+bool ModuleUpdateTaskManager::AddTask(const std::string &hmpName)
 {
     LOG(INFO) << "add task, hmp name=" << hmpName;
     if (taskNum_ >= MAX_TASK_NUM) {

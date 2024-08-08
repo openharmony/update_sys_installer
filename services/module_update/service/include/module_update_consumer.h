@@ -16,11 +16,11 @@
 #ifndef MODULE_UPDATE_CONSUMER_H
 #define MODULE_UPDATE_CONSUMER_H
 
-#include "module_ipc_helper.h"
-#include "module_update_queue.h"
 #include <csignal>
 #include <unordered_map>
 #include <unordered_set>
+#include "module_ipc_helper.h"
+#include "module_update_queue.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -34,8 +34,8 @@ private:
     ModuleUpdateQueue &queue_;
     std::unordered_map<int32_t, std::string> &saIdHmpMap_;
     volatile sig_atomic_t &exit_;
-    void DoRevert(const std::string &hmpName, const int32_t &saId);
-    void DoUnload(const std::string &hmpName, const int32_t &saId);
+    void DoRevert(const std::string &hmpName, int32_t saId);
+    void DoUnload(const std::string &hmpName, int32_t saId);
     void DoInstall(ModuleUpdateStatus &status);
 };
 } // SysInstaller

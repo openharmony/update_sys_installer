@@ -26,28 +26,12 @@ namespace OHOS {
 namespace SysInstaller {
 static constexpr int32_t IPC_MAX_SIZE = 128;
 
-struct SaStatus {
-    int32_t saId;
-    bool isPreInstalled;
-    bool isMountSuccess;
-};
-
 struct ModuleUpdateStatus {
     std::string hmpName;
-    std::list<SaStatus> saStatusList;
-    bool isAllMountSuccess;
-    bool isHotInstall;
-};
-
-struct SaInfo {
-    std::string saName;
-    int32_t saId;
-    ModuleVersion version;
-};
-
-struct ModulePackageInfo {
-    std::string hmpName;
-    std::list<SaInfo> saInfoList;
+    bool isPreInstalled {false};
+    bool isAllMountSuccess {false};
+    bool isHotInstall {false};
+    HmpInstallType type {COLD_SA_TYPE};
 };
 
 class ModuleIpcHelper {
