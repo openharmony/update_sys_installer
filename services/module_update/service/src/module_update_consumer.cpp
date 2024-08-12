@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
+#include "module_update_consumer.h"
+#include <vector>
 #include "directory_ex.h"
 #include "log/log.h"
 #include "module_constants.h"
 #include "module_update.h"
-#include "module_update_consumer.h"
 #include "module_utils.h"
 #include "parameter.h"
 #include "scope_guard.h"
-#include <vector>
 
 namespace OHOS {
 namespace SysInstaller {
@@ -45,17 +45,19 @@ void ModuleUpdateConsumer::DoInstall(ModuleUpdateStatus &status)
     }
 }
 
-void ModuleUpdateConsumer::DoRevert(const std::string &hmpName, const int32_t &saId)
+void ModuleUpdateConsumer::DoRevert(const std::string &hmpName, int32_t saId)
 {
     LOG(INFO) << "hmp package revert,hmp name=" << hmpName << "; said=" << saId;
-    Revert(hmpName, !IsHotSa(saId));
+    bool isHotHmp = IsHotHmpPackage(hmpName);
     ModuleUpdateStatus status;
     status.hmpName = hmpName;
-    status.isHotInstall = IsHotSa(saId);
+    status.isHotInstall = isHotHmp;
+    ModuleUpdate::GetInstance().RemoveMountPoint(hmpName);
+    Revert(hmpName, !isHotHmp);
     DoInstall(status);
 }
 
-void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, const int32_t &saId)
+void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, int32_t saId)
 {
     LOG(INFO) << "hmp package unload,hmp name=" << hmpName << "; said=" << saId;
     ModuleUpdateStatus status;
@@ -65,6 +67,7 @@ void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, const int32_t &s
         LOG(INFO) << "sa is running, saId=" << saId;
         return;
     }
+    // check whether install hmp exists
     DoInstall(status);
 }
 
@@ -80,6 +83,10 @@ void ModuleUpdateConsumer::Run()
         if (saStatusPair.first == 0 && saStatusPair.second == "") {
             LOG(INFO) << "producer and consumer stop";
             break;
+        }
+        if (saStatusPair.first == APP_SERIAL_NUMBER) {
+            DoRevert(saStatusPair.second, APP_SERIAL_NUMBER);
+            continue;
         }
         int32_t saId = saStatusPair.first;
         std::string saStatus = saStatusPair.second;

@@ -32,16 +32,17 @@ public:
     virtual ~ModuleUpdate() = default;
     void CheckModuleUpdate();
     bool DoModuleUpdate(ModuleUpdateStatus &status);
+    bool RemoveMountPoint(const std::string &hmpName);
 
 private:
-    void PrepareModuleFileList(int32_t saId, ModuleUpdateStatus &status);
-    bool ActivateModules(ModuleUpdateStatus &status);
+    void PrepareModuleFileList(const ModuleUpdateStatus &status);
+    bool ActivateModules(ModuleUpdateStatus &status, const Timer &timer);
     bool MountModulePackage(const ModuleFile &moduleFile, const bool mountOnVerity) const;
     void ReportModuleUpdateStatus(const ModuleUpdateStatus &status) const;
     void WaitDevice(const std::string &blockDevice) const;
-    bool CheckMountComplete(int32_t saId) const;
-    void ProcessSaFile(const std::string &saFile, ModuleUpdateStatus &status);
-    std::unique_ptr<ModuleFile> GetLatestUpdateModulePackage(const int32_t saId);
+    bool CheckMountComplete(const std::string &hmpName) const;
+    void ProcessHmpFile(const std::string &hmpFile, const ModuleUpdateStatus &status, const Timer &timer);
+    std::unique_ptr<ModuleFile> GetLatestUpdateModulePackage(const std::string &hmpName);
 
     std::list<ModuleFile> moduleFileList_;
     ModuleFileRepository repository_;

@@ -14,7 +14,6 @@
  */
 
 #include "module_utils.h"
-
 #include <cerrno>
 #include <cstdio>
 #include <dirent.h>
@@ -26,12 +25,14 @@
 #include "if_system_ability_manager.h"
 #include "iremote_object.h"
 #include "iservice_registry.h"
-
 #include "directory_ex.h"
 #include "log/log.h"
+#include "parameter.h"
+#include "parameters.h"
+#include "singleton.h"
+#include "utils.h"
 #include "module_constants.h"
 #include "module_file.h"
-#include "parameter.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -71,8 +72,7 @@ bool CreateDirIfNeeded(const std::string &path, mode_t mode)
     // Need to manually call chmod because mkdir will create a folder with
     // permissions mode & ~umask.
     if (chmod(path.c_str(), mode) != 0) {
-        LOG(ERROR) << "Could not chmod " << path;
-        return false;
+        LOG(WARNING) << "Could not chmod " << path;
     }
     return true;
 }
@@ -208,31 +208,35 @@ std::string GetRealPath(const std::string &filePath)
 
 void Revert(const std::string &hmpName, bool reboot)
 {
-    LOG(INFO) << "RevertAndReboot";
-    if (!CheckPathExists(UPDATE_BACKUP_DIR)) {
-        LOG(ERROR) << UPDATE_BACKUP_DIR << " does not exist";
-        return;
+    LOG(INFO) << "RevertAndReboot, reboot: " << reboot;
+    std::string installPath = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
+    if (CheckPathExists(installPath)) {
+        if (!ForceRemoveDirectory(installPath)) {
+            LOG(ERROR) << "Failed to remove installPath: " << installPath;
+            return;
+        }
     }
     struct stat statData;
-    int ret = stat(UPDATE_ACTIVE_DIR, &statData);
+    std::string activePath = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
+    int ret = stat(activePath.c_str(), &statData);
     if (ret != 0) {
-        LOG(ERROR) << "Failed to access " << UPDATE_ACTIVE_DIR << " err=" << errno;
+        LOG(ERROR) << "Failed to access " << activePath << " err=" << errno;
         return;
     }
-    if (!ForceRemoveDirectory(UPDATE_ACTIVE_DIR)) {
-        LOG(ERROR) << "Failed to remove " << UPDATE_ACTIVE_DIR;
+    if (!ForceRemoveDirectory(activePath)) {
+        LOG(ERROR) << "Failed to remove " << activePath;
         return;
     }
 
-    ret = rename(UPDATE_BACKUP_DIR, UPDATE_ACTIVE_DIR);
-    if (ret != 0) {
-        LOG(ERROR) << "Failed to rename " << UPDATE_BACKUP_DIR << " to " << UPDATE_ACTIVE_DIR << " err=" << errno;
-        return;
-    }
-    ret = chmod(UPDATE_ACTIVE_DIR, statData.st_mode & ALL_PERMISSIONS);
-    if (ret != 0) {
-        LOG(ERROR) << "Failed to restore original permissions for " << UPDATE_ACTIVE_DIR << " err=" << errno;
-        return;
+    std::string backupPath = std::string(UPDATE_BACKUP_DIR) + "/" + hmpName;
+    if (CheckPathExists(backupPath)) {
+        ret = rename(backupPath.c_str(), activePath.c_str());
+        if (ret != 0) {
+            LOG(ERROR) << "Failed to rename " << backupPath << " to " << activePath << " err=" << errno;
+        }
+        if (ret == 0 && chmod(activePath.c_str(), statData.st_mode & ALL_PERMISSIONS) != 0) {
+            LOG(ERROR) << "Failed to restore original permissions for " << activePath << " err=" << errno;
+        }
     }
     sync();
     if (reboot) {
@@ -241,7 +245,7 @@ void Revert(const std::string &hmpName, bool reboot)
     }
 }
 
-bool IsHotSa(const int32_t &saId)
+bool IsHotSa(int32_t saId)
 {
     std::vector<int32_t> onDemandSaIds;
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -261,7 +265,7 @@ bool IsHotSa(const int32_t &saId)
     return true;
 }
 
-bool IsRunning(const int32_t &saId)
+bool IsRunning(int32_t saId)
 {
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
@@ -276,7 +280,7 @@ bool IsRunning(const int32_t &saId)
     return true;
 }
 
-bool CheckBootComplete()
+bool CheckBootComplete(void)
 {
     char value[PARAM_VALUE_SIZE] = "";
     int ret = GetParameter(BOOT_COMPLETE_PARAM, "", value, PARAM_VALUE_SIZE);
@@ -287,26 +291,59 @@ bool CheckBootComplete()
     return strcmp(value, BOOT_SUCCESS_VALUE) == 0;
 }
 
+bool IsHotHmpPackage(int32_t type)
+{
+    return (type & HMP_HOT_TYPE_BITS) != 0;
+}
+
 bool IsHotHmpPackage(const std::string &hmpName)
 {
-    std::vector<std::string> files;
-    std::vector<std::string> saFiles;
-    std::string hmpDir = std::string(MODULE_PREINSTALL_DIR) + "/" + hmpName;
-    GetDirFiles(hmpDir, files);
-    for (auto &file : files) {
-        if (CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
-            saFiles.emplace_back(file);
-        }
-    }
-    if (saFiles.size() != 1) {
+    std::string preInstalledPath = std::string(MODULE_PREINSTALL_DIR) + "/" + hmpName + "/" + HMP_INFO_NAME;
+    if (!Utils::IsFileExist(preInstalledPath)) {
+        LOG(ERROR) << "preInstalled hmp is not exist: " << preInstalledPath;
         return false;
     }
-    std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(saFiles[0]);
-    if (moduleFile == nullptr) {
-        LOG(ERROR) << "get module file failed, hmpName=" << hmpName;
+    std::unique_ptr<ModuleFile> preInstalledFile = ModuleFile::Open(preInstalledPath);
+    if (preInstalledFile == nullptr) {
+        LOG(ERROR) << "preInstalled file is invalid: " << preInstalledPath;
         return false;
     }
-    return IsHotSa(moduleFile->GetSaId());
+    return IsHotHmpPackage(static_cast<int32_t>(preInstalledFile->GetHmpPackageType()));
+}
+
+std::string GetDeviceSaSdkVersion(void)
+{
+    std::string sdkVersion = system::GetParameter("const.build.sa_sdk_version", "");
+    if (sdkVersion.empty()) {
+        LOG(ERROR) << "get device sa sdk version failed.";
+        return sdkVersion;
+    }
+    return sdkVersion;
+}
+
+int GetDeviceApiVersion(void)
+{
+    std::string apiVersion = system::GetParameter("const.ohos.apiversion", "");
+    if (apiVersion.empty()) {
+        LOG(ERROR) << "get device api version failed.";
+        return 0;
+    }
+    return Utils::String2Int<int>(apiVersion, Utils::N_DEC);
+}
+
+std::string GetContentFromZip(const std::string &zipPath, const std::string &fileName)
+{
+    ModuleZipHelper helper(zipPath);
+    if (!helper.IsValid()) {
+        LOG(ERROR) << "Failed to open file: " << zipPath;
+        return "";
+    }
+    std::string content;
+    if (!ExtractZipFile(helper, fileName, content)) {
+        LOG(ERROR) << "Failed to extract: " << fileName << " from package: " << zipPath;
+        return "";
+    }
+    return content;
 }
 
 void ClearModuleDirs(const std::string &hmpName)
@@ -315,6 +352,16 @@ void ClearModuleDirs(const std::string &hmpName)
     if (CheckPathExists(hmpInstallDir) && !ForceRemoveDirectory(hmpInstallDir)) {
         LOG(WARNING) << "Failed to remove " << hmpName;
     }
+}
+
+void KillProcessOnArkWeb(void)
+{
+}
+
+bool InstallHmpBundle(const std::string &hmpPath, bool revert)
+{
+    LOG(INFO) << "Start to install hmp bundle: " << hmpPath << " ,revert: " << revert;
+    return false;
 }
 } // namespace SysInstaller
 } // namespace OHOS

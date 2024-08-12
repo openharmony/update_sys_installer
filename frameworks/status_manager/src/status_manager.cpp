@@ -65,7 +65,7 @@ void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent, const
     }
 
     updateStatus_ = updateStatus;
-    LOG(INFO) << "status:" << updateStatus_ << " percent:"  << percent_ << " msg:"  << resultMsg;
+    LOG(INFO) << "status:" << updateStatus_ << " percent:"  << percent_ << " msg:" << resultMsg;
     updateCallback_->OnUpgradeProgress(updateStatus_, percent_, resultMsg);
 }
 
