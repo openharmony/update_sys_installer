@@ -31,6 +31,7 @@ using namespace Updater;
 
 namespace {
 constexpr int LOAD_SA_TIMEOUT_MS = 3;
+static volatile std::atomic_long g_request(0);
 }
 
 ModuleUpdateKits &ModuleUpdateKits::GetInstance()
@@ -132,13 +133,16 @@ int32_t ModuleUpdateKitsImpl::GetModulePackageInfo(const std::string &hmpName,
 
 int32_t ModuleUpdateKitsImpl::ExitModuleUpdate()
 {
-    LOG(INFO) << "ExitModuleUpdate";
+    LOG(INFO) << "ExitModuleUpdate, g_request = " << g_request;
     auto moduleUpdate = GetService();
     if (moduleUpdate == nullptr) {
         LOG(ERROR) << "Get moduleUpdate failed";
         return ModuleErrorCode::ERR_SERVICE_NOT_FOUND;
     }
-    return moduleUpdate->ExitModuleUpdate();
+    if (--g_request <= 0) {
+        return moduleUpdate->ExitModuleUpdate();
+    }
+    return 0;
 }
 
 int32_t ModuleUpdateKitsImpl::Init()
@@ -185,6 +189,7 @@ int32_t ModuleUpdateKitsImpl::InitModuleUpdate()
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
+    g_request++;
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
 }
 
