@@ -28,7 +28,6 @@
 constexpr int USER_UPDATE_AUTHORITY = 6666;
 
 static std::mutex g_mtx;
-static volatile std::atomic_long g_request(0);
 namespace OHOS {
 namespace SysInstaller {
 using namespace std;
@@ -107,16 +106,10 @@ int32_t ModuleUpdateStub::ExitModuleUpdateStub(ModuleUpdateStub *service,
         LOG(ERROR) << "Invalid param";
         return -1;
     }
-    int32_t ret = 0;
-    if (--g_request == 0) {
-        ret = service->ExitModuleUpdate();
-        std::lock_guard<std::mutex> locker(g_mtx);
-        reply.WriteInt32(ret);
-        return 0;
-    }
+    int32_t ret = service->ExitModuleUpdate();
     std::lock_guard<std::mutex> locker(g_mtx);
     reply.WriteInt32(ret);
-    return 1;
+    return 0;
 }
 
 int32_t ModuleUpdateStub::GetHmpVersionInfoStub(ModuleUpdateStub *service,
@@ -216,7 +209,6 @@ int32_t ModuleUpdateStub::OnRemoteRequest(uint32_t code,
         }
         return inter->second(this, data, reply, option);
     }
-    g_request++;
     LOG(INFO) << "ModuleUpdateStub OnRemoteRequest code " << code << "not found";
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
