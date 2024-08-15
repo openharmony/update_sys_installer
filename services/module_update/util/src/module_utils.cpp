@@ -293,7 +293,7 @@ bool CheckBootComplete(void)
 
 bool IsHotHmpPackage(int32_t type)
 {
-    return (type & HMP_HOT_TYPE_BITS) != 0;
+    return false;
 }
 
 bool IsHotHmpPackage(const std::string &hmpName)

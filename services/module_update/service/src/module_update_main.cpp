@@ -493,8 +493,14 @@ void ModuleUpdateMain::ParseHmpVersionInfo(std::vector<HmpVersionInfo> &versionI
     std::vector<std::string> preVersion {};
     std::vector<std::string> actVersion {};
     // version: xxx-d01 M.S.F.B
-    if (!ParseVersion(preInfo.version, " ", preVersion) || !ParseVersion(actInfo.version, " ", actVersion)) {
-        LOG(ERROR) << "ParseVersion failed";
+    if (!ParseVersion(preInfo.version, " ", preVersion)) {
+        LOG(ERROR) << "Parse preVersion failed.";
+        return;
+    }
+
+    if (!ParseVersion(actInfo.version, " ", actVersion)) {
+        LOG(WARNING) << "Parse actVersion failed.";
+        versionInfos.emplace_back(preInfo);
         return;
     }
 

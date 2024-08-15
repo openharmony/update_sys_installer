@@ -31,7 +31,6 @@ namespace {
 constexpr size_t FS_TYPE_MAX_SIZE = 10;
 }
 
-constexpr int32_t HMP_HOT_TYPE_BITS = 0xf0;  // high bits not 0 means hot
 constexpr const char *HMP_APP_TYPE = "APP";
 constexpr const char *HMP_SA_TYPE = "systemAbility";
 constexpr const char *HMP_SA_TYPE_OLD = "SYSTEM ability";
