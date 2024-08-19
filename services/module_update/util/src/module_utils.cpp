@@ -346,11 +346,14 @@ std::string GetContentFromZip(const std::string &zipPath, const std::string &fil
     return content;
 }
 
-void ClearModuleDirs(const std::string &hmpName)
+void RemoveSpecifiedDir(const std::string &path)
 {
-    std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
-    if (CheckPathExists(hmpInstallDir) && !ForceRemoveDirectory(hmpInstallDir)) {
-        LOG(WARNING) << "Failed to remove " << hmpName;
+    if (!CheckPathExists(path)) {
+        return;
+    }
+    LOG(INFO) << "Remove specified dir: " << path;
+    if (!ForceRemoveDirectory(path)) {
+        LOG(ERROR) << "Failed to remove: " << path << ", err: " << errno;
     }
 }
 

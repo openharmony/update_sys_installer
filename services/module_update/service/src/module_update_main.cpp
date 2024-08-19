@@ -137,13 +137,13 @@ void ModuleUpdateMain::HotSaInstall(ModuleUpdateStatus &status)
         LOG(ERROR) << "HotSaInstall fail, hmpName=" << status.hmpName;
         return;
     }
-    ClearModuleDirs(status.hmpName);
+    RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName);
 }
 
 bool ModuleUpdateMain::HotAppInstall(ModuleUpdateStatus &status)
 {
     ON_SCOPE_EXIT(rmdir) {
-        ClearModuleDirs(status.hmpName);
+        RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName);
     };
     if (!ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
         LOG(ERROR) << "HotAppInstall fail, hmpName=" << status.hmpName;
@@ -222,7 +222,7 @@ int32_t ModuleUpdateMain::CheckHmpName(const std::string &hmpName)
     }
     int32_t ret = CreateModuleDirs(hmpName);
     if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
-        ClearModuleDirs(hmpName);
+        RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + hmpName);
         return ret;
     }
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
@@ -236,10 +236,10 @@ int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
     if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
         return ret;
     }
-    ON_SCOPE_EXIT(rmdir) {
-        ClearModuleDirs(hmpName);
-    };
     std::string hmpDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
+    ON_SCOPE_EXIT(rmdir) {
+        RemoveSpecifiedDir(hmpDir);
+    };
     std::string outPath = hmpDir + "/";
     ret = ExtraPackageDir(pkgPath.c_str(), nullptr, nullptr, outPath.c_str());
     if (ret != 0) {

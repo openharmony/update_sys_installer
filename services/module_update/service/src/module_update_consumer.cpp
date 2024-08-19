@@ -36,7 +36,7 @@ ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
 void ModuleUpdateConsumer::DoInstall(ModuleUpdateStatus &status)
 {
     ON_SCOPE_EXIT(rmdir) {
-        ClearModuleDirs(status.hmpName);
+        RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName);
     };
     if (ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
         LOG(INFO) << "hmp package successful install, hmp name=" << status.hmpName;

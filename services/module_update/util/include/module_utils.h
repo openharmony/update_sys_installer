@@ -41,7 +41,7 @@ bool IsRunning(int32_t saId);
 bool IsHotHmpPackage(int32_t type);
 bool IsHotHmpPackage(const std::string &hmpName);
 bool CheckBootComplete(void);
-void ClearModuleDirs(const std::string &hmpName);
+void RemoveSpecifiedDir(const std::string &path);
 std::string GetDeviceSaSdkVersion(void);
 int GetDeviceApiVersion(void);
 std::string GetContentFromZip(const std::string &zipPath, const std::string &fileName);
