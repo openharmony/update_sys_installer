@@ -52,7 +52,6 @@ void ModuleUpdateConsumer::DoRevert(const std::string &hmpName, int32_t saId)
     ModuleUpdateStatus status;
     status.hmpName = hmpName;
     status.isHotInstall = isHotHmp;
-    ModuleUpdate::GetInstance().RemoveMountPoint(hmpName);
     Revert(hmpName, !isHotHmp);
     DoInstall(status);
 }
