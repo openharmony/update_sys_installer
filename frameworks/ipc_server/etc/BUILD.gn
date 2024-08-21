@@ -16,7 +16,6 @@ import("//build/ohos.gni")
 group("sys_installer_etc") {
   deps = [
     ":check_module_update_cfg",
-    ":module_update_cfg",
     ":module_update_sa_cfg",
     ":sys_installer.para",
     ":sys_installer.para.dac",
@@ -26,13 +25,6 @@ group("sys_installer_etc") {
 
 ohos_prebuilt_etc("sys_installer_sa.rc") {
   source = "sys_installer_sa.cfg"
-  relative_install_dir = "init"
-  part_name = "sys_installer"
-  subsystem_name = "updater"
-}
-
-ohos_prebuilt_etc("module_update_cfg") {
-  source = "module_update_service.cfg"
   relative_install_dir = "init"
   part_name = "sys_installer"
   subsystem_name = "updater"
