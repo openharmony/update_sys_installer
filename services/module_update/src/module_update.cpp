@@ -297,6 +297,9 @@ void ModuleUpdate::PrepareModuleFileList(const ModuleUpdateStatus &status)
         moduleFileList_.emplace_back(std::move(*latestModuleFile));
     } else {
         moduleFileList_.emplace_back(std::move(*systemModuleFile));
+        // when choose preInstall hmp, remove activeHmp and backupHmp
+        RemoveSpecifiedDir(std::string(UPDATE_ACTIVE_DIR) + "/" + status.hmpName);
+        RemoveSpecifiedDir(std::string(UPDATE_BACKUP_DIR) + "/" + status.hmpName);
     }
 }
 
@@ -392,7 +395,7 @@ void ModuleUpdate::ReportModuleUpdateStatus(const ModuleUpdateStatus &status) co
     }
     if (!status.isAllMountSuccess) {
         LOG(ERROR) << "ReportModuleUpdateStatus mount fail, hmp name=" << status.hmpName;
-        ClearModuleDirs(status.hmpName);
+        RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName);
         Revert(status.hmpName, !status.isHotInstall);
         return;
     }
