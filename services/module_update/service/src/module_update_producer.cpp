@@ -28,7 +28,7 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 namespace {
-static const std::vector<std::string> saStatusVec {UNLOAD, LOAD_FAIL, CRASH};
+static const std::vector<std::string> SA_STATUS_VEC {UNLOAD, LOAD_FAIL, CRASH};
 constexpr int32_t PARAM_VALUE_SIZE = 10;
 constexpr const char *BOOT_COMPLETE_PARAM = "bootevent.boot.completed";
 constexpr const char *BOOT_SUCCESS_VALUE = "true";
@@ -54,7 +54,7 @@ void ModuleUpdateProducer::AddAbnormalSa()
             LOG(ERROR) << "failed to get parameter " << attr;
             continue;
         }
-        if (find(saStatusVec.begin(), saStatusVec.end(), saStatus) != saStatusVec.end()) {
+        if (find(SA_STATUS_VEC.begin(), SA_STATUS_VEC.end(), saStatus) != SA_STATUS_VEC.end()) {
             LOG(INFO) << "add abnormal sa=" << saId << "; status=" << saStatus;
             std::pair<int32_t, std::string> saStatusPair = std::make_pair(saId, saStatus);
             char bootValue[PARAM_VALUE_SIZE] = "";

@@ -28,6 +28,7 @@ ModuleUpdateQueue::ModuleUpdateQueue() : size_(0), head_(0), tail_(0)
 
 void ModuleUpdateQueue::Stop()
 {
+    std::unique_lock<std::mutex> locker(mtx_);
     isStop_ = true;
     notFull_.notify_all();
     notEmpty_.notify_all();
