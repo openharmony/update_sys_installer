@@ -19,6 +19,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <unordered_set>
 
 #include "directory_ex.h"
 #include "module_utils.h"
@@ -264,16 +265,36 @@ bool CompareSaListVersion(const std::list<SaInfo> &smallList, const std::list<Sa
         return false;
     }
     std::unordered_map<int32_t, SaInfo> saMap {};
-    for (const auto &info : smallList) {
+    for (const auto &info : bigList) {
         saMap.emplace(info.saId, info);
     }
-    for (const auto &info : bigList) {
+    for (const auto &info : smallList) {
         auto saIter = saMap.find(info.saId);
         if (saIter == saMap.end()) {
             LOG(ERROR) << info.saId << "not found when compare saList";
             return false;
         }
         if (!CompareSaVersion(saIter->second.version, info.version)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool CompareBundleList(const std::list<BundleInfo> &smallList, const std::list<BundleInfo> &bigList)
+{
+    if (smallList.size() != bigList.size()) {
+        LOG(ERROR) << "Bundle smallList size: " << smallList.size() << " not equal to big: " << bigList.size();
+        return false;
+    }
+    std::unordered_set<std::string> bundleSet {};
+    for (const auto &info : bigList) {
+        bundleSet.insert(info.bundleName);
+    }
+    for (const auto &info : smallList) {
+        auto bundleIter = bundleSet.find(info.bundleName);
+        if (bundleIter == bundleSet.end()) {
+            LOG(ERROR) << info.bundleName << " not found when compare bundleList";
             return false;
         }
     }
@@ -424,6 +445,10 @@ bool ModuleFile::CompareVersion(const ModuleFile &newFile, const ModuleFile &old
     }
     if (!CompareSaListVersion(oldFile.GetVersionInfo().saInfoList, newFile.GetVersionInfo().saInfoList)) {
         LOG(ERROR) << "old hmp sa version is higher.";
+        return false;
+    }
+    if (!CompareBundleList(oldFile.GetVersionInfo().bundleInfoList, newFile.GetVersionInfo().bundleInfoList)) {
+        LOG(ERROR) << "new hmp bundle list do not meet expectation.";
         return false;
     }
     return true;
