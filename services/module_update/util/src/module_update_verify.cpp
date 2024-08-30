@@ -69,7 +69,11 @@ bool CheckSaSdkVersion(const std::string &saSdkVersion)
         LOG(ERROR) << "ParseVersion hmpSaSdkVersion failed: " << saSdkVersion;
         return false;
     }
-    return CompareSaSdkVersion(saSdkVersionVec, hmpVersionVec);
+    if (!CompareSaSdkVersion(saSdkVersionVec, hmpVersionVec)) {
+        LOG(ERROR) << "saSdkVersion compare fail, sys:" << sysSaSdkVersion << "; hmp:" << saSdkVersion;
+        return false;
+    }
+    return true;
 }
 
 bool GetPackInfoVer(const JsonNode &root, const std::string &key, std::string &version)

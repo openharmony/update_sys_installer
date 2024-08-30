@@ -171,6 +171,7 @@ std::vector<HmpUpdateInfo> ModuleUpdateService::GetHmpUpdateResult()
     }
     ifs.close();
     (void)unlink(MODULE_RESULT_PATH);
+    LOG(INFO) << "after get hmpUpdateResult, delete module_update_result.";
     return updateInfo;
 }
 

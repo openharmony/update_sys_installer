@@ -337,16 +337,19 @@ int32_t ModuleUpdateMain::InstallModuleFile(const std::string &hmpName, const st
         LOG(ERROR) << "Wrong module file " << file << " in hmp package " << hmpName;
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
+    ON_SCOPE_EXIT(clear) {
+        moduleFile->ClearVerifiedData();
+    };
     if (!moduleFile->GetImageStat().has_value()) {
         LOG(ERROR) << "Could not install empty module package " << file;
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
-    if (ValidateVersion(*moduleFile, hmpName) != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
-        return ModuleErrorCode::ERR_INSTALL_FAIL;
+    int32_t ret = ValidateVersion(*moduleFile, hmpName);
+    if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
+        return ret;
     }
     status.type = moduleFile->GetHmpPackageType();
     status.isHotInstall = IsHotHmpPackage(static_cast<int32_t>(status.type));
-    moduleFile->ClearVerifiedData();
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
 }
 
