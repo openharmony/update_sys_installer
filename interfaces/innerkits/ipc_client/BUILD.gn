@@ -158,7 +158,8 @@ config("exported_header_files") {
 }
 
 ohos_executable("module_update_client") {
-  sources = [ "${sys_installer_path}/interfaces/innerkits/ipc_client/src/main.cpp" ]
+  sources =
+      [ "${sys_installer_path}/interfaces/innerkits/ipc_client/src/main.cpp" ]
 
   include_dirs = [ "./include" ]
   deps = [ "${sys_installer_path}/interfaces/innerkits/ipc_client:libmodule_update_shared" ]
