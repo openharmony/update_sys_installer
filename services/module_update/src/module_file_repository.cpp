@@ -89,9 +89,12 @@ void ModuleFileRepository::ProcessFile(const string &hmpName, const string &path
     if (moduleFile == nullptr || moduleFile->GetVersionInfo().hmpName != hmpName) {
         return;
     }
-    string pubkey = moduleFile->GetPublicKey();
+    if (!moduleFile->GetImageStat().has_value()) {
+        LOG(ERROR) << "verify failed, img is empty: " << file;
+        SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "img empty", timer);
+        return;
+    }
     if (path != MODULE_PREINSTALL_DIR) {
-        pubkey = GetPublicKey(hmpName);
         if (!CheckFilePath(*moduleFile, path)) {
             LOG(ERROR) << "Open " << file << " failed";
             SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "get pub key fail", timer);
@@ -102,11 +105,11 @@ void ModuleFileRepository::ProcessFile(const string &hmpName, const string &path
             SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "verify fail", timer);
             return;
         }
-    }
-    if (moduleFile->GetImageStat().has_value() && !moduleFile->VerifyModuleVerity(pubkey)) {
-        SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "hvb fail", timer);
-        LOG(ERROR) << "verify verity failed of " << file;
-        return;
+        if (!moduleFile->VerifyModuleVerity()) {
+            LOG(ERROR) << "verify verity failed of " << file;
+            SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "hvb fail", timer);
+            return;
+        }
     }
     LOG(INFO) << "ProcessFile  " << file << " successful";
     fileMap.insert(std::make_pair(path, std::move(*moduleFile)));
@@ -138,15 +141,6 @@ bool ModuleFileRepository::IsPreInstalledModule(const ModuleFile &moduleFile) co
         return false;
     }
     return preInstalledModule->GetPath() == moduleFile.GetPath();
-}
-
-string ModuleFileRepository::GetPublicKey(const string &hmpName) const
-{
-    std::unique_ptr<ModuleFile> preInstalledModule = GetModuleFile(MODULE_PREINSTALL_DIR, hmpName);
-    if (preInstalledModule == nullptr) {
-        return "";
-    }
-    return preInstalledModule->GetPublicKey();
 }
 
 bool ModuleFileRepository::CheckFilePath(const ModuleFile &moduleFile, const string &prefix) const
