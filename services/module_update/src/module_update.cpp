@@ -208,7 +208,7 @@ void ModuleUpdate::ProcessSaFile(const std::string &saFile, ModuleUpdateStatus &
 bool ModuleUpdate::DoModuleUpdate(ModuleUpdateStatus &status)
 {
     LOG(INFO) << "enter domoduleupdate";
-    std::string hmpPackagePath = std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName;
+    std::string hmpPackagePath = std::string(MODULE_PREINSTALL_DIR) + "/" + status.hmpName;
     LOG(INFO) << "DoModuleUpdate hmp package path=" << hmpPackagePath;
     std::vector<std::string> files;
     GetDirFiles(hmpPackagePath, files);

@@ -410,7 +410,7 @@ bool IsLoopDevMatchedImg(const std::string &loopPath, const std::string &imgFile
         return false;
     }
     close(fd);
-    return (imgFilePath == std::string((char *)info.lo_file_name));
+    return (imgFilePath == std::string(reinterpret_cast<char *>(info.lo_file_name)));
 }
 
 bool CloseLoopDev(const std::string &loopPath)

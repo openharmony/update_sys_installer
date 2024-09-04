@@ -41,8 +41,8 @@ public:
     bool GetTaskResult();
     bool AddTask(std::string hmpName);
     void ClearTask();
-    void Start();
     void Stop();
+    void Start();
     size_t GetCurTaskNum();
 
 private:
