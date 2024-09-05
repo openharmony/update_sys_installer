@@ -28,6 +28,8 @@ enum ModuleErrorCode {
     ERR_INSTALL_FAIL,
     ERR_UNINSTALL_FAIL,
     ERR_REPORT_STATUS_FAIL,
+    ERR_SAMGR_REVERT,
+    ERR_BMS_REVERT,
     MODULE_UPDATE_FAIL
 };
 } // namespace SysInstaller

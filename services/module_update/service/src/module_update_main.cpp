@@ -545,6 +545,9 @@ void ModuleUpdateMain::SaveInstallerResult(const std::string &hmpPath, int resul
     }
     std::string writeInfo = hmpPath + ";" + std::to_string(result) + ";" +
         resultInfo + "|" + std::to_string(timer.duration().count()) + "\n";
+    if (CheckAndUpdateRevertResult(hmpPath, writeInfo, "revert")) {
+        return;
+    }
     if (write(fd, writeInfo.data(), writeInfo.length()) <= 0) {
         LOG(WARNING) << "write result file failed, err:" << errno;
     }

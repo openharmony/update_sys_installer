@@ -357,6 +357,50 @@ void RemoveSpecifiedDir(const std::string &path)
     }
 }
 
+bool CheckAndUpdateRevertResult(const std::string &hmpPath, const std::string &resultInfo, const std::string &keyWord)
+{
+    if (resultInfo.find(keyWord) == std::string::npos) {
+        return false;
+    }
+    std::ifstream ifs { MODULE_RESULT_PATH };
+    if (!ifs.is_open()) {
+        LOG(ERROR) << "ifs open result_file fail" << strerror(errno);
+        return false;
+    }
+    std::string line;
+    std::vector<std::string> lines;
+    bool ret = false;
+    while (getline(ifs, line)) {
+        if (line.find(hmpPath) == std::string::npos) {
+            lines.push_back(line);
+            continue;
+        }
+        std::vector<std::string> results = Utils::SplitString(line, ";");
+        if (results.size() < 3) {  // 3: hmp|result|msg
+            LOG(ERROR) << "Split result fail: " << line;
+            continue;
+        }
+        if (results[1] != "0") {  // 1: index of result
+            lines.push_back(line);
+            continue;
+        }
+        ret = true;
+        lines.push_back(resultInfo);
+    }
+    ifs.close();
+    std::ofstream outfile(MODULE_RESULT_PATH, std::ios::binary | std::ios::trunc);
+    if (!outfile) {
+        LOG(ERROR) << "ofs open result_file fail" << strerror(errno);
+        return false;
+    }
+    for (const auto &info : lines) {
+        outfile << info;
+    }
+    LOG(INFO) << "Update revert result succ";
+    sync();
+    return ret;
+}
+
 void KillProcessOnArkWeb(void)
 {
 }
