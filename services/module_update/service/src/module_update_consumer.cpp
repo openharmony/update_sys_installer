@@ -18,7 +18,9 @@
 #include "directory_ex.h"
 #include "log/log.h"
 #include "module_constants.h"
+#include "module_error_code.h"
 #include "module_update.h"
+#include "module_update_main.h"
 #include "module_utils.h"
 #include "parameter.h"
 #include "scope_guard.h"
@@ -83,7 +85,10 @@ void ModuleUpdateConsumer::Run()
             LOG(INFO) << "producer and consumer stop";
             break;
         }
+        Timer timer;
         if (saStatusPair.first == APP_SERIAL_NUMBER) {
+            ModuleUpdateMain::GetInstance().SaveInstallerResult(saStatusPair.second, ModuleErrorCode::ERR_BMS_REVERT,
+                saStatusPair.second + " revert", timer);
             DoRevert(saStatusPair.second, APP_SERIAL_NUMBER);
             continue;
         }
@@ -96,6 +101,8 @@ void ModuleUpdateConsumer::Run()
         }
         std::string hmpName = it->second;
         if (strcmp(saStatus.c_str(), LOAD_FAIL) == 0 || strcmp(saStatus.c_str(), CRASH) == 0) {
+            ModuleUpdateMain::GetInstance().SaveInstallerResult(hmpName, ModuleErrorCode::ERR_SAMGR_REVERT,
+                std::to_string(saId) + " revert", timer);
             DoRevert(hmpName, saId);
         } else if (IsHotSa(saId) && strcmp(saStatus.c_str(), UNLOAD) == 0) {
             DoUnload(hmpName, saId);

@@ -45,6 +45,7 @@ void RemoveSpecifiedDir(const std::string &path);
 std::string GetDeviceSaSdkVersion(void);
 int GetDeviceApiVersion(void);
 std::string GetContentFromZip(const std::string &zipPath, const std::string &fileName);
+bool CheckAndUpdateRevertResult(const std::string &hmpPath, const std::string &resultInfo, const std::string &keyWord);
 void KillProcessOnArkWeb(void);
 bool InstallHmpBundle(const std::string &hmpPath, bool revert);
 

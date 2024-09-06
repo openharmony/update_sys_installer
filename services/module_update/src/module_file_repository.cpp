@@ -73,6 +73,9 @@ void ModuleFileRepository::SaveInstallerResult(const std::string &path, const st
 
     std::string writeInfo = hmpName + ";" + std::to_string(result) + ";" +
         resultInfo + "|" + std::to_string(timer.duration().count()) + "\n";
+    if (CheckAndUpdateRevertResult(hmpName, writeInfo, "mount fail")) {
+        return;
+    }
     if (write(fd, writeInfo.data(), writeInfo.length()) <= 0) {
         LOG(WARNING) << "write result file failed, err:" << errno;
     }
