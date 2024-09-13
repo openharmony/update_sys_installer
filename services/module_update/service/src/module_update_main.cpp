@@ -325,10 +325,6 @@ void ModuleUpdateMain::ExitModuleUpdate()
 {
     LOG(INFO) << "ExitModuleUpdate";
     Stop();
-    LOG(INFO) << "Deleting " << UPDATE_INSTALL_DIR;
-    if (!ForceRemoveDirectory(UPDATE_INSTALL_DIR)) {
-        LOG(ERROR) << "Failed to remove " << UPDATE_INSTALL_DIR << " err=" << errno;
-    }
 }
 
 bool ModuleUpdateMain::GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo)
