@@ -46,6 +46,7 @@ bool CompareSaSdkVersion(const std::vector<std::string> &smallVersion, const std
 extern "C" {
 #endif
 int32_t VerifyModulePackageSign(const std::string &path);
+bool EnhancedVerifyModule(const uint8_t *addr, uint64_t size);
 #ifdef __cplusplus
 }
 #endif
@@ -104,11 +105,9 @@ public:
     static bool CompareVersion(const ModuleFile &newFile, const ModuleFile &oldFile);
     ModuleFile(const std::string &modulePath,
                const ModulePackageInfo &versionInfo,
-               const std::string &modulePubkey,
                const std::optional<ImageStat> &imageStat)
         : modulePath_(modulePath),
           versionInfo_(versionInfo),
-          modulePubkey_(modulePubkey),
           imageStat_(imageStat) {}
     virtual ~ModuleFile() = default;
     ModuleFile(const ModuleFile&) = default;
@@ -124,10 +123,6 @@ public:
     {
         return versionInfo_;
     }
-    const std::string &GetPublicKey() const
-    {
-        return modulePubkey_;
-    }
     const std::optional<ImageStat> &GetImageStat() const
     {
         return imageStat_;
@@ -136,7 +131,7 @@ public:
     {
         modulePath_ = path;
     }
-    bool VerifyModuleVerity(const std::string &publicKey);
+    bool VerifyModuleVerity();
     void ClearVerifiedData();
     HmpInstallType GetHmpPackageType(void) const;
 #ifdef SUPPORT_HVB
@@ -149,7 +144,6 @@ public:
 private:
     std::string modulePath_;
     ModulePackageInfo versionInfo_;
-    std::string modulePubkey_;
     std::optional<ImageStat> imageStat_;
 
 #ifdef SUPPORT_HVB
