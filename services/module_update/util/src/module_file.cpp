@@ -274,7 +274,7 @@ bool CompareSaListVersion(const std::list<SaInfo> &smallList, const std::list<Sa
             LOG(ERROR) << info.saId << "not found when compare saList";
             return false;
         }
-        if (!CompareSaVersion(saIter->second.version, info.version)) {
+        if (!CompareSaVersion(info.version, saIter->second.version)) {
             return false;
         }
     }
