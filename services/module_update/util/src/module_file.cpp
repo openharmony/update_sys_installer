@@ -15,15 +15,17 @@
 
 #include "module_file.h"
 
+#include <dlfcn.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <dlfcn.h>
+#include <unordered_set>
 
+#include "directory_ex.h"
+#include "module_utils.h"
 #include "json_node.h"
 #include "log/log.h"
 #include "module_constants.h"
-#include "module_utils.h"
 #include "module_zip_helper.h"
 #include "package/package.h"
 #include "scope_guard.h"
@@ -44,9 +46,6 @@ using namespace Updater;
 using std::string;
 
 namespace {
-constexpr const char *JSON_NODE_NAME = "name";
-constexpr const char *JSON_NODE_SAID = "id";
-constexpr const char *JSON_NODE_VERSION = "version";
 constexpr const char *VERSION_DELIMITER = ".";
 constexpr size_t API_VERSION_INDEX = 0;
 constexpr size_t VERSION_CODE_INDEX = 1;
@@ -79,26 +78,21 @@ const char *RetrieveFsType(int fd, uint32_t imageOffset)
     return nullptr;
 }
 
-bool ParseImageStat(ModuleZipHelper &helper, const string &path, ImageStat &imageStat)
+bool ParseImageStat(const string &path, ImageStat &imageStat)
 {
-    if (!helper.LocateFile(IMG_FILE_NAME)) {
-        LOG(ERROR) << "Could not find " << IMG_FILE_NAME << " in package " << path;
-        return false;
-    }
-    if (!helper.GetFileOffset(imageStat.imageOffset)) {
-        LOG(ERROR) << "Failed to get file offset from package " << path;
-        return false;
-    }
-    if (!helper.GetFileSize(imageStat.imageSize)) {
-        LOG(ERROR) << "Failed to get file size from package " << path;
-        return false;
-    }
-
     string realPath = GetRealPath(path);
-    if (realPath.empty()) {
+    if (realPath.empty() || !Utils::IsFileExist(realPath)) {
         LOG(ERROR) << "Invalid path " << path;
         return false;
     }
+    struct stat buffer;
+    if (stat(realPath.c_str(), &buffer) != 0) {
+        LOG(ERROR) << "stat file " << path << " failed.";
+        return false;
+    }
+    imageStat.imageOffset = 0;
+    imageStat.imageSize = static_cast<uint32_t>(buffer.st_size);
+
     UniqueFd fd(open(realPath.c_str(), O_RDONLY | O_CLOEXEC));
     if (fd.Get() == -1) {
         LOG(ERROR) << "Failed to open package " << path << ": I/O error";
@@ -117,41 +111,193 @@ bool ParseImageStat(ModuleZipHelper &helper, const string &path, ImageStat &imag
     return true;
 }
 
-bool ParseModuleInfo(const string &moduleInfo, string &saName, int32_t &saId, ModuleVersion &versionInfo)
+bool ParseHmpVersionInfo(const JsonNode &package, ModulePackageInfo &versionInfo)
 {
-    JsonNode root(moduleInfo);
-
-    std::optional<string> name = root[JSON_NODE_NAME].As<string>();
+    std::optional<string> name = package["name"].As<string>();
     if (!name.has_value()) {
-        LOG(ERROR) << "Failed to get name string";
+        LOG(ERROR) << "Hmpinfo: Failed to get name val";
         return false;
     }
-    saName = name.value();
+    std::optional<string> version = package["version"].As<string>();
+    if (!version.has_value()) {
+        LOG(ERROR) << "Hmpinfo: Failed to get version val";
+        return false;
+    }
+    std::optional<string> hotApply = package["hotApply"].As<string>();
+    if (!hotApply.has_value()) {
+        LOG(ERROR) << "Hmpinfo: Failed to get hotApply val";
+        return false;
+    }
+    versionInfo.hmpName = name.value();
+    versionInfo.version = version.value();
+    versionInfo.hotApply = Utils::String2Int<int>(hotApply.value(), Utils::N_DEC);
 
-    std::optional<int> optionalSaId = root[JSON_NODE_SAID].As<int>();
-    if (!optionalSaId.has_value()) {
-        LOG(ERROR) << "Failed to get saId";
+    if (versionInfo.type == HMP_APP_TYPE || versionInfo.type == HMP_MIX_TYPE) {
+        std::optional<string> apiVersion = package[HMP_API_VERSION].As<string>();
+        if (!apiVersion.has_value()) {
+            LOG(ERROR) << "Hmpinfo: Failed to get apiVersion val";
+            return false;
+        }
+        versionInfo.apiVersion = Utils::String2Int<int>(apiVersion.value(), Utils::N_DEC);
+    } else if (versionInfo.type == HMP_SA_TYPE ||
+               versionInfo.type == HMP_SA_TYPE_OLD ||
+               versionInfo.type == HMP_MIX_TYPE) {
+        std::optional<string> saSdkVersion = package[HMP_SA_SDK_VERSION].As<string>();
+        if (!saSdkVersion.has_value()) {
+            LOG(ERROR) << "Hmpinfo: Failed to get saSdkVersion val";
+            return false;
+        }
+    } else {
+        LOG(ERROR) << "Hmpinfo: Invalid type: " << versionInfo.type;
         return false;
     }
-    saId = static_cast<int32_t>(optionalSaId.value());
+    return true;
+}
 
-    std::optional<string> versionStr = root[JSON_NODE_VERSION].As<string>();
-    if (!versionStr.has_value()) {
-        LOG(ERROR) << "Failed to get version string";
-        return false;
-    }
+bool ParseSaVersion(const string &versionStr, SaInfo &info)
+{
     std::vector<string> versionVec;
-    SplitStr(versionStr.value(), VERSION_DELIMITER, versionVec);
+    SplitStr(versionStr, VERSION_DELIMITER, versionVec);
     if (versionVec.size() != VERSION_VECTOR_SIZE) {
-        LOG(ERROR) << "invalid version " << versionStr.value();
+        LOG(ERROR) << "SaVersion: Invalid version: " << versionStr;
         return false;
     }
-    versionInfo.apiVersion = static_cast<uint32_t>(std::stoi(versionVec.at(API_VERSION_INDEX)));
-    versionInfo.versionCode = static_cast<uint32_t>(std::stoi(versionVec.at(VERSION_CODE_INDEX)));
-    versionInfo.patchVersion = static_cast<uint32_t>(std::stoi(versionVec.at(PATCH_VERSION_INDEX)));
+    info.version.apiVersion = static_cast<uint32_t>(std::stoi(versionVec.at(API_VERSION_INDEX)));
+    info.version.versionCode = static_cast<uint32_t>(std::stoi(versionVec.at(VERSION_CODE_INDEX)));
+    info.version.patchVersion = static_cast<uint32_t>(std::stoi(versionVec.at(PATCH_VERSION_INDEX)));
+    return true;
+}
 
-    LOG(INFO) << "ParseModuleInfo success. name: " << saName << " saId: " << saId << " version: " <<
-        static_cast<string>(versionInfo);
+bool ParseSaList(const JsonNode &package, ModulePackageInfo &versionInfo)
+{
+    const auto &saListJson = package["saList"];
+    for (const auto &saInfo : saListJson) {
+        std::optional<string> saInfoStr = saInfo.get().As<string>();
+        if (!saInfoStr.has_value()) {
+            LOG(ERROR) << "SaList: Failed to get saInfoStr val";
+            return false;
+        }
+        std::vector<string> saInfoVec;
+        SplitStr(saInfoStr.value(), " ", saInfoVec);
+        if (saInfoVec.size() != 3) {  // 3: name id version
+            LOG(ERROR) << "SaList: Invalid saInfoStr: " << saInfoStr.value();
+            return false;
+        }
+        SaInfo &infoTmp = versionInfo.saInfoList.emplace_back();
+        infoTmp.saName = saInfoVec.at(0);  // 0:index of name
+        infoTmp.saId = static_cast<int32_t>(std::stoi(saInfoVec.at(1)));  // 1:index of saId
+        if (!ParseSaVersion(saInfoVec.at(2), infoTmp)) {  // 2:index of version
+            return false;
+        }
+    }
+    return true;
+}
+
+bool ParseBundleList(const JsonNode &package, ModulePackageInfo &versionInfo)
+{
+    const auto &bundleListJson = package["bundleList"];
+    for (const auto &bundleInfo : bundleListJson) {
+        const auto &bundleInfoStr = bundleInfo.get().Key();
+        if (!bundleInfoStr.has_value()) {
+            LOG(ERROR) << "BundleList: Failed to get bundleInfo val";
+            return false;
+        }
+        std::vector<string> bundleInfoVec;
+        SplitStr(bundleInfoStr.value(), " ", bundleInfoVec);
+        if (bundleInfoVec.size() != 2) {  // 2: name version
+            LOG(ERROR) << "BundleList: Invalid bundleInfoStr: " << bundleInfoStr.value();
+            return false;
+        }
+        BundleInfo &infoTmp = versionInfo.bundleInfoList.emplace_back();
+        infoTmp.bundleName = bundleInfoVec.at(0);  // 0:index of bundleName
+        infoTmp.bundleVersion = bundleInfoVec.at(1);  // 1:index of bundleVersion
+    }
+    return true;
+}
+
+bool ParseModuleInfo(const string &packInfo, ModulePackageInfo &versionInfo)
+{
+    JsonNode root(packInfo);
+    const JsonNode &type = root["type"];
+    std::optional<string> hmpType = type.As<string>();
+    if (!hmpType.has_value()) {
+        LOG(ERROR) << "HmpInfo: Failed to get type val";
+        return false;
+    }
+    versionInfo.type = hmpType.value();
+
+    const JsonNode &package = root["package"];
+    if (!ParseHmpVersionInfo(package, versionInfo)) {
+        return false;
+    }
+    // parse sa info
+    if (versionInfo.type == HMP_SA_TYPE || versionInfo.type == HMP_SA_TYPE_OLD ||
+        versionInfo.type == HMP_MIX_TYPE) {
+        if (!ParseSaList(package, versionInfo)) {
+            return false;
+        }
+    }
+    // parse bundle info
+    if (versionInfo.type == HMP_APP_TYPE || versionInfo.type == HMP_MIX_TYPE) {
+        if (!ParseBundleList(package, versionInfo)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// avp a= v>= p>=
+bool CompareSaVersion(const SaVersion &smaller, const SaVersion &bigger)
+{
+    if (smaller.apiVersion != bigger.apiVersion) {
+        return false;
+    }
+    if (smaller.versionCode > bigger.versionCode) {
+        return false;
+    }
+    return bigger.patchVersion >= smaller.patchVersion;
+}
+
+bool CompareSaListVersion(const std::list<SaInfo> &smallList, const std::list<SaInfo> &bigList)
+{
+    if (smallList.size() != bigList.size()) {
+        LOG(ERROR) << "smallList size: " << smallList.size() << " not equal to big: " << bigList.size();
+        return false;
+    }
+    std::unordered_map<int32_t, SaInfo> saMap {};
+    for (const auto &info : bigList) {
+        saMap.emplace(info.saId, info);
+    }
+    for (const auto &info : smallList) {
+        auto saIter = saMap.find(info.saId);
+        if (saIter == saMap.end()) {
+            LOG(ERROR) << info.saId << "not found when compare saList";
+            return false;
+        }
+        if (!CompareSaVersion(info.version, saIter->second.version)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool CompareBundleList(const std::list<BundleInfo> &smallList, const std::list<BundleInfo> &bigList)
+{
+    if (smallList.size() != bigList.size()) {
+        LOG(ERROR) << "Bundle smallList size: " << smallList.size() << " not equal to big: " << bigList.size();
+        return false;
+    }
+    std::unordered_set<std::string> bundleSet {};
+    for (const auto &info : bigList) {
+        bundleSet.insert(info.bundleName);
+    }
+    for (const auto &info : smallList) {
+        auto bundleIter = bundleSet.find(info.bundleName);
+        if (bundleIter == bundleSet.end()) {
+            LOG(ERROR) << info.bundleName << " not found when compare bundleList";
+            return false;
+        }
+    }
     return true;
 }
 } // namespace
@@ -169,8 +315,8 @@ bool ExtractZipFile(ModuleZipHelper &helper, const string &fileName, string &buf
     return true;
 }
 
-__attribute__((unused)) bool ComparePackInfoVer(const std::vector<std::string> &smallVersion,
-    const std::vector<std::string> &bigVersion)
+// MSFB M= S= F= B>
+bool CompareHmpVersion(const std::vector<string> &smallVersion, const std::vector<string> &bigVersion)
 {
     if (smallVersion.size() != PACKINFO_VERSION_VECTOR_SIZE || bigVersion.size() != PACKINFO_VERSION_VECTOR_SIZE) {
         LOG(ERROR) << "invalid smallVersion " << smallVersion.size() << " invalid bigVersion " << bigVersion.size();
@@ -181,21 +327,36 @@ __attribute__((unused)) bool ComparePackInfoVer(const std::vector<std::string> &
         return false;
     }
 
-    for (size_t i = 1; i < PACKINFO_VERSION_VECTOR_SIZE; i++) {
-        uint32_t smallVer = static_cast<uint32_t>(std::stoi(smallVersion.at(i)));
-        uint32_t bigVer = static_cast<uint32_t>(std::stoi(bigVersion.at(i)));
-        if (smallVer > bigVer) {
-            return false;
-        } else if (smallVer < bigVer) {
-            return true;
-        }
+    if (std::stoi(smallVersion.at(1)) == std::stoi(bigVersion.at(1)) &&  // 1:index of M
+        std::stoi(smallVersion.at(2)) == std::stoi(bigVersion.at(2)) &&  // 2:index of S
+        std::stoi(smallVersion.at(3)) == std::stoi(bigVersion.at(3)) &&  // 3:index of F
+        std::stoi(smallVersion.at(4)) < std::stoi(bigVersion.at(4))) {  // 4:index of B
+        return true;
     }
-    // same
-    return true;
+    return false;
 }
 
-__attribute__((unused)) bool ParseVersion(const std::string &version, const std::string &split,
-    std::vector<std::string> &versionVec)
+// MSFB M= S= F<=
+bool CompareSaSdkVersion(const std::vector<string> &smallVersion, const std::vector<string> &bigVersion)
+{
+    if (smallVersion.size() != PACKINFO_VERSION_VECTOR_SIZE || bigVersion.size() != PACKINFO_VERSION_VECTOR_SIZE) {
+        LOG(ERROR) << "invalid smallSaSdk " << smallVersion.size() << " ;invalid bigSaSdk " << bigVersion.size();
+        return false;
+    }
+    if (smallVersion[0] != bigVersion[0]) {
+        LOG(ERROR) << "pre " << smallVersion[0] << " not same as pkg " << bigVersion[0];
+        return false;
+    }
+
+    if (std::stoi(smallVersion.at(1)) == std::stoi(bigVersion.at(1)) &&  // 1:index of M
+        std::stoi(smallVersion.at(2)) == std::stoi(bigVersion.at(2)) &&  // 2:index of S
+        std::stoi(smallVersion.at(3)) >= std::stoi(bigVersion.at(3))) {  // 3:index of F
+        return true;
+    }
+    return false;
+}
+
+bool ParseVersion(const string &version, const string &split, std::vector<string> &versionVec)
 {
     size_t index = version.rfind(split);
     if (index == std::string::npos) {
@@ -229,24 +390,23 @@ std::unique_ptr<ModuleFile> ModuleFile::Open(const string &path)
     }
 
     string moduleInfo;
-    if (!ExtractZipFile(helper, CONFIG_FILE_NAME, moduleInfo)) {
-        LOG(ERROR) << "Failed to extract " << CONFIG_FILE_NAME << " from package " << path;
+    if (!ExtractZipFile(helper, PACK_INFO_NAME, moduleInfo)) {
+        LOG(ERROR) << "Failed to extract " << PACK_INFO_NAME << " from package " << path;
         return nullptr;
     }
-    string saName;
-    int32_t saId = 0;
-    ModuleVersion versionInfo;
-    if (!ParseModuleInfo(moduleInfo, saName, saId, versionInfo)) {
+    ModulePackageInfo versionInfo;
+    if (!ParseModuleInfo(moduleInfo, versionInfo)) {
         LOG(ERROR) << "Failed to parse version info of package " << path;
         return nullptr;
     }
 
     ImageStat tmpStat;
     std::optional<ImageStat> imageStat;
-    if (ParseImageStat(helper, path, tmpStat)) {
+    string imagePath = ExtractFilePath(path) + IMG_FILE_NAME;
+    if (ParseImageStat(imagePath, tmpStat)) {
         imageStat = std::move(tmpStat);
-    } else if (!StartsWith(path, MODULE_PREINSTALL_DIR)) {
-        LOG(ERROR) << "Update package without image " << path;
+    } else if (!StartsWith(imagePath, MODULE_PREINSTALL_DIR)) {
+        LOG(ERROR) << "Update package without image " << imagePath;
         return nullptr;
     }
 
@@ -262,20 +422,36 @@ std::unique_ptr<ModuleFile> ModuleFile::Open(const string &path)
     }
 #endif
 
-    return std::make_unique<ModuleFile>(path, saName, saId, versionInfo, modulePubkey, imageStat);
+    return std::make_unique<ModuleFile>(path, versionInfo, modulePubkey, imageStat);
 }
 
-bool ModuleFile::CompareVersion(const ModuleFile &file1, const ModuleFile &file2)
+bool ModuleFile::CompareVersion(const ModuleFile &newFile, const ModuleFile &oldFile)
 {
-    ModuleVersion version1 = file1.GetVersionInfo();
-    ModuleVersion version2 = file2.GetVersionInfo();
-    if (version1.apiVersion != version2.apiVersion) {
+    if (newFile.GetPath() == oldFile.GetPath()) {
+        return true;
+    }
+    std::vector<string> newVersion {};
+    std::vector<string> oldVersion {};
+    // version: xxx-d01 M.S.F.B
+    if (!ParseVersion(newFile.GetVersionInfo().version, " ", newVersion) ||
+        !ParseVersion(oldFile.GetVersionInfo().version, " ", oldVersion)) {
+        LOG(ERROR) << "when compare version, parse version failed.";
         return false;
     }
-    if (version1.versionCode != version2.versionCode) {
-        return version1.versionCode > version2.versionCode;
+
+    if (!CompareHmpVersion(oldVersion, newVersion)) {
+        LOG(ERROR) << "old hmp version is higher.";
+        return false;
     }
-    return version1.patchVersion >= version2.patchVersion;
+    if (!CompareSaListVersion(oldFile.GetVersionInfo().saInfoList, newFile.GetVersionInfo().saInfoList)) {
+        LOG(ERROR) << "old hmp sa version is higher.";
+        return false;
+    }
+    if (!CompareBundleList(oldFile.GetVersionInfo().bundleInfoList, newFile.GetVersionInfo().bundleInfoList)) {
+        LOG(ERROR) << "new hmp bundle list do not meet expectation.";
+        return false;
+    }
+    return true;
 }
 
 bool ModuleFile::VerifyModuleVerity(const string &publicKey)
@@ -294,7 +470,8 @@ bool ModuleFile::VerifyModuleVerity(const string &publicKey)
     ON_SCOPE_EXIT(clear) {
         ClearVerifiedData();
     };
-    enum hvb_errno ret = footer_init_desc(ModuleHvbGetOps(), GetPath().c_str(), nullptr, &pubkey, vd_);
+    string imagePath = ExtractFilePath(GetPath()) + IMG_FILE_NAME;
+    enum hvb_errno ret = footer_init_desc(ModuleHvbGetOps(), imagePath.c_str(), nullptr, &pubkey, vd_);
     if (ret != HVB_OK) {
         LOG(ERROR) << "hvb verify failed err=" << ret;
         return false;
@@ -316,6 +493,18 @@ void ModuleFile::ClearVerifiedData()
         vd_ = nullptr;
     }
 #endif
+}
+
+HmpInstallType ModuleFile::GetHmpPackageType(void) const
+{
+    LOG(INFO) << "Hmp type is " << versionInfo_.type;
+    if (versionInfo_.type == HMP_APP_TYPE) {
+        return COLD_APP_TYPE;
+    }
+    if (versionInfo_.type == HMP_MIX_TYPE) {
+        return COLD_MIX_TYPE;
+    }
+    return COLD_SA_TYPE;
 }
 } // namespace SysInstaller
 } // namespace OHOS

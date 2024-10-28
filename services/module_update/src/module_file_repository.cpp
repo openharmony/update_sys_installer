@@ -22,7 +22,6 @@
 #include "directory_ex.h"
 #include "log/log.h"
 #include "module_constants.h"
-#include "module_utils.h"
 #include "module_error_code.h"
 #include "scope_guard.h"
 #include "unique_fd.h"
@@ -37,22 +36,22 @@ ModuleFileRepository::~ModuleFileRepository()
     Clear();
 }
 
-void ModuleFileRepository::InitRepository(const int32_t saId)
+void ModuleFileRepository::InitRepository(const string &hmpName, const Timer &timer)
 {
     string allPath[] = {MODULE_PREINSTALL_DIR, UPDATE_INSTALL_DIR, UPDATE_ACTIVE_DIR};
-    std::unordered_map<std::string, ModuleFile> fileMap;
+    auto& fileMap = moduleFileMap_[hmpName];
     for (string &path : allPath) {
         std::vector<string> files;
-        GetDirFiles(path, files);
+        const string checkDir = path + "/" + hmpName;
+        GetDirFiles(checkDir, files);
         for (string &file : files) {
-            ProcessFile(saId, path, file, fileMap);
-            moduleFileMap_[saId] = fileMap;
+            ProcessFile(hmpName, path, file, fileMap, timer);
         }
     }
 }
 
 void ModuleFileRepository::SaveInstallerResult(const std::string &path, const std::string &hmpName,
-    int result, const std::string &resultInfo) const
+    int result, const std::string &resultInfo, const Timer &timer) const
 {
     if (path.find(UPDATE_INSTALL_DIR) == std::string::npos && path.find(UPDATE_ACTIVE_DIR) == std::string::npos) {
         return;
@@ -72,42 +71,43 @@ void ModuleFileRepository::SaveInstallerResult(const std::string &path, const st
         return;
     }
 
-    std::string writeInfo = hmpName + ";" + std::to_string(result) + ";" + resultInfo + "\n";
+    std::string writeInfo = hmpName + ";" + std::to_string(result) + ";" +
+        resultInfo + "|" + std::to_string(timer.duration().count()) + "\n";
+    if (CheckAndUpdateRevertResult(hmpName, writeInfo, "mount fail")) {
+        return;
+    }
     if (write(fd, writeInfo.data(), writeInfo.length()) <= 0) {
         LOG(WARNING) << "write result file failed, err:" << errno;
     }
     fsync(fd.Get());
 }
 
-void ModuleFileRepository::ProcessFile(const int32_t saId, const string &path,
-    const string &file, std::unordered_map<std::string, ModuleFile> &fileMap) const
+void ModuleFileRepository::ProcessFile(const string &hmpName, const string &path, const string &file,
+    std::unordered_map<std::string, ModuleFile> &fileMap, const Timer &timer) const
 {
     if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
         return;
     }
     std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
-    if (moduleFile == nullptr || moduleFile->GetSaId() != saId) {
+    if (moduleFile == nullptr || moduleFile->GetVersionInfo().hmpName != hmpName) {
         return;
     }
     string pubkey = moduleFile->GetPublicKey();
     if (path != MODULE_PREINSTALL_DIR) {
-        pubkey = GetPublicKey(moduleFile->GetSaId());
+        pubkey = GetPublicKey(hmpName);
         if (!CheckFilePath(*moduleFile, path)) {
             LOG(ERROR) << "Open " << file << " failed";
-            SaveInstallerResult(path, GetHmpName(moduleFile->GetPath()),
-                ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "get pub key fail");
+            SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "get pub key fail", timer);
             return;
         }
         if (VerifyModulePackageSign(file) != 0) {
             LOG(ERROR) << "VerifyModulePackageSign failed of " << file;
-            SaveInstallerResult(path, GetHmpName(moduleFile->GetPath()),
-                ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "verify fail");
+            SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "verify fail", timer);
             return;
         }
     }
     if (moduleFile->GetImageStat().has_value() && !moduleFile->VerifyModuleVerity(pubkey)) {
-        SaveInstallerResult(path, GetHmpName(moduleFile->GetPath()),
-            ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "hvb fail");
+        SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "hvb fail", timer);
         LOG(ERROR) << "verify verity failed of " << file;
         return;
     }
@@ -115,17 +115,18 @@ void ModuleFileRepository::ProcessFile(const int32_t saId, const string &path,
     fileMap.insert(std::make_pair(path, std::move(*moduleFile)));
 }
 
-std::unique_ptr<ModuleFile> ModuleFileRepository::GetModuleFile(const std::string &pathPrefix, const int32_t saId) const
+std::unique_ptr<ModuleFile> ModuleFileRepository::GetModuleFile(const std::string &pathPrefix,
+    const string &hmpName) const
 {
-    auto mapIter = moduleFileMap_.find(saId);
+    auto mapIter = moduleFileMap_.find(hmpName);
     if (mapIter == moduleFileMap_.end()) {
-        LOG(ERROR) << "Invalid path saId= " << saId;
+        LOG(ERROR) << "Invalid path hmpName= " << hmpName;
         return nullptr;
     }
     std::unordered_map<std::string, ModuleFile> fileMap = mapIter->second;
     auto fileIter = fileMap.find(pathPrefix);
     if (fileIter == fileMap.end()) {
-        LOG(INFO) << saId << " not found in " << pathPrefix;
+        LOG(INFO) << hmpName << " not found in " << pathPrefix;
         return nullptr;
     }
     ModuleFile file = fileIter->second;
@@ -134,16 +135,17 @@ std::unique_ptr<ModuleFile> ModuleFileRepository::GetModuleFile(const std::strin
 
 bool ModuleFileRepository::IsPreInstalledModule(const ModuleFile &moduleFile) const
 {
-    std::unique_ptr<ModuleFile> preInstalledModule = GetModuleFile(MODULE_PREINSTALL_DIR, moduleFile.GetSaId());
+    std::unique_ptr<ModuleFile> preInstalledModule = GetModuleFile(MODULE_PREINSTALL_DIR,
+        moduleFile.GetVersionInfo().hmpName);
     if (preInstalledModule == nullptr) {
         return false;
     }
     return preInstalledModule->GetPath() == moduleFile.GetPath();
 }
 
-string ModuleFileRepository::GetPublicKey(const int32_t saId) const
+string ModuleFileRepository::GetPublicKey(const string &hmpName) const
 {
-    std::unique_ptr<ModuleFile> preInstalledModule = GetModuleFile(MODULE_PREINSTALL_DIR, saId);
+    std::unique_ptr<ModuleFile> preInstalledModule = GetModuleFile(MODULE_PREINSTALL_DIR, hmpName);
     if (preInstalledModule == nullptr) {
         return "";
     }
@@ -152,7 +154,8 @@ string ModuleFileRepository::GetPublicKey(const int32_t saId) const
 
 bool ModuleFileRepository::CheckFilePath(const ModuleFile &moduleFile, const string &prefix) const
 {
-    std::unique_ptr<ModuleFile> preInstalledModule = GetModuleFile(MODULE_PREINSTALL_DIR, moduleFile.GetSaId());
+    std::unique_ptr<ModuleFile> preInstalledModule = GetModuleFile(MODULE_PREINSTALL_DIR,
+        moduleFile.GetVersionInfo().hmpName);
     if (preInstalledModule == nullptr) {
         return false;
     }

@@ -18,7 +18,9 @@
 #include <cerrno>
 #include <fcntl.h>
 
+#include "directory_ex.h"
 #include "log/log.h"
+#include "module_constants.h"
 #include "module_file.h"
 #include "module_utils.h"
 #include "unique_fd.h"
@@ -35,13 +37,14 @@ using namespace Updater;
 static bool ParseReadParam(const std::string &path, const int64_t offset, const uint64_t numBytes, off_t &outOffset,
     size_t &outCount)
 {
-    std::unique_ptr<ModuleFile> file = ModuleFile::Open(path);
+    std::string modulePath = OHOS::ExtractFilePath(path) + HMP_INFO_NAME;
+    std::unique_ptr<ModuleFile> file = ModuleFile::Open(modulePath);
     if (file == nullptr) {
-        LOG(ERROR) << "failed to parse file " << path;
+        LOG(ERROR) << "failed to parse file " << modulePath;
         return false;
     }
     if (!file->GetImageStat().has_value()) {
-        LOG(ERROR) << path << " has no image";
+        LOG(ERROR) << modulePath << " has no image";
         return false;
     }
     int64_t imageOffset = static_cast<int64_t>(file->GetImageStat().value().imageOffset);

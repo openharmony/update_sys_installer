@@ -22,6 +22,7 @@
 #include "iservice_registry.h"
 #include "isys_installer_callback.h"
 #include "module_ipc_helper.h"
+#include "module_utils.h"
 #include "singleton.h"
 
 namespace OHOS {
@@ -29,7 +30,7 @@ namespace SysInstaller {
 class ModuleUpdateMain final : public Singleton<ModuleUpdateMain> {
     DECLARE_SINGLETON(ModuleUpdateMain);
 public:
-    void DoHotInstall(ModuleUpdateStatus &status);
+    bool DoHotInstall(ModuleUpdateStatus &status);
     int32_t CheckHmpName(const std::string &hmpName);
     int32_t UninstallModulePackage(const std::string &hmpName);
     int32_t GetModulePackageInfo(const std::string &hmpName,
@@ -37,21 +38,28 @@ public:
     int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status);
     std::vector<HmpVersionInfo> GetHmpVersionInfo();
     void ExitModuleUpdate();
-    int32_t InstallModuleFile(const std::string &hmpName, const std::string &file) const;
+    int32_t InstallModuleFile(const std::string &hmpName, const std::string &file, ModuleUpdateStatus &status) const;
     void CollectModulePackageInfo(const std::string &hmpName, std::list<ModulePackageInfo> &modulePackageInfos) const;
-    bool BackupActiveModules() const;
+    bool BackupActiveModules(const std::string &hmpName) const;
     bool GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo);
-    void SaveInstallerResult(const std::string &hmpPath, int result, const std::string &resultInfo);
+    void SaveInstallerResult(const std::string &hmpPath, int result,
+        const std::string &resultInfo, const Timer &timer);
     int32_t ReallyInstallModulePackage(const std::string &pkgPath, const sptr<ISysInstallerCallback> &updateCallback);
     void ParseHmpVersionInfo(std::vector<HmpVersionInfo> &versionInfos, const HmpVersionInfo &preInfo,
         const HmpVersionInfo &actInfo);
+
+    bool HotAppInstall(ModuleUpdateStatus &status);
+    void HotSaInstall(ModuleUpdateStatus &status);
+    void HotAppInstallWhenUpdateFail(ModuleUpdateStatus &status);
+    void FirstRevertInstallHotApp(ModuleUpdateStatus &status);
+    void SecondRevertInstallHotApp(ModuleUpdateStatus &status);
 
     void ScanPreInstalledHmp();
     void Start();
     void Stop();
 
 private:
-    void BuildSaIdHmpMap(std::unordered_map<int32_t, std::string> &saIdHmpMap);
+    int32_t ValidateVersion(ModuleFile &installFile, const std::string &hmpName) const;
     sptr<ISystemAbilityManager> &GetSystemAbilityManager();
 
     sptr<ISystemAbilityManager> samgr_ = nullptr;

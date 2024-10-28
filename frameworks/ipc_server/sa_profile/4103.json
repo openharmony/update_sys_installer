@@ -12,6 +12,10 @@
                     {
                         "name":"persist.samgr.moduleupdate.start",
                         "value":"true"
+                    },
+                    {
+                        "name":"persist.moduleupdate.bms.scan",
+                        "value":"revert"
                     }
                 ]
             },

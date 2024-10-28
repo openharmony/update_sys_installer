@@ -15,16 +15,18 @@
 
 #include "module_update_main.h"
 
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <thread>
+#include <unistd.h>
 
 #include "directory_ex.h"
+#include "module_utils.h"
 #include "hisysevent_manager.h"
 #include "json_node.h"
 #include "log/log.h"
 #include "module_update_service.h"
-#include "module_utils.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
 #include "module_constants.h"
@@ -38,7 +40,6 @@
 #include "utils.h"
 #include "unique_fd.h"
 
-#include <unistd.h>
 #ifdef WITH_SELINUX
 #include <policycoreutils.h>
 #endif // WITH_SELINUX
@@ -68,11 +69,6 @@ int32_t CreateModuleDirs(const std::string &hmpName)
     std::string hmpInstallDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
     if (!CreateDirIfNeeded(hmpInstallDir, DIR_MODE)) {
         LOG(ERROR) << "Failed to create hmp install dir " << hmpInstallDir;
-        return ModuleErrorCode::ERR_INSTALL_FAIL;
-    }
-    std::string hmpActiveDir = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
-    if (!CreateDirIfNeeded(hmpActiveDir, DIR_MODE)) {
-        LOG(ERROR) << "Failed to create hmp active dir " << hmpActiveDir;
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
@@ -118,17 +114,100 @@ ModuleUpdateMain::ModuleUpdateMain()
 
 ModuleUpdateMain::~ModuleUpdateMain() = default;
 
-void ModuleUpdateMain::DoHotInstall(ModuleUpdateStatus &status)
+bool ModuleUpdateMain::DoHotInstall(ModuleUpdateStatus &status)
 {
     if (!status.isHotInstall) {
-        return;
+        if (status.type == COLD_APP_TYPE || status.type == COLD_MIX_TYPE) {
+            SetParameter(BMS_START_INSTALL, BMS_UPDATE);
+        }
+        return true;
     }
+    LOG(INFO) << "DoHotInstall, hmpName=" << status.hmpName << " ;type=" << status.type;
+    if (status.type == HOT_APP_TYPE) {
+        return HotAppInstall(status);
+    } else if (status.type == HOT_SA_TYPE) {
+        HotSaInstall(status);
+    }
+    return true;
+}
+
+void ModuleUpdateMain::HotSaInstall(ModuleUpdateStatus &status)
+{
     if (!ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
-        LOG(ERROR) << "DoHotInstall fail, hmpName=" << status.hmpName;
+        LOG(ERROR) << "HotSaInstall fail, hmpName=" << status.hmpName;
         return;
     }
-    ClearModuleDirs(status.hmpName);
-    LOG(INFO) << "DoHotInstall success, hmpName=" << status.hmpName;
+    RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName);
+}
+
+bool ModuleUpdateMain::HotAppInstall(ModuleUpdateStatus &status)
+{
+    ON_SCOPE_EXIT(rmdir) {
+        RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName);
+    };
+    if (!ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
+        LOG(ERROR) << "HotAppInstall fail, hmpName=" << status.hmpName;
+        HotAppInstallWhenUpdateFail(status);
+        return false;
+    }
+    std::string hmpPath = std::string(MODULE_ROOT_DIR) + "/" + status.hmpName;
+    if (InstallHmpBundle(hmpPath, false)) {
+        LOG(INFO) << "HotAppInstall, install app succ; hmpName=" << status.hmpName;
+        return true;
+    }
+    // remove mountPoint and redo ModuleUpdate; even remove fail, still revert.
+    (void)ModuleUpdate::GetInstance().RemoveMountPoint(status.hmpName);
+    Revert(status.hmpName, false);
+    FirstRevertInstallHotApp(status);
+    return false;
+}
+
+void ModuleUpdateMain::HotAppInstallWhenUpdateFail(ModuleUpdateStatus &status)
+{
+    std::string hmpPath = std::string(MODULE_ROOT_DIR) + "/" + status.hmpName;
+    // if /module_update/hmp exist, do not revert
+    if (CheckPathExists(hmpPath)) {
+        LOG(ERROR) << "Current module img is the same with last, don't revert; hmpName:" << status.hmpName;
+        return;
+    }
+    FirstRevertInstallHotApp(status);
+}
+
+void ModuleUpdateMain::FirstRevertInstallHotApp(ModuleUpdateStatus &status)
+{
+    LOG(WARNING) << "First revert hot app, hmpName=" << status.hmpName;
+    std::string activeHmpPath = std::string(UPDATE_ACTIVE_DIR) + "/" + status.hmpName;
+    std::string hmpPath = std::string(MODULE_ROOT_DIR) + "/" + status.hmpName;
+    if (!ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
+        LOG(ERROR) << "First revert fail, hmpName=" << status.hmpName;
+        SecondRevertInstallHotApp(status);
+        return;
+    }
+    if (InstallHmpBundle(hmpPath, true)) {
+        LOG(INFO) << "After first revert, install app succ; hmpName=" << status.hmpName;
+        return;
+    }
+    SecondRevertInstallHotApp(status);
+}
+
+void ModuleUpdateMain::SecondRevertInstallHotApp(ModuleUpdateStatus &status)
+{
+    LOG(WARNING) << "Second revert hot app, hmpName=" << status.hmpName;
+    std::string activeHmpPath = std::string(UPDATE_ACTIVE_DIR) + "/" + status.hmpName;
+    std::string hmpPath = std::string(MODULE_ROOT_DIR) + "/" + status.hmpName;
+    if (!CheckPathExists(activeHmpPath) && CheckPathExists(hmpPath)) {
+        LOG(WARNING) << "current IMG is preinstall, force to install; hmpName:" << status.hmpName;
+        (void)InstallHmpBundle(hmpPath, true);
+        return;
+    }
+    (void)ModuleUpdate::GetInstance().RemoveMountPoint(status.hmpName);
+    Revert(status.hmpName, false);
+    (void)ModuleUpdate::GetInstance().DoModuleUpdate(status);
+    if (!CheckPathExists(hmpPath)) {
+        LOG(ERROR) << "HotApp, Second Revert hmpName: " << status.hmpName <<  " fail.";
+        return;
+    }
+    (void)InstallHmpBundle(hmpPath, true);
 }
 
 int32_t ModuleUpdateMain::CheckHmpName(const std::string &hmpName)
@@ -143,7 +222,7 @@ int32_t ModuleUpdateMain::CheckHmpName(const std::string &hmpName)
     }
     int32_t ret = CreateModuleDirs(hmpName);
     if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
-        ClearModuleDirs(hmpName);
+        RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + hmpName);
         return ret;
     }
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
@@ -157,10 +236,10 @@ int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
     if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
         return ret;
     }
-    ON_SCOPE_EXIT(rmdir) {
-        ClearModuleDirs(hmpName);
-    };
     std::string hmpDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
+    ON_SCOPE_EXIT(rmdir) {
+        RemoveSpecifiedDir(hmpDir);
+    };
     std::string outPath = hmpDir + "/";
     ret = ExtraPackageDir(pkgPath.c_str(), nullptr, nullptr, outPath.c_str());
     if (ret != 0) {
@@ -169,9 +248,12 @@ int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
     }
     std::vector<std::string> files;
     GetDirFiles(hmpDir, files);
+    // for check hot hmp
+    ModuleUpdateStatus status;
+    status.hmpName = hmpName;
     int index = 1;
     for (auto &file : files) {
-        ret = InstallModuleFile(hmpName, file);
+        ret = InstallModuleFile(hmpName, file, status);
         if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
             return ret;
         }
@@ -181,20 +263,61 @@ int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
         }
         index++;
     }
-    if (!BackupActiveModules()) {
-        LOG(ERROR) << "Failed to backup active modules";
+    if (!BackupActiveModules(hmpName)) {
+        LOG(ERROR) << "Failed to backup active hmp: " << hmpName;
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
     CANCEL_SCOPE_EXIT_GUARD(rmdir);
-    ModuleUpdateStatus status;
-    status.hmpName = hmpName;
-    status.isHotInstall = IsHotHmpPackage(hmpName);
-    DoHotInstall(status);
+
+    // create avtive hmp dir finally, avoid to be backup.
+    std::string hmpActiveDir = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
+    if (!CreateDirIfNeeded(hmpActiveDir, DIR_MODE)) {
+        LOG(ERROR) << "Failed to create hmp active dir " << hmpActiveDir;
+        return ModuleErrorCode::ERR_INSTALL_FAIL;
+    }
+    if (!DoHotInstall(status)) {
+        sync();
+        return ModuleErrorCode::ERR_INSTALL_FAIL;
+    }
     sync();
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
 }
 
-int32_t ModuleUpdateMain::InstallModuleFile(const std::string &hmpName, const std::string &file) const
+int32_t ModuleUpdateMain::ValidateVersion(ModuleFile &installFile, const std::string &hmpName) const
+{
+    std::string preInstalledPath = std::string(MODULE_PREINSTALL_DIR) + "/" + hmpName + "/" + HMP_INFO_NAME;
+    std::unique_ptr<ModuleFile> preInstalledFile = ModuleFile::Open(preInstalledPath);
+    if (preInstalledFile == nullptr) {
+        LOG(ERROR) << "Invalid preinstalled file " << preInstalledPath;
+        return ModuleErrorCode::ERR_INSTALL_FAIL;
+    }
+    if (!ModuleFile::CompareVersion(installFile, *preInstalledFile)) {
+        LOG(ERROR) << "Installed version is lower than preInstall.";
+        return ModuleErrorCode::ERR_LOWER_VERSION;
+    }
+    if (!installFile.VerifyModuleVerity(preInstalledFile->GetPublicKey())) {
+        LOG(ERROR) << "Failed to verify install img: " << hmpName;
+        return ModuleErrorCode::ERR_VERIFY_SIGN_FAIL;
+    }
+
+    std::string activePath = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName + "/" + HMP_INFO_NAME;
+    if (!Utils::IsFileExist(activePath)) {
+        return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
+    }
+    std::unique_ptr<ModuleFile> activeFile = ModuleFile::Open(activePath);
+    if (activeFile == nullptr) {
+        LOG(WARNING) << "Invalid active file " << activePath;
+        return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
+    }
+    if (!ModuleFile::CompareVersion(installFile, *activeFile)) {
+        LOG(ERROR) << "Installed version is lower than active.";
+        return ModuleErrorCode::ERR_LOWER_VERSION;
+    }
+    return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
+}
+
+int32_t ModuleUpdateMain::InstallModuleFile(const std::string &hmpName, const std::string &file,
+    ModuleUpdateStatus &status) const
 {
     if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
         return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
@@ -203,6 +326,12 @@ int32_t ModuleUpdateMain::InstallModuleFile(const std::string &hmpName, const st
     if (fileName.empty()) {
         return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
     }
+    // verify first, then open module file.
+    if (VerifyModulePackageSign(file) != 0) {
+        LOG(ERROR) << "Verify sign failed " << file;
+        return ModuleErrorCode::ERR_VERIFY_SIGN_FAIL;
+    }
+
     std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
     if (moduleFile == nullptr) {
         LOG(ERROR) << "Wrong module file " << file << " in hmp package " << hmpName;
@@ -212,35 +341,11 @@ int32_t ModuleUpdateMain::InstallModuleFile(const std::string &hmpName, const st
         LOG(ERROR) << "Could not install empty module package " << file;
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
-    if (saIdHmpMap_.find(moduleFile->GetSaId()) == saIdHmpMap_.end()) {
-        LOG(ERROR) << "Could not update module file " << file << " without preInstalled";
+    if (ValidateVersion(*moduleFile, hmpName) != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
-    std::string preInstalledHmp = saIdHmpMap_.at(moduleFile->GetSaId());
-    if (preInstalledHmp != hmpName) {
-        LOG(ERROR) << "Module file " << file << " should be in hmp " << preInstalledHmp;
-        return ModuleErrorCode::ERR_INSTALL_FAIL;
-    }
-    if (VerifyModulePackageSign(file) != 0) {
-        LOG(ERROR) << "Verify sign failed " << file;
-        return ModuleErrorCode::ERR_VERIFY_SIGN_FAIL;
-    }
-
-    std::string preInstalledPath = std::string(MODULE_PREINSTALL_DIR) + "/" + hmpName + "/" + fileName
-        + MODULE_PACKAGE_SUFFIX;
-    std::unique_ptr<ModuleFile> preInstalledFile = ModuleFile::Open(preInstalledPath);
-    if (preInstalledFile == nullptr) {
-        LOG(ERROR) << "Invalid preinstalled file " << preInstalledPath;
-        return ModuleErrorCode::ERR_INSTALL_FAIL;
-    }
-    if (!ModuleFile::CompareVersion(*moduleFile, *preInstalledFile)) {
-        LOG(ERROR) << "Installed lower version of " << file;
-        return ModuleErrorCode::ERR_LOWER_VERSION;
-    }
-    if (!moduleFile->VerifyModuleVerity(preInstalledFile->GetPublicKey())) {
-        LOG(ERROR) << "Failed to verify module verity " << file;
-        return ModuleErrorCode::ERR_VERIFY_SIGN_FAIL;
-    }
+    status.type = moduleFile->GetHmpPackageType();
+    status.isHotInstall = IsHotHmpPackage(static_cast<int32_t>(status.type));
     moduleFile->ClearVerifiedData();
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
 }
@@ -302,44 +407,39 @@ void ModuleUpdateMain::CollectModulePackageInfo(const std::string &hmpName,
     std::vector<std::string> files;
     GetDirFiles(installHmpPath, files);
     GetDirFiles(activeHmpPath, files);
-    ModulePackageInfo info;
-    info.hmpName = hmpName;
     for (auto &file : files) {
         if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
             continue;
         }
         std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
         if (moduleFile == nullptr) {
-            continue;
+            return;
         }
-        SaInfo saInfo;
-        saInfo.saName = moduleFile->GetSaName();
-        saInfo.saId = moduleFile->GetSaId();
-        saInfo.version = moduleFile->GetVersionInfo();
-        info.saInfoList.emplace_back(std::move(saInfo));
+        modulePackageInfos.emplace_back(std::move(moduleFile->GetVersionInfo()));
     }
-    modulePackageInfos.emplace_back(std::move(info));
 }
 
 void ModuleUpdateMain::ExitModuleUpdate()
 {
     LOG(INFO) << "ExitModuleUpdate";
     Stop();
-    LOG(INFO) << "Deleting " << UPDATE_INSTALL_DIR;
-    if (!ForceRemoveDirectory(UPDATE_INSTALL_DIR)) {
-        LOG(ERROR) << "Failed to remove " << UPDATE_INSTALL_DIR << " err=" << errno;
-    }
 }
 
 bool ModuleUpdateMain::GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo)
 {
     LOG(INFO) << "GetHmpVersion " << hmpPath;
-    std::string packInfoPath = hmpPath + "/" + PACK_INFO_NAME;
-    if (VerifyModulePackageSign(packInfoPath) != 0) {
+    std::string packInfoPath = hmpPath + "/" + HMP_INFO_NAME;
+    if (!Utils::IsFileExist(packInfoPath)) {
+        LOG(ERROR) << "pack.info is not exist: " << packInfoPath;
+        return false;
+    }
+    if (!StartsWith(packInfoPath, MODULE_PREINSTALL_DIR) &&
+        VerifyModulePackageSign(packInfoPath) != 0) {
         LOG(ERROR) << "Verify sign failed " << packInfoPath;
         return false;
     }
-    JsonNode root(std::filesystem::path { packInfoPath });
+    std::string packInfo = GetContentFromZip(packInfoPath, PACK_INFO_NAME);
+    JsonNode root(packInfo);
     const JsonNode &package = root["package"];
     std::optional<std::string> name = package["name"].As<std::string>();
     if (!name.has_value()) {
@@ -388,13 +488,19 @@ void ModuleUpdateMain::ParseHmpVersionInfo(std::vector<HmpVersionInfo> &versionI
     }
     std::vector<std::string> preVersion {};
     std::vector<std::string> actVersion {};
-    // version: xxx-d01 4.5.10.100
-    if (!ParseVersion(preInfo.version, " ", preVersion) || !ParseVersion(actInfo.version, " ", actVersion)) {
-        LOG(ERROR) << "ParseVersion failed";
+    // version: xxx-d01 M.S.F.B
+    if (!ParseVersion(preInfo.version, " ", preVersion)) {
+        LOG(ERROR) << "Parse preVersion failed.";
         return;
     }
 
-    if (ComparePackInfoVer(preVersion, actVersion)) {
+    if (!ParseVersion(actInfo.version, " ", actVersion)) {
+        LOG(WARNING) << "Parse actVersion failed.";
+        versionInfos.emplace_back(preInfo);
+        return;
+    }
+
+    if (CompareHmpVersion(preVersion, actVersion)) {
         LOG(INFO) << "add active info";
         versionInfos.emplace_back(actInfo);
     } else {
@@ -421,7 +527,8 @@ std::vector<HmpVersionInfo> ModuleUpdateMain::GetHmpVersionInfo()
     return versionInfos;
 }
 
-void ModuleUpdateMain::SaveInstallerResult(const std::string &hmpPath, int result, const std::string &resultInfo)
+void ModuleUpdateMain::SaveInstallerResult(const std::string &hmpPath, int result,
+    const std::string &resultInfo, const Timer &timer)
 {
     LOG(INFO) << "hmpPath:" << hmpPath << " result:" << result << " resultInfo:" << resultInfo;
     UniqueFd fd(open(MODULE_RESULT_PATH, O_APPEND | O_RDWR | O_CREAT | O_CLOEXEC));
@@ -433,34 +540,40 @@ void ModuleUpdateMain::SaveInstallerResult(const std::string &hmpPath, int resul
     if (chmod(MODULE_RESULT_PATH, mode) != 0) {
         LOG(ERROR) << "Could not chmod " << MODULE_RESULT_PATH;
     }
-    std::string writeInfo = hmpPath + ";" + std::to_string(result) + ";" + resultInfo + "\n";
+    std::string writeInfo = hmpPath + ";" + std::to_string(result) + ";" +
+        resultInfo + "|" + std::to_string(timer.duration().count()) + "\n";
+    if (CheckAndUpdateRevertResult(hmpPath, writeInfo, "revert")) {
+        return;
+    }
     if (write(fd, writeInfo.data(), writeInfo.length()) <= 0) {
         LOG(WARNING) << "write result file failed, err:" << errno;
     }
     fsync(fd.Get());
 }
 
-bool ModuleUpdateMain::BackupActiveModules() const
+bool ModuleUpdateMain::BackupActiveModules(const std::string &hmpName) const
 {
-    if (!CheckPathExists(UPDATE_ACTIVE_DIR)) {
-        LOG(INFO) << "Nothing to backup";
+    std::string activePath = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
+    if (!CheckPathExists(activePath)) {
+        LOG(INFO) << "Nothing to backup, path: " << activePath;
         return true;
     }
-    if (CheckPathExists(UPDATE_BACKUP_DIR)) {
-        if (!ForceRemoveDirectory(UPDATE_BACKUP_DIR)) {
-            LOG(ERROR) << "Failed to remove backup dir";
+    std::string backupPath = std::string(UPDATE_BACKUP_DIR) + "/" + hmpName;
+    if (CheckPathExists(backupPath)) {
+        if (!ForceRemoveDirectory(backupPath)) {
+            LOG(ERROR) << "Failed to remove backup dir:" << backupPath;
             return false;
         }
     }
-    if (!CreateDirIfNeeded(UPDATE_BACKUP_DIR, DIR_MODE)) {
-        LOG(ERROR) << "Failed to create backup dir";
+    if (!CreateDirIfNeeded(backupPath, DIR_MODE)) {
+        LOG(ERROR) << "Failed to create backup dir:" << backupPath;
         return false;
     }
 
     std::vector<std::string> activeFiles;
-    GetDirFiles(UPDATE_ACTIVE_DIR, activeFiles);
+    GetDirFiles(activePath, activeFiles);
     ON_SCOPE_EXIT(rmdir) {
-        if (!ForceRemoveDirectory(UPDATE_BACKUP_DIR)) {
+        if (!ForceRemoveDirectory(backupPath)) {
             LOG(WARNING) << "Failed to remove backup dir when backup failed";
         }
     };
@@ -492,7 +605,9 @@ void ModuleUpdateMain::ScanPreInstalledHmp()
         }
         std::unique_lock<std::mutex> locker(mlock_);
         hmpSet_.emplace(hmpName);
-        saIdHmpMap_.emplace(moduleFile->GetSaId(), hmpName);
+        for (const auto &saInfo : moduleFile->GetVersionInfo().saInfoList) {
+            saIdHmpMap_.emplace(saInfo.saId, hmpName);
+        }
     }
 }
 
@@ -516,34 +631,12 @@ sptr<ISystemAbilityManager> &ModuleUpdateMain::GetSystemAbilityManager()
     return samgr_;
 }
 
-void ModuleUpdateMain::BuildSaIdHmpMap(std::unordered_map<int32_t, std::string> &saIdHmpMap)
-{
-    std::vector<std::string> files;
-    GetDirFiles(MODULE_PREINSTALL_DIR, files);
-    for (auto &file : files) {
-        if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
-            continue;
-        }
-        std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
-        if (moduleFile == nullptr) {
-            continue;
-        }
-        std::string hmpName = GetHmpName(file);
-        if (hmpName.empty()) {
-            continue;
-        }
-        saIdHmpMap.emplace(moduleFile->GetSaId(), hmpName);
-    }
-}
-
 void ModuleUpdateMain::Start()
 {
     LOG(INFO) << "ModuleUpdateMain Start";
-    std::unordered_map<int32_t, std::string> saIdHmpMap;
-    BuildSaIdHmpMap(saIdHmpMap);
     ModuleUpdateQueue queue;
-    ModuleUpdateProducer producer(queue, saIdHmpMap, g_exit);
-    ModuleUpdateConsumer consumer(queue, saIdHmpMap, g_exit);
+    ModuleUpdateProducer producer(queue, saIdHmpMap_, hmpSet_, g_exit);
+    ModuleUpdateConsumer consumer(queue, saIdHmpMap_, g_exit);
     std::thread produceThread([&producer] {
         producer.Run();
         });
