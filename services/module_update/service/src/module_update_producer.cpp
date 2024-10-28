@@ -28,16 +28,19 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 namespace {
-static const std::vector<std::string> saStatusVec {UNLOAD, LOAD_FAIL, CRASH};
+static const std::vector<std::string> SA_STATUS_VEC {UNLOAD, LOAD_FAIL, CRASH};
 constexpr int32_t PARAM_VALUE_SIZE = 10;
 constexpr const char *BOOT_COMPLETE_PARAM = "bootevent.boot.completed";
 constexpr const char *BOOT_SUCCESS_VALUE = "true";
 }
 
 ModuleUpdateProducer::ModuleUpdateProducer(ModuleUpdateQueue &queue,
-    std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit)
+    std::unordered_map<int32_t, std::string> &saIdHmpMap,
+    std::unordered_set<std::string> &hmpSet,
+    volatile sig_atomic_t &exit)
     : queue_(queue),
       saIdHmpMap_(saIdHmpMap),
+      hmpNameSet_(hmpSet),
       exit_(exit) {}
 
 void ModuleUpdateProducer::AddAbnormalSa()
@@ -51,7 +54,7 @@ void ModuleUpdateProducer::AddAbnormalSa()
             LOG(ERROR) << "failed to get parameter " << attr;
             continue;
         }
-        if (find(saStatusVec.begin(), saStatusVec.end(), saStatus) != saStatusVec.end()) {
+        if (find(SA_STATUS_VEC.begin(), SA_STATUS_VEC.end(), saStatus) != SA_STATUS_VEC.end()) {
             LOG(INFO) << "add abnormal sa=" << saId << "; status=" << saStatus;
             std::pair<int32_t, std::string> saStatusPair = std::make_pair(saId, saStatus);
             char bootValue[PARAM_VALUE_SIZE] = "";
@@ -74,6 +77,26 @@ void ModuleUpdateProducer::AddAbnormalSa()
     }
 }
 
+void ModuleUpdateProducer::AddAbnormalApp()
+{
+    char appInstallRes[PARAM_VALUE_SIZE] = "";
+    std::size_t resLength = strlen(BMS_INSTALL_FAIL);
+    for (const auto &hmpName : hmpNameSet_) {
+        std::string attr = std::string(BMS_RESULT_PREFIX) + "." + hmpName;
+        if (GetParameter(attr.c_str(), "", appInstallRes, PARAM_VALUE_SIZE) < 0) {
+            LOG(ERROR) << "failed to get parameter " << attr;
+            continue;
+        }
+        if (strncmp(appInstallRes, BMS_INSTALL_FAIL, resLength) != 0) {
+            (void)memset_s(appInstallRes, PARAM_VALUE_SIZE, 0, PARAM_VALUE_SIZE);
+            continue;
+        }
+        std::pair<int32_t, std::string> appResultPair = std::make_pair(APP_SERIAL_NUMBER, hmpName);
+        queue_.Put(appResultPair);
+        (void)memset_s(appInstallRes, PARAM_VALUE_SIZE, 0, PARAM_VALUE_SIZE);
+    }
+}
+
 void ModuleUpdateProducer::Run()
 {
     LOG(INFO) << "ModuleUpdateProducer Produce";
@@ -81,6 +104,11 @@ void ModuleUpdateProducer::Run()
     int ret = GetParameter(SA_START, "", saValue, PARAM_VALUE_SIZE);
     if (ret < 0) {
         LOG(ERROR) << "failed to get parameter " << SA_START;
+        return;
+    }
+    char appValue[PARAM_VALUE_SIZE] = "";
+    if (GetParameter(BMS_START_INSTALL, "", appValue, PARAM_VALUE_SIZE) < 0) {
+        LOG(ERROR) << "failed to get parameter " << BMS_START_INSTALL;
         return;
     }
     do {
@@ -93,11 +121,17 @@ void ModuleUpdateProducer::Run()
             SetParameter(SA_START, SA_NORMAL);
             AddAbnormalSa();
         }
-        if (strcpy_s(saValue, PARAM_VALUE_SIZE, "") != EOK) {
-            LOG(ERROR) << "fail to strcpy saValue";
-            return;
+        // bms write all hmp install result at once
+        if (strcmp(appValue, BMS_REVERT) == 0) {
+            SetParameter(BMS_START_INSTALL, NOTIFY_BMS_REVERT);
+            AddAbnormalApp();
         }
-        ret = GetParameter(SA_START, "", saValue, PARAM_VALUE_SIZE);
+        (void)memset_s(saValue, PARAM_VALUE_SIZE, 0, PARAM_VALUE_SIZE);
+        (void)memset_s(appValue, PARAM_VALUE_SIZE, 0, PARAM_VALUE_SIZE);
+        if (GetParameter(SA_START, "", saValue, PARAM_VALUE_SIZE) < 0 ||
+            GetParameter(BMS_START_INSTALL, "", appValue, PARAM_VALUE_SIZE) < 0) {
+            exit_ = 1;
+        }
     } while (true);
     LOG(INFO) << "producer exit";
 }

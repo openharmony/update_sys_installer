@@ -13,15 +13,7 @@
  * limitations under the License.
  */
 
-#include "log/log.h"
 #include "module_loop.h"
-#include "module_dm.h"
-#include "module_utils.h"
-#include "module_constants.h"
-#include "sys/sysmacros.h"
-#include "securec.h"
-#include "string_ex.h"
-
 #include <dirent.h>
 #include <fcntl.h>
 #include <filesystem>
@@ -37,6 +29,14 @@
 #include <linux/loop.h>
 #include <linux/magic.h>
 #include <cerrno>
+#include "securec.h"
+#include "string_ex.h"
+#include "log/log.h"
+#include "module_dm.h"
+#include "module_utils.h"
+#include "module_constants.h"
+#include "sys/sysmacros.h"
+#include "scope_guard.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -149,10 +149,26 @@ bool ConfigureReadAhead(const string &devicePath)
         LOG(ERROR) << "invalid device path " << sysfsDevice;
         return false;
     }
+
+    struct stat fileState;
+    if (stat(realPath.c_str(), &fileState) != 0) {
+        LOG(ERROR) << "Fail to Stat file: " << realPath << ", errno=" << errno;
+        return false;
+    }
+    ON_SCOPE_EXIT(recoveryMode) {
+        (void)chmod(realPath.c_str(), fileState.st_mode);
+    };
     UniqueFd sysfsFd(open(realPath.c_str(), O_RDWR | O_CLOEXEC));
     if (sysfsFd.Get() == -1) {
-        LOG(ERROR) << "Failed to open " << realPath;
-        return false;
+        // 0644: give permission to write
+        if (chmod(realPath.c_str(), 0644) != 0) {
+            LOG(WARNING) << "Fail to chmod file: " << realPath << ", errno=" << errno;
+        }
+        sysfsFd = UniqueFd(open(realPath.c_str(), O_RDWR | O_CLOEXEC));
+        if (sysfsFd.Get() == -1) {
+            LOG(ERROR) << "Fail to open file: " << realPath << ", errno=" << errno;
+            return false;
+        }
     }
     int writeBytes = write(sysfsFd.Get(), READ_AHEAD_KB, strlen(READ_AHEAD_KB) + 1);
     if (writeBytes < 0) {
@@ -210,8 +226,7 @@ bool SetLoopDeviceStatus(const int deviceFd, const int targetFd, const struct lo
     }
     ret = ioctl(deviceFd, BLKFLSBUF, 0);
     if (ret < 0) {
-        LOG(ERROR) << "Failed to flush buffers on the loop device err=" << errno;
-        return false;
+        LOG(WARNING) << "Failed to flush buffers on the loop device err=" << errno;
     }
     ret = ioctl(deviceFd, LOOP_SET_BLOCK_SIZE, LOOP_BLOCK_SIZE);
     if (ret < 0) {
@@ -421,8 +436,6 @@ bool CloseLoopDev(const std::string &loopPath)
         return false;
     }
 
-    int minorNum = static_cast<int>(minor(st.st_rdev));
-
     int userFd = open(loopPath.c_str(), O_RDWR);
     if (userFd < 0) {
         LOG(ERROR) << "Open error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
@@ -431,25 +444,11 @@ bool CloseLoopDev(const std::string &loopPath)
 
     int ret = ioctl(userFd, LOOP_CLR_FD);
     close(userFd);
-    if (ret < 0) {
+    if (ret != 0) {
         LOG(ERROR) << "Clear error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
-    }
-
-    int fd = open(LOOP_CTL_PATH, O_RDWR);
-    if (fd < 0) {
-        LOG(ERROR) << "Open loop ctl err, errno=" << errno;
         return false;
     }
-
-    ret = ioctl(fd, LOOP_CTL_REMOVE, minorNum);
-    close(fd);
-    if (ret < 0) {
-        LOG(ERROR) << "Remove error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
-    }
-    if (remove(loopPath.c_str()) < 0) {
-        LOG(ERROR) << "Remove dev error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
-    }
-    return (ret == 0);
+    return true;
 }
 } // Loop
 } // SysInstaller

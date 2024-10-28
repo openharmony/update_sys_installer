@@ -39,7 +39,7 @@ public:
     ~ModuleUpdateTaskManager() override {}
     void SetTaskResult(bool result);
     bool GetTaskResult();
-    bool AddTask(std::string hmpName);
+    bool AddTask(const std::string &hmpName);
     void ClearTask();
     void Stop();
     void Start();

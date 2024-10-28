@@ -16,14 +16,9 @@
 #ifndef MODULE_UPDATE_QUEUE_H
 #define MODULE_UPDATE_QUEUE_H
 
-#include <iostream>
 #include <algorithm>
-#include <vector>
-#include <iterator>
-#include <thread>
-#include <mutex>
-#include <functional>
 #include <condition_variable>
+#include <mutex>
 #include <string>
 #include <vector>
 

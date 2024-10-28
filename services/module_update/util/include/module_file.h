@@ -16,6 +16,7 @@
 #ifndef SYS_INSTALLER_MODULE_FILE_H
 #define SYS_INSTALLER_MODULE_FILE_H
 
+#include <list>
 #include <memory>
 #include <optional>
 #include <string>
@@ -30,9 +31,17 @@ namespace {
 constexpr size_t FS_TYPE_MAX_SIZE = 10;
 }
 
+constexpr const char *HMP_APP_TYPE = "APP";
+constexpr const char *HMP_SA_TYPE = "systemAbility";
+constexpr const char *HMP_SA_TYPE_OLD = "SYSTEM ability";
+constexpr const char *HMP_MIX_TYPE = "combineType";
+constexpr const char *HMP_API_VERSION = "apiVersion";
+constexpr const char *HMP_SA_SDK_VERSION = "saSdkVersion";
+
 bool ExtractZipFile(ModuleZipHelper &helper, const std::string &fileName, std::string &buf);
 bool ParseVersion(const std::string &version, const std::string &split, std::vector<std::string> &versionVec);
-bool ComparePackInfoVer(const std::vector<std::string> &smallVersion, const std::vector<std::string> &bigVersion);
+bool CompareHmpVersion(const std::vector<std::string> &smallVersion, const std::vector<std::string> &bigVersion);
+bool CompareSaSdkVersion(const std::vector<std::string> &smallVersion, const std::vector<std::string> &bigVersion);
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,7 +50,7 @@ int32_t VerifyModulePackageSign(const std::string &path);
 }
 #endif
 
-struct ModuleVersion {
+struct SaVersion {
     uint32_t apiVersion;
     uint32_t versionCode;
     uint32_t patchVersion;
@@ -52,16 +61,47 @@ struct ModuleVersion {
     }
 };
 
+struct SaInfo {
+    std::string saName;
+    int32_t saId {0};
+    SaVersion version;
+};
+
+struct BundleInfo {
+    std::string bundleName;
+    std::string bundleVersion;
+};
+
+struct ModulePackageInfo {
+    std::string hmpName;
+    std::string version;
+    std::string saSdkVersion;
+    std::string type;
+    int apiVersion {-1};
+    int hotApply {0};
+    std::list<SaInfo> saInfoList;
+    std::list<BundleInfo> bundleInfoList;
+};
+
 struct ImageStat {
     uint32_t imageOffset;
     uint32_t imageSize;
     char fsType[FS_TYPE_MAX_SIZE];
 };
 
+enum HmpInstallType {
+    COLD_SA_TYPE = 0x01,
+    COLD_APP_TYPE,
+    COLD_MIX_TYPE,
+    HOT_SA_TYPE = 0x10,
+    HOT_APP_TYPE,
+    HOT_MIX_TYPE
+};
+
 class ModuleFile {
 public:
     static std::unique_ptr<ModuleFile> Open(const std::string &path);
-    static bool CompareVersion(const ModuleFile &file1, const ModuleFile &file2);
+    static bool CompareVersion(const ModuleFile &newFile, const ModuleFile &oldFile);
     ModuleFile(const std::string &modulePath,
                const std::string &saName,
                const int32_t saId,
@@ -84,15 +124,7 @@ public:
     {
         return modulePath_;
     }
-    const std::string &GetSaName() const
-    {
-        return saName_;
-    }
-    int32_t GetSaId() const
-    {
-        return saId_;
-    }
-    const ModuleVersion &GetVersionInfo() const
+    const ModulePackageInfo &GetVersionInfo() const
     {
         return versionInfo_;
     }
@@ -110,6 +142,7 @@ public:
     }
     bool VerifyModuleVerity(const std::string &publicKey);
     void ClearVerifiedData();
+    HmpInstallType GetHmpPackageType(void) const;
 #ifdef SUPPORT_HVB
     struct hvb_verified_data *GetVerifiedData() const
     {
@@ -119,10 +152,7 @@ public:
 
 private:
     std::string modulePath_;
-    std::string saName_;
-    int32_t saId_ = 0;
-    ModuleVersion versionInfo_;
-    std::string modulePubkey_;
+    ModulePackageInfo versionInfo_;
     std::optional<ImageStat> imageStat_;
 
 #ifdef SUPPORT_HVB

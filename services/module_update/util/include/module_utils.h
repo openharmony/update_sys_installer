@@ -36,11 +36,18 @@ uint16_t ReadLE16(const uint8_t *buff);
 uint32_t ReadLE32(const uint8_t *buff);
 std::string GetRealPath(const std::string &path);
 void Revert(const std::string &hmpName, bool reboot);
-bool IsHotSa(const int32_t &saId);
-bool IsRunning(const int32_t &saId);
+bool IsHotSa(int32_t saId);
+bool IsRunning(int32_t saId);
+bool IsHotHmpPackage(int32_t type);
 bool IsHotHmpPackage(const std::string &hmpName);
-bool CheckBootComplete();
-void ClearModuleDirs(const std::string &hmpName);
+bool CheckBootComplete(void);
+void RemoveSpecifiedDir(const std::string &path);
+std::string GetDeviceSaSdkVersion(void);
+int GetDeviceApiVersion(void);
+std::string GetContentFromZip(const std::string &zipPath, const std::string &fileName);
+bool CheckAndUpdateRevertResult(const std::string &hmpPath, const std::string &resultInfo, const std::string &keyWord);
+void KillProcessOnArkWeb(void);
+bool InstallHmpBundle(const std::string &hmpPath, bool revert);
 
 class Timer {
 public:

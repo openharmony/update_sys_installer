@@ -21,6 +21,7 @@
 #include <unordered_set>
 
 #include "module_file.h"
+#include "module_utils.h"
 #include "singleton.h"
 
 namespace OHOS {
@@ -30,19 +31,19 @@ public:
     DISALLOW_COPY_AND_MOVE(ModuleFileRepository);
     ModuleFileRepository() = default;
     ~ModuleFileRepository();
-    void InitRepository(const int32_t saId);
-    std::unique_ptr<ModuleFile> GetModuleFile(const std::string &pathPrefix, const int32_t saId) const;
+    void InitRepository(const std::string &hmpName, const Timer &timer);
+    std::unique_ptr<ModuleFile> GetModuleFile(const std::string &pathPrefix, const std::string &hmpName) const;
     bool IsPreInstalledModule(const ModuleFile &moduleFile) const;
-    std::string GetPublicKey(const int32_t saId) const;
+    std::string GetPublicKey(const std::string &hmpName) const;
     void Clear();
     void SaveInstallerResult(const std::string &path, const std::string &hmpName,
-        int result, const std::string &resultInfo) const;
+        int result, const std::string &resultInfo, const Timer &timer) const;
 private:
-    void ProcessFile(const int32_t saId, const std::string &path, const std::string &file,
-        std::unordered_map<std::string, ModuleFile> &fileMap) const;
+    void ProcessFile(const std::string &hmpName, const std::string &path, const std::string &file,
+        std::unordered_map<std::string, ModuleFile> &fileMap, const Timer &timer) const;
     bool CheckFilePath(const ModuleFile &moduleFile, const std::string &prefix) const;
 
-    std::unordered_map<int32_t, std::unordered_map<std::string, ModuleFile>> moduleFileMap_;
+    std::unordered_map<std::string, std::unordered_map<std::string, ModuleFile>> moduleFileMap_;
 };
 } // SysInstaller
 } // namespace OHOS
