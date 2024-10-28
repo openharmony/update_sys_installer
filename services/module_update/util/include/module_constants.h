@@ -28,6 +28,7 @@ static constexpr const char *HMP_PACKAGE_SUFFIX = ".zip";
 static constexpr const char *MODULE_PACKAGE_SUFFIX = ".zip";
 static constexpr const char *HMP_INFO_NAME = "module_info.zip";
 static constexpr const char *IMG_FILE_NAME = "module.img";
+static constexpr const char *PUBLIC_KEY_NAME = "pub_key.pem";
 static constexpr const char *PACK_INFO_NAME = "pack.info";
 static constexpr const char *MODULE_RESULT_PATH = "/data/updater/module_update_result";
 static constexpr const char *OTA_PACKAGE_DIR = "/data/update/ota_package";

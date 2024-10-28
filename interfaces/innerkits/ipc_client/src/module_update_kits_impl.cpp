@@ -43,7 +43,7 @@ ModuleUpdateKitsImpl::ModuleUpdateKitsImpl() {}
 
 ModuleUpdateKitsImpl::~ModuleUpdateKitsImpl() {}
 
-void ModuleUpdateKitsImpl::ResetService(const wptr<IRemoteObject>& remote)
+void ModuleUpdateKitsImpl::ResetService(const wptr<IRemoteObject> &remote)
 {
     LOG(INFO) << "Remote is dead, reset service instance";
 
@@ -120,7 +120,7 @@ int32_t ModuleUpdateKitsImpl::UninstallModulePackage(const std::string &hmpName)
 }
 
 int32_t ModuleUpdateKitsImpl::GetModulePackageInfo(const std::string &hmpName,
-    std::list<ModulePackageInfo> &modulePackageInfos)
+                                                   std::list<ModulePackageInfo> &modulePackageInfos)
 {
     LOG(INFO) << "GetModulePackageInfo";
     auto moduleUpdate = GetService();

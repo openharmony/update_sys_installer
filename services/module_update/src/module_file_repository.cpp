@@ -92,8 +92,9 @@ void ModuleFileRepository::ProcessFile(const string &hmpName, const string &path
     if (moduleFile == nullptr || moduleFile->GetVersionInfo().hmpName != hmpName) {
         return;
     }
-    string pubkey = moduleFile->GetPublicKey(hmpName);
+    string pubkey = moduleFile->GetPublicKey();
     if (path != MODULE_PREINSTALL_DIR) {
+        pubkey = GetPublicKey(hmpName);
         if (!CheckFilePath(*moduleFile, path)) {
             LOG(ERROR) << "Open " << file << " failed";
             SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "get pub key fail", timer);

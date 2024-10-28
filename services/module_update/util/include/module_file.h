@@ -103,14 +103,10 @@ public:
     static std::unique_ptr<ModuleFile> Open(const std::string &path);
     static bool CompareVersion(const ModuleFile &newFile, const ModuleFile &oldFile);
     ModuleFile(const std::string &modulePath,
-               const std::string &saName,
-               const int32_t saId,
-               const ModuleVersion &versionInfo,
+               const ModulePackageInfo &versionInfo,
                const std::string &modulePubkey,
                const std::optional<ImageStat> &imageStat)
         : modulePath_(modulePath),
-          saName_(saName),
-          saId_(saId),
           versionInfo_(versionInfo),
           modulePubkey_(modulePubkey),
           imageStat_(imageStat) {}
@@ -153,6 +149,7 @@ public:
 private:
     std::string modulePath_;
     ModulePackageInfo versionInfo_;
+    std::string modulePubkey_;
     std::optional<ImageStat> imageStat_;
 
 #ifdef SUPPORT_HVB

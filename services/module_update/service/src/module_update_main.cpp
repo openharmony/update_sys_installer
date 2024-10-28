@@ -295,7 +295,7 @@ int32_t ModuleUpdateMain::ValidateVersion(ModuleFile &installFile, const std::st
         LOG(ERROR) << "Installed version is lower than preInstall.";
         return ModuleErrorCode::ERR_LOWER_VERSION;
     }
-    if (!installFile.VerifyModuleVerity()) {
+    if (!installFile.VerifyModuleVerity(preInstalledFile->GetPublicKey())) {
         LOG(ERROR) << "Failed to verify install img: " << hmpName;
         return ModuleErrorCode::ERR_VERIFY_SIGN_FAIL;
     }
