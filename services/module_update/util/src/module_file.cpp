@@ -315,7 +315,7 @@ bool ExtractZipFile(ModuleZipHelper &helper, const string &fileName, string &buf
     return true;
 }
 
-// MSFB M= S>= F= B>=
+// MSFB M= S= F= B>
 bool CompareHmpVersion(const std::vector<string> &smallVersion, const std::vector<string> &bigVersion)
 {
     if (smallVersion.size() != PACKINFO_VERSION_VECTOR_SIZE || bigVersion.size() != PACKINFO_VERSION_VECTOR_SIZE) {
@@ -502,7 +502,7 @@ HmpInstallType ModuleFile::GetHmpPackageType(void) const
     if (versionInfo_.type == HMP_MIX_TYPE) {
         return COLD_MIX_TYPE;
     }
-        return COLD_SA_TYPE;
+    return COLD_SA_TYPE;
 }
 } // namespace SysInstaller
 } // namespace OHOS
