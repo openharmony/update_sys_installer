@@ -410,19 +410,7 @@ std::unique_ptr<ModuleFile> ModuleFile::Open(const string &path)
         return nullptr;
     }
 
-    string modulePubkey = "";
-#ifdef SUPPORT_HVB
-    if (!ExtractZipFile(helper, PUBLIC_KEY_NAME, modulePubkey)) {
-        LOG(ERROR) << "Failed to extract pubkey from package " << path;
-        return nullptr;
-    }
-    if (modulePubkey.empty()) {
-        LOG(ERROR) << "Public key is empty in " << path;
-        return nullptr;
-    }
-#endif
-
-    return std::make_unique<ModuleFile>(path, versionInfo, modulePubkey, imageStat);
+    return std::make_unique<ModuleFile>(path, versionInfo, imageStat);
 }
 
 bool ModuleFile::CompareVersion(const ModuleFile &newFile, const ModuleFile &oldFile)
@@ -454,7 +442,7 @@ bool ModuleFile::CompareVersion(const ModuleFile &newFile, const ModuleFile &old
     return true;
 }
 
-bool ModuleFile::VerifyModuleVerity(const string &publicKey)
+bool ModuleFile::VerifyModuleVerity()
 {
 #ifdef SUPPORT_HVB
     if (vd_ != nullptr) {
@@ -477,12 +465,22 @@ bool ModuleFile::VerifyModuleVerity(const string &publicKey)
         return false;
     }
 
+    if (!EnhancedVerifyModule(pubkey.addr, pubkey.size)) {
+        LOG(ERROR) << "EnhancedVerifyModule failed";
+        return false;
+    }
     CANCEL_SCOPE_EXIT_GUARD(clear);
     return true;
 #else
     LOG(INFO) << "do not support hvb";
     return true;
 #endif
+}
+
+__attribute__((weak)) bool EnhancedVerifyModule(const uint8_t *addr, uint64_t size)
+{
+    LOG(INFO) << "EnhancedVerifyModule success";
+    return true;
 }
 
 void ModuleFile::ClearVerifiedData()

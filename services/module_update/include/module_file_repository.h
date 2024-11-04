@@ -34,7 +34,6 @@ public:
     void InitRepository(const std::string &hmpName, const Timer &timer);
     std::unique_ptr<ModuleFile> GetModuleFile(const std::string &pathPrefix, const std::string &hmpName) const;
     bool IsPreInstalledModule(const ModuleFile &moduleFile) const;
-    std::string GetPublicKey(const std::string &hmpName) const;
     void Clear();
     void SaveInstallerResult(const std::string &path, const std::string &hmpName,
         int result, const std::string &resultInfo, const Timer &timer) const;
