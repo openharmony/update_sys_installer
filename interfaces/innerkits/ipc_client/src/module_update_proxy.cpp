@@ -23,6 +23,9 @@
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
+namespace {
+constexpr const int32_t MAX_MODULE_SIZE = 64;
+}
 
 int32_t ModuleUpdateProxy::InstallModulePackage(const std::string &pkgPath)
 {
@@ -163,6 +166,10 @@ std::vector<HmpVersionInfo> ModuleUpdateProxy::GetHmpVersionInfo()
     }
 
     int32_t count = reply.ReadInt32();
+    if (count > MAX_MODULE_SIZE) {
+        LOG(ERROR) << "Not support such a large number of modules: " << count;
+        return versionInfo;
+    }
     for (int32_t i = 0; i < count; i++) {
         std::unique_ptr<HmpVersionInfo> infoPtr(reply.ReadParcelable<HmpVersionInfo>());
         if (infoPtr != nullptr) {
@@ -236,6 +243,10 @@ std::vector<HmpUpdateInfo> ModuleUpdateProxy::GetHmpUpdateResult()
     }
 
     int32_t count = reply.ReadInt32();
+    if (count > MAX_MODULE_SIZE) {
+        LOG(ERROR) << "Not support such a large number of results: " << count;
+        return updateInfo;
+    }
     for (int32_t i = 0; i < count; i++) {
         std::unique_ptr<HmpUpdateInfo> infoPtr(reply.ReadParcelable<HmpUpdateInfo>());
         if (infoPtr != nullptr) {
