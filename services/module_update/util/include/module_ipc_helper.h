@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace SysInstaller {
+static constexpr int32_t IPC_MIN_SIZE = 0;
 static constexpr int32_t IPC_MAX_SIZE = 128;
 
 struct ModuleUpdateStatus {
@@ -46,7 +47,7 @@ public:
         const std::function<void(MessageParcel &, T &)> &read)
     {
         int32_t size = reply.ReadInt32();
-        if (size > IPC_MAX_SIZE) {
+        if (size > IPC_MAX_SIZE || size < IPC_MIN_SIZE) {
             return;
         }
         for (int32_t i = 0; i < size; ++i) {
