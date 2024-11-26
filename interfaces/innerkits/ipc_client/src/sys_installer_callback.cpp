@@ -33,7 +33,7 @@ int32_t SysInstallerCallbackStub::OnRemoteRequest(uint32_t code,
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     if (data.ReadInterfaceToken() != GetDescriptor()) {
-        printf("ReadInterfaceToken fail");
+        LOG(ERROR) << "ReadInterfaceToken fail";
         return -1;
     }
     switch (code) {
