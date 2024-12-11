@@ -43,6 +43,7 @@ private:
     bool CheckMountComplete(const std::string &hmpName) const;
     void ProcessHmpFile(const std::string &hmpFile, const ModuleUpdateStatus &status, const Timer &timer);
     std::unique_ptr<ModuleFile> GetLatestUpdateModulePackage(const std::string &hmpName);
+    bool CheckRevert(const std::string &hmpName);
 
     std::list<ModuleFile> moduleFileList_;
     ModuleFileRepository repository_;
