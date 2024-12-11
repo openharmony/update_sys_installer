@@ -170,5 +170,10 @@ void ModuleFileRepository::Clear()
     }
     moduleFileMap_.clear();
 }
+
+std::unordered_map<std::string, std::unordered_map<std::string, ModuleFile>> &ModuleFileRepository::GetModuleMap(void)
+{
+    return moduleFileMap_;
+}
 } // SysInstaller
 } // namespace OHOS

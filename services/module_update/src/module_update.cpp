@@ -285,6 +285,26 @@ void ModuleUpdate::CheckModuleUpdate()
     }
 }
 
+bool ModuleUpdate::CheckRevert(const std::string &hmpName)
+{
+    if (!CheckPathExists(std::string(UPDATE_BACKUP_DIR) + "/" + hmpName)) {
+        return false;
+    }
+    auto &moduleMap = repository_.GetModuleMap();
+    for (const auto &[key, value] : moduleMap) {
+        if (key != hmpName) {
+            continue;
+        }
+        // only system hmp
+        if (value.size() == 1) {
+            LOG(ERROR) << "active dir destroyed, but backup dir exists, try to revert.";
+            Utils::SetParameter(BMS_START_INSTALL, NOTIFY_BMS_REVERT);
+            return true;
+        }
+    }
+    return false;
+}
+
 void ModuleUpdate::PrepareModuleFileList(const ModuleUpdateStatus &status)
 {
     std::unique_ptr<ModuleFile> systemModuleFile = repository_.GetModuleFile(MODULE_PREINSTALL_DIR, status.hmpName);
@@ -297,6 +317,11 @@ void ModuleUpdate::PrepareModuleFileList(const ModuleUpdateStatus &status)
         moduleFileList_.emplace_back(std::move(*latestModuleFile));
     } else {
         moduleFileList_.emplace_back(std::move(*systemModuleFile));
+        if (CheckRevert(status.hmpName)) {
+            LOG(ERROR) << "some error happened, revert.";
+            Revert(status.hmpName, true);
+            return;
+        }
         // when choose preInstall hmp, remove activeHmp and backupHmp
         RemoveSpecifiedDir(std::string(UPDATE_ACTIVE_DIR) + "/" + status.hmpName);
         RemoveSpecifiedDir(std::string(UPDATE_BACKUP_DIR) + "/" + status.hmpName);

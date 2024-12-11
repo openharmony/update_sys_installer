@@ -37,6 +37,7 @@ public:
     void Clear();
     void SaveInstallerResult(const std::string &path, const std::string &hmpName,
         int result, const std::string &resultInfo, const Timer &timer) const;
+    std::unordered_map<std::string, std::unordered_map<std::string, ModuleFile>> &GetModuleMap(void);
 private:
     void ProcessFile(const std::string &hmpName, const std::string &path, const std::string &file,
         std::unordered_map<std::string, ModuleFile> &fileMap, const Timer &timer) const;
