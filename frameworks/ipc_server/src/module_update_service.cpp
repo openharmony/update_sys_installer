@@ -154,7 +154,7 @@ std::vector<HmpUpdateInfo> ModuleUpdateService::GetHmpUpdateResult()
             continue;
         }
         tmpUpdateInfo.path = signalResult[0];
-        if (!utils::ConvertToLong(signalResult[1], tmpUpdateInfo.result)) {
+        if (!Utils::ConvertToLong(signalResult[1], tmpUpdateInfo.result)) {
             LOG(ERROR) << "ConvertToLong failed";
             continue;
         }
