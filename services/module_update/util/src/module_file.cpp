@@ -350,7 +350,7 @@ bool CompareHmpVersion(const std::vector<string> &smallVersion, const std::vecto
     if (smallVer[1] == bigVer[1] && // 1: index of M
         smallVer[2] == bigVer[2] && // 2: index of S
         smallVer[3] == bigVer[3] && // 3: index of F
-        smallVer[4] == bigVer[4]) {
+        smallVer[4] == bigVer[4]) { // 4: index of B
         return true;
     }
     return false;
@@ -371,11 +371,18 @@ bool CompareSaSdkVersion(const std::vector<string> &smallVersion, const std::vec
     int32_t smallVer[SA_SDK_VERSION_TYPE_NUM + 1] = {0};
     int32_t bigVer[SA_SDK_VERSION_TYPE_NUM + 1] = {0};
     for (int32_t i = 1; i < SA_SDK_VERSION_TYPE_NUM + 1; i++) {
-        
+        if (!Utils::ConvertToLong(smallVersion.at(i), smallVer[i])) {
+            LOG(ERROR) << "smallVersion ConvertToLong failed, index: " << i;
+            return false;
+        }
+        if (!Utils::ConvertToLong(bigVersion.at(i), bigVer[i])) {
+            LOG(ERROR) << "bigVersion ConvertToLong failed, index: " << i;
+            return false;
+        }
     }
-    if (std::stoi(smallVersion.at(1)) == std::stoi(bigVersion.at(1)) &&  // 1:index of M
-        std::stoi(smallVersion.at(2)) == std::stoi(bigVersion.at(2)) &&  // 2:index of S
-        std::stoi(smallVersion.at(3)) >= std::stoi(bigVersion.at(3))) {  // 3:index of F
+    if (smallVer[1] == bigVer[1] && // 1: index of M
+        smallVer[2] == bigVer[2] && // 2: index of S
+        smallVer[3] == bigVer[3]) { // 3: index of F
         return true;
     }
     return false;
