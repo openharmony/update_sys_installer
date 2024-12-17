@@ -52,6 +52,8 @@ constexpr size_t VERSION_CODE_INDEX = 1;
 constexpr size_t PATCH_VERSION_INDEX = 2;
 constexpr size_t VERSION_VECTOR_SIZE = 3;
 constexpr size_t PACKINFO_VERSION_VECTOR_SIZE = 5;
+constexpr size_t HMP_VERSION_TYPE_NUM = 4;
+constexpr size_t SA_SDK_VERSION_TYPE_NUM = 3;
 
 struct FsMagic {
     const char *type;
@@ -162,9 +164,12 @@ bool ParseSaVersion(const string &versionStr, SaInfo &info)
         LOG(ERROR) << "SaVersion: Invalid version: " << versionStr;
         return false;
     }
-    info.version.apiVersion = static_cast<uint32_t>(std::stoi(versionVec.at(API_VERSION_INDEX)));
-    info.version.versionCode = static_cast<uint32_t>(std::stoi(versionVec.at(VERSION_CODE_INDEX)));
-    info.version.patchVersion = static_cast<uint32_t>(std::stoi(versionVec.at(PATCH_VERSION_INDEX)));
+    if (!Utils::ConvertToUnsignedLong(versionVec.at(API_VERSION_INDEX), info.version.apiVersion) ||
+        !Utils::ConvertToUnsignedLong(versionVec.at(VERSION_CODE_INDEX), info.version.versionCode) ||
+        !Utils::ConvertToUnsignedLong(versionVec.at(PATCH_VERSION_INDEX), info.version.patchVersion)) {
+        LOG(ERROR) << "ConvertToUnsignedLong failed";
+        return false;
+    }
     return true;
 }
 
@@ -185,7 +190,10 @@ bool ParseSaList(const JsonNode &package, ModulePackageInfo &versionInfo)
         }
         SaInfo &infoTmp = versionInfo.saInfoList.emplace_back();
         infoTmp.saName = saInfoVec.at(0);  // 0:index of name
-        infoTmp.saId = static_cast<int32_t>(std::stoi(saInfoVec.at(1)));  // 1:index of saId
+        if (!Utils::ConvertToLong(saInfoVec.at(1), infoTmp.saId)) { // 1: index of saId
+            LOG(ERROR) << "ConvertToLong failed";
+            return false;
+        }
         if (!ParseSaVersion(saInfoVec.at(2), infoTmp)) {  // 2:index of version
             return false;
         }
@@ -327,10 +335,22 @@ bool CompareHmpVersion(const std::vector<string> &smallVersion, const std::vecto
         return false;
     }
 
-    if (std::stoi(smallVersion.at(1)) == std::stoi(bigVersion.at(1)) &&  // 1:index of M
-        std::stoi(smallVersion.at(2)) == std::stoi(bigVersion.at(2)) &&  // 2:index of S
-        std::stoi(smallVersion.at(3)) == std::stoi(bigVersion.at(3)) &&  // 3:index of F
-        std::stoi(smallVersion.at(4)) < std::stoi(bigVersion.at(4))) {  // 4:index of B
+    int32_t smallVer[HMP_VERSION_TYPE_NUM + 1] = {0};
+    int32_t bigVer[HMP_VERSION_TYPE_NUM + 1] = {0};
+    for (int32_t i = 1; i < HMP_VERSION_TYPE_NUM + 1; i++) {
+        if (!Utils::ConvertToLong(smallVersion.at(i), smallVer[i])) {
+            LOG(ERROR) << "smallVersion ConvertToLong failed, index: " << i;
+            return false;
+        }
+        if (!Utils::ConvertToLong(bigVersion.at(i), bigVer[i])) {
+            LOG(ERROR) << "bigVersion ConvertToLong failed, index: " << i;
+            return false;
+        }
+    }
+    if (smallVer[1] == bigVer[1] && // 1: index of M
+        smallVer[2] == bigVer[2] && // 2: index of S
+        smallVer[3] == bigVer[3] && // 3: index of F
+        smallVer[4] == bigVer[4]) { // 4: index of B
         return true;
     }
     return false;
@@ -348,9 +368,21 @@ bool CompareSaSdkVersion(const std::vector<string> &smallVersion, const std::vec
         return false;
     }
 
-    if (std::stoi(smallVersion.at(1)) == std::stoi(bigVersion.at(1)) &&  // 1:index of M
-        std::stoi(smallVersion.at(2)) == std::stoi(bigVersion.at(2)) &&  // 2:index of S
-        std::stoi(smallVersion.at(3)) >= std::stoi(bigVersion.at(3))) {  // 3:index of F
+    int32_t smallVer[SA_SDK_VERSION_TYPE_NUM + 1] = {0};
+    int32_t bigVer[SA_SDK_VERSION_TYPE_NUM + 1] = {0};
+    for (int32_t i = 1; i < SA_SDK_VERSION_TYPE_NUM + 1; i++) {
+        if (!Utils::ConvertToLong(smallVersion.at(i), smallVer[i])) {
+            LOG(ERROR) << "smallVersion ConvertToLong failed, index: " << i;
+            return false;
+        }
+        if (!Utils::ConvertToLong(bigVersion.at(i), bigVer[i])) {
+            LOG(ERROR) << "bigVersion ConvertToLong failed, index: " << i;
+            return false;
+        }
+    }
+    if (smallVer[1] == bigVer[1] && // 1: index of M
+        smallVer[2] == bigVer[2] && // 2: index of S
+        smallVer[3] == bigVer[3]) { // 3: index of F
         return true;
     }
     return false;
