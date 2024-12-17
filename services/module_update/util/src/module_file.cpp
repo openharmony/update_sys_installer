@@ -190,8 +190,8 @@ bool ParseSaList(const JsonNode &package, ModulePackageInfo &versionInfo)
         }
         SaInfo &infoTmp = versionInfo.saInfoList.emplace_back();
         infoTmp.saName = saInfoVec.at(0);  // 0:index of name
-        if (!Utils::ConvertToUnsignedLong(saInfoVec.at(1), infoTmp.saId)) { // 1: index of saId
-            LOG(ERROR) << "ConvertToUnsignedLong failed";
+        if (!Utils::ConvertToLong(saInfoVec.at(1), infoTmp.saId)) { // 1: index of saId
+            LOG(ERROR) << "ConvertToLong failed";
             return false;
         }
         if (!ParseSaVersion(saInfoVec.at(2), infoTmp)) {  // 2:index of version
