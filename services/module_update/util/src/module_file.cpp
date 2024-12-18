@@ -350,7 +350,7 @@ bool CompareHmpVersion(const std::vector<string> &smallVersion, const std::vecto
     if (smallVer[1] == bigVer[1] && // 1: index of M
         smallVer[2] == bigVer[2] && // 2: index of S
         smallVer[3] == bigVer[3] && // 3: index of F
-        smallVer[4] == bigVer[4]) { // 4: index of B
+        smallVer[4] < bigVer[4]) { // 4: index of B
         return true;
     }
     return false;
@@ -382,7 +382,7 @@ bool CompareSaSdkVersion(const std::vector<string> &smallVersion, const std::vec
     }
     if (smallVer[1] == bigVer[1] && // 1: index of M
         smallVer[2] == bigVer[2] && // 2: index of S
-        smallVer[3] == bigVer[3]) { // 3: index of F
+        smallVer[3] >= bigVer[3]) { // 3: index of F
         return true;
     }
     return false;
