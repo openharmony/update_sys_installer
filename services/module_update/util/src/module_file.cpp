@@ -337,7 +337,7 @@ bool CompareHmpVersion(const std::vector<string> &smallVersion, const std::vecto
 
     int32_t smallVer[HMP_VERSION_TYPE_NUM + 1] = {0};
     int32_t bigVer[HMP_VERSION_TYPE_NUM + 1] = {0};
-    for (int32_t i = 1; i < HMP_VERSION_TYPE_NUM + 1; i++) {
+    for (size_t i = 1; i < HMP_VERSION_TYPE_NUM + 1; i++) {
         if (!Utils::ConvertToLong(smallVersion.at(i), smallVer[i])) {
             LOG(ERROR) << "smallVersion ConvertToLong failed, index: " << i;
             return false;
@@ -370,7 +370,7 @@ bool CompareSaSdkVersion(const std::vector<string> &smallVersion, const std::vec
 
     int32_t smallVer[SA_SDK_VERSION_TYPE_NUM + 1] = {0};
     int32_t bigVer[SA_SDK_VERSION_TYPE_NUM + 1] = {0};
-    for (int32_t i = 1; i < SA_SDK_VERSION_TYPE_NUM + 1; i++) {
+    for (size_t i = 1; i < SA_SDK_VERSION_TYPE_NUM + 1; i++) {
         if (!Utils::ConvertToLong(smallVersion.at(i), smallVer[i])) {
             LOG(ERROR) << "smallVersion ConvertToLong failed, index: " << i;
             return false;
