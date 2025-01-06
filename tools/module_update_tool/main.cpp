@@ -18,8 +18,10 @@
 #include "isys_installer_callback.h"
 #include "module_update_kits.h"
 #include "module_error_code.h"
+#include "scope_guard.h"
 
 using namespace OHOS;
+using namespace Updater;
 using namespace OHOS::SysInstaller;
 
 static const int32_t MIN_PARAM_NUM = 2;
@@ -65,8 +67,8 @@ static std::string GetFailReasonByErrCode(int32_t err)
             return "ERR_INVALID_PATH";
         case OHOS::SysInstaller::ERR_LOWER_VERSION:
             return "ERR_LOWER_VERSION";
-        case OHOS::SysInstaller::ERR_VERIFY_SIGN_FAIL:
-            return "ERR_VERIFY_SIGN_FAIL";
+        case OHOS::SysInstaller::ERR_VERIFY_FAIL:
+            return "ERR_VERIFY_FAIL";
         case OHOS::SysInstaller::ERR_INSTALL_FAIL:
             return "ERR_INSTALL_FAIL";
         case OHOS::SysInstaller::ERR_UNINSTALL_FAIL:
@@ -74,7 +76,7 @@ static std::string GetFailReasonByErrCode(int32_t err)
         case OHOS::SysInstaller::ERR_REPORT_STATUS_FAIL:
             return "ERR_REPORT_STATUS_FAIL";
         default:
-            return "Unknown Error";
+            return "Unknown Error, number is " + std::to_string(err);
     }
 }
 
@@ -89,11 +91,19 @@ static void PrintUpgradeInfo(std::list<OHOS::SysInstaller::ModulePackageInfo> &m
     printf("Got %zu upgraded modules info\n", modulePackageInfos.size());
     for (it = modulePackageInfos.begin(); it != modulePackageInfos.end(); it++) {
         OHOS::SysInstaller::ModulePackageInfo moduleInfo = *it;
-        printf("%s\n", moduleInfo.hmpName.c_str());
-        std::list<OHOS::SysInstaller::SaInfo>::iterator saIt;
-        for (saIt = moduleInfo.saInfoList.begin(); saIt != moduleInfo.saInfoList.end(); saIt++) {
-            std::string verStr = (*saIt).version;
-            printf(" {saName:%s saId:%d version:%s}\n", (*saIt).saName.c_str(), (*saIt).saId, verStr.c_str());
+        printf("%s, %s, %s, %s, apiversion: %d\n", moduleInfo.hmpName.c_str(), moduleInfo.version.c_str(),
+            moduleInfo.saSdkVersion.c_str(), moduleInfo.type.c_str(), moduleInfo.apiVersion);
+        for (const auto &[key, value] : moduleInfo.moduleMap) {
+            printf("module: %s\n", key.c_str());
+            for (const auto& sa : value.saInfoList) {
+                printf("SA: \n");
+                printf(" {saName:%s saId:%d version:%s}\n", sa.saName.c_str(), sa.saId,
+                    std::string(sa.version).c_str());
+            }
+            for (const auto& bundle : value.bundleInfoList) {
+                printf("Bundle: \n");
+                printf("{bundleName:%s version:%s}\n", bundle.bundleName.c_str(), bundle.bundleVersion.c_str());
+            }
         }
         printf(" \n");
     }
@@ -165,6 +175,11 @@ int main(int argc, char **argv)
     int ret = 0;
     OHOS::SysInstaller::ModuleUpdateKits& moduleUpdateKits = OHOS::SysInstaller::ModuleUpdateKits::GetInstance();
     ret = moduleUpdateKits.InitModuleUpdate();
+
+    ON_SCOPE_EXIT(exit) {
+        moduleUpdateKits.ExitModuleUpdate();
+    };
+
     if (ret != 0) {
         PrintErrMsg(GetFailReasonByErrCode(ret));
         return ret;

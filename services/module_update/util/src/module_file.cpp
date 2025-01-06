@@ -38,6 +38,7 @@
 #include "hvb.h"
 #include "hvb_footer.h"
 #include "module_hvb_ops.h"
+#include "module_hvb_utils.h"
 #endif
 
 namespace OHOS {
@@ -117,41 +118,30 @@ bool ParseHmpVersionInfo(const JsonNode &package, ModulePackageInfo &versionInfo
 {
     std::optional<string> name = package["name"].As<string>();
     if (!name.has_value()) {
-        LOG(ERROR) << "Hmpinfo: Failed to get name val";
+        LOG(ERROR) << "Hmpinfo: Failed to get hmp name val";
         return false;
     }
     std::optional<string> version = package["version"].As<string>();
     if (!version.has_value()) {
-        LOG(ERROR) << "Hmpinfo: Failed to get version val";
-        return false;
-    }
-    std::optional<string> hotApply = package["hotApply"].As<string>();
-    if (!hotApply.has_value()) {
-        LOG(ERROR) << "Hmpinfo: Failed to get hotApply val";
+        LOG(ERROR) << "Hmpinfo: Failed to get hmp version val";
         return false;
     }
     versionInfo.hmpName = name.value();
     versionInfo.version = version.value();
-    versionInfo.hotApply = Utils::String2Int<int>(hotApply.value(), Utils::N_DEC);
 
-    if (versionInfo.type == HMP_APP_TYPE || versionInfo.type == HMP_MIX_TYPE) {
+    if (versionInfo.type != HMP_SA_TYPE && versionInfo.type != HMP_SA_TYPE_OLD) {
         std::optional<string> apiVersion = package[HMP_API_VERSION].As<string>();
         if (!apiVersion.has_value()) {
             LOG(ERROR) << "Hmpinfo: Failed to get apiVersion val";
             return false;
         }
         versionInfo.apiVersion = Utils::String2Int<int>(apiVersion.value(), Utils::N_DEC);
-    } else if (versionInfo.type == HMP_SA_TYPE ||
-               versionInfo.type == HMP_SA_TYPE_OLD ||
-               versionInfo.type == HMP_MIX_TYPE) {
+    } else if (versionInfo.type != HMP_APP_TYPE) {
         std::optional<string> saSdkVersion = package[HMP_SA_SDK_VERSION].As<string>();
         if (!saSdkVersion.has_value()) {
             LOG(ERROR) << "Hmpinfo: Failed to get saSdkVersion val";
             return false;
         }
-    } else {
-        LOG(ERROR) << "Hmpinfo: Invalid type: " << versionInfo.type;
-        return false;
     }
     return true;
 }
@@ -173,7 +163,7 @@ bool ParseSaVersion(const string &versionStr, SaInfo &info)
     return true;
 }
 
-bool ParseSaList(const JsonNode &package, ModulePackageInfo &versionInfo)
+bool ParseSaList(const JsonNode &package, ModuleInfo &versionInfo)
 {
     const auto &saListJson = package["saList"];
     for (const auto &saInfo : saListJson) {
@@ -201,7 +191,7 @@ bool ParseSaList(const JsonNode &package, ModulePackageInfo &versionInfo)
     return true;
 }
 
-bool ParseBundleList(const JsonNode &package, ModulePackageInfo &versionInfo)
+bool ParseBundleList(const JsonNode &package, ModuleInfo &versionInfo)
 {
     const auto &bundleListJson = package["bundleList"];
     for (const auto &bundleInfo : bundleListJson) {
@@ -223,6 +213,29 @@ bool ParseBundleList(const JsonNode &package, ModulePackageInfo &versionInfo)
     return true;
 }
 
+bool ParseTrainInfo(const JsonNode &package, ModulePackageInfo &versionInfo)
+{
+    const auto &moduleList = package[HMP_MODULE_INFO];
+
+    for (const auto &moduleInfo : moduleList) {
+        ModuleInfo infoTmp;
+        const JsonNode &modulePackage = moduleInfo.get()["package"];
+        std::optional<string> name = modulePackage["name"].As<string>();
+        if (!name.has_value()) {
+            LOG(ERROR) << "Hmpinfo: Failed to get name val";
+            return false;
+        }
+        if (!ParseSaList(modulePackage, infoTmp)) {
+            return false;
+        }
+        if (!ParseBundleList(modulePackage, infoTmp)) {
+            return false;
+        }
+        versionInfo.moduleMap.emplace(name.value(), std::move(infoTmp));
+    }
+    return true;
+}
+
 bool ParseModuleInfo(const string &packInfo, ModulePackageInfo &versionInfo)
 {
     JsonNode root(packInfo);
@@ -238,19 +251,25 @@ bool ParseModuleInfo(const string &packInfo, ModulePackageInfo &versionInfo)
     if (!ParseHmpVersionInfo(package, versionInfo)) {
         return false;
     }
+
+    if (versionInfo.type == HMP_TRAIN_TYPE) {
+        return ParseTrainInfo(package, versionInfo);
+    }
+    ModuleInfo infoTmp;
     // parse sa info
     if (versionInfo.type == HMP_SA_TYPE || versionInfo.type == HMP_SA_TYPE_OLD ||
         versionInfo.type == HMP_MIX_TYPE) {
-        if (!ParseSaList(package, versionInfo)) {
+        if (!ParseSaList(package, infoTmp)) {
             return false;
         }
     }
     // parse bundle info
     if (versionInfo.type == HMP_APP_TYPE || versionInfo.type == HMP_MIX_TYPE) {
-        if (!ParseBundleList(package, versionInfo)) {
+        if (!ParseBundleList(package, infoTmp)) {
             return false;
         }
     }
+    versionInfo.moduleMap.emplace(versionInfo.hmpName, std::move(infoTmp));
     return true;
 }
 
@@ -262,6 +281,9 @@ bool CompareSaVersion(const SaVersion &smaller, const SaVersion &bigger)
     }
     if (smaller.versionCode > bigger.versionCode) {
         return false;
+    }
+    if (smaller.versionCode < bigger.versionCode) {
+        return true;
     }
     return bigger.patchVersion >= smaller.patchVersion;
 }
@@ -413,6 +435,11 @@ __attribute__((weak)) int32_t VerifyModulePackageSign(const std::string &path)
     return VerifyPackage(path.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0);
 }
 
+ModuleFile::~ModuleFile()
+{
+    ClearVerifiedData();
+}
+
 std::unique_ptr<ModuleFile> ModuleFile::Open(const string &path)
 {
     ModuleZipHelper helper(path);
@@ -460,18 +487,45 @@ bool ModuleFile::CompareVersion(const ModuleFile &newFile, const ModuleFile &old
     }
 
     if (!CompareHmpVersion(oldVersion, newVersion)) {
-        LOG(ERROR) << "old hmp version is higher.";
+        LOG(ERROR) << "old hmp version: " << oldFile.GetVersionInfo().version <<
+            "is higher than " << newFile.GetVersionInfo().version;
         return false;
     }
-    if (!CompareSaListVersion(oldFile.GetVersionInfo().saInfoList, newFile.GetVersionInfo().saInfoList)) {
-        LOG(ERROR) << "old hmp sa version is higher.";
+    if (oldFile.GetVersionInfo().moduleMap.size() != newFile.GetVersionInfo().moduleMap.size()) {
+        LOG(ERROR) << "old hmp module size: " << oldFile.GetVersionInfo().moduleMap.size() <<
+            "; new hmp module size: " << newFile.GetVersionInfo().moduleMap.size();
         return false;
     }
-    if (!CompareBundleList(oldFile.GetVersionInfo().bundleInfoList, newFile.GetVersionInfo().bundleInfoList)) {
-        LOG(ERROR) << "new hmp bundle list do not meet expectation.";
+    for (const auto& [key, value] : oldFile.GetVersionInfo().moduleMap) {
+        if (newFile.GetVersionInfo().moduleMap.find(key) == newFile.GetVersionInfo().moduleMap.end()) {
+            LOG(ERROR) << key << " is not exist in new hmp.";
+            return false;
+        }
+        if (!CompareSaListVersion(value.saInfoList, newFile.GetVersionInfo().moduleMap.at(key).saInfoList)) {
+            LOG(ERROR) << "old hmp sa version is higher.";
+            return false;
+        }
+        if (!CompareBundleList(value.bundleInfoList, newFile.GetVersionInfo().moduleMap.at(key).bundleInfoList)) {
+            LOG(ERROR) << "new hmp bundle list do not meet expectation.";
+            return false;
+        }
+    }
+    return true;
+}
+
+bool ModuleFile::ProcessModuleUpdateVerityInfo(const std::string &partition) const
+{
+#ifdef SUPPORT_HVB
+    string imagePath = ExtractFilePath(GetPath()) + IMG_FILE_NAME;
+    if (!DealModuleUpdateHvbInfo(imagePath, imageStat_->imageSize, partition)) {
+        LOG(ERROR) << "deal with module update partition hvb info fail";
         return false;
     }
     return true;
+#else
+    LOG(INFO) << "do not support hvb";
+    return true;
+#endif
 }
 
 bool ModuleFile::VerifyModuleVerity()
@@ -496,23 +550,12 @@ bool ModuleFile::VerifyModuleVerity()
         LOG(ERROR) << "hvb verify failed err=" << ret;
         return false;
     }
-
-    if (!EnhancedVerifyModule(pubkey.addr, pubkey.size)) {
-        LOG(ERROR) << "EnhancedVerifyModule failed";
-        return false;
-    }
     CANCEL_SCOPE_EXIT_GUARD(clear);
     return true;
 #else
     LOG(INFO) << "do not support hvb";
     return true;
 #endif
-}
-
-__attribute__((weak)) bool EnhancedVerifyModule(const uint8_t *addr, uint64_t size)
-{
-    LOG(INFO) << "EnhancedVerifyModule success";
-    return true;
 }
 
 void ModuleFile::ClearVerifiedData()
@@ -523,18 +566,6 @@ void ModuleFile::ClearVerifiedData()
         vd_ = nullptr;
     }
 #endif
-}
-
-HmpInstallType ModuleFile::GetHmpPackageType(void) const
-{
-    LOG(INFO) << "Hmp type is " << versionInfo_.type;
-    if (versionInfo_.type == HMP_APP_TYPE) {
-        return COLD_APP_TYPE;
-    }
-    if (versionInfo_.type == HMP_MIX_TYPE) {
-        return COLD_MIX_TYPE;
-    }
-    return COLD_SA_TYPE;
 }
 } // namespace SysInstaller
 } // namespace OHOS

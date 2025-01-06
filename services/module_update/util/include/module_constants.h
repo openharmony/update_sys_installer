@@ -19,6 +19,8 @@
 namespace OHOS {
 namespace SysInstaller {
 static constexpr int32_t APP_SERIAL_NUMBER = -1;
+static constexpr int32_t REGISTER_LEVEL_ONE = 1;
+static constexpr int32_t REGISTER_LEVEL_TWO = 2;
 static constexpr const char *UPDATE_INSTALL_DIR = "/data/module_update_package";
 static constexpr const char *UPDATE_ACTIVE_DIR = "/data/module_update/active";
 static constexpr const char *UPDATE_BACKUP_DIR = "/data/module_update/backup";
@@ -26,11 +28,13 @@ static constexpr const char *MODULE_PREINSTALL_DIR = "/system/module_update";
 static constexpr const char *MODULE_ROOT_DIR = "/module_update";
 static constexpr const char *HMP_PACKAGE_SUFFIX = ".zip";
 static constexpr const char *MODULE_PACKAGE_SUFFIX = ".zip";
+static constexpr const char *MODULE_IMAGE_SUFFIX = ".img";
 static constexpr const char *HMP_INFO_NAME = "module_info.zip";
 static constexpr const char *IMG_FILE_NAME = "module.img";
+static constexpr const char *IMG_DIFF_FILE_NAME = "module.diff";
 static constexpr const char *PACK_INFO_NAME = "pack.info";
 static constexpr const char *MODULE_RESULT_PATH = "/data/updater/module_update_result";
-static constexpr const char *OTA_PACKAGE_DIR = "/data/update/ota_package";
+static constexpr const char *MODULE_UPDATE_LOG_FILE = "/data/updater/log/module_update.log";
 static constexpr const char *SA_ABNORMAL = "true";
 static constexpr const char *SA_NORMAL = "false";
 static constexpr const char *SA_START = "persist.samgr.moduleupdate.start";
@@ -44,6 +48,8 @@ static constexpr const char *BMS_UPDATE = "update";
 static constexpr const char *BMS_REVERT = "revert";
 static constexpr const char *NOTIFY_BMS_REVERT = "revert_bms";
 static constexpr const char *BMS_INSTALL_FAIL = "false";
+static constexpr const char *HMP_INCR_PACKAGE_TYPE = "increment";
+static constexpr const char *HVB_PARTITION_NAME = "module_update";
 } // namespace SysInstaller
 } // namespace OHOS
 #endif // SYS_INSTALLER_MODULE_CONSTANTS_H

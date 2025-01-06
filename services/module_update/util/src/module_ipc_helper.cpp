@@ -66,10 +66,17 @@ void ReadModulePackageInfo(MessageParcel &reply, ModulePackageInfo &info)
     info.saSdkVersion = Str16ToStr8(reply.ReadString16());
     info.type = Str16ToStr8(reply.ReadString16());
     info.apiVersion = reply.ReadInt32();
-    info.hotApply = reply.ReadInt32();
-
-    ModuleIpcHelper::ReadList<SaInfo>(reply, info.saInfoList, ReadSaInfo);
-    ModuleIpcHelper::ReadList<BundleInfo>(reply, info.bundleInfoList, ReadBundleInfo);
+    int32_t moduleSize = reply.ReadInt32();
+    if (moduleSize > IPC_MAX_SIZE || moduleSize < IPC_MIN_SIZE) {
+        return;
+    }
+    for (int32_t i = 0; i < moduleSize; ++i) {
+        ModuleInfo infoTmp;
+        std::string moduleName = Str16ToStr8(reply.ReadString16());
+        ModuleIpcHelper::ReadList<SaInfo>(reply, infoTmp.saInfoList, ReadSaInfo);
+        ModuleIpcHelper::ReadList<BundleInfo>(reply, infoTmp.bundleInfoList, ReadBundleInfo);
+        info.moduleMap.emplace(moduleName, std::move(infoTmp));
+    }
 }
 
 void WriteModulePackageInfo(MessageParcel &data, const ModulePackageInfo &info)
@@ -79,10 +86,13 @@ void WriteModulePackageInfo(MessageParcel &data, const ModulePackageInfo &info)
     data.WriteString16(Str8ToStr16(info.saSdkVersion));
     data.WriteString16(Str8ToStr16(info.type));
     data.WriteInt32(info.apiVersion);
-    data.WriteInt32(info.hotApply);
 
-    ModuleIpcHelper::WriteList<SaInfo>(data, info.saInfoList, WriteSaInfo);
-    ModuleIpcHelper::WriteList<BundleInfo>(data, info.bundleInfoList, WriteBundleInfo);
+    data.WriteInt32(static_cast<int32_t>(info.moduleMap.size()));
+    for (const auto &[key, value] : info.moduleMap) {
+        data.WriteString16(Str8ToStr16(key));
+        ModuleIpcHelper::WriteList<SaInfo>(data, value.saInfoList, WriteSaInfo);
+        ModuleIpcHelper::WriteList<BundleInfo>(data, value.bundleInfoList, WriteBundleInfo);
+    }
 }
 
 int32_t ModuleIpcHelper::ReadModulePackageInfos(MessageParcel &reply, std::list<ModulePackageInfo> &infos)
@@ -102,8 +112,6 @@ int32_t ModuleIpcHelper::ReadModuleUpdateStatus(MessageParcel &reply, ModuleUpda
     status.hmpName = Str16ToStr8(reply.ReadString16());
     status.isPreInstalled = reply.ReadBool();
     status.isAllMountSuccess = reply.ReadBool();
-    status.isHotInstall = reply.ReadBool();
-    status.type = static_cast<HmpInstallType>(reply.ReadInt32());
     return 0;
 }
 
@@ -112,8 +120,6 @@ int32_t ModuleIpcHelper::WriteModuleUpdateStatus(MessageParcel &data, const Modu
     data.WriteString16(Str8ToStr16(status.hmpName));
     data.WriteBool(status.isPreInstalled);
     data.WriteBool(status.isAllMountSuccess);
-    data.WriteBool(status.isHotInstall);
-    data.WriteInt32(static_cast<int32_t>(status.type));
     return 0;
 }
 } // namespace SysInstaller

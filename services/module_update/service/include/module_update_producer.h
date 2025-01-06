@@ -26,7 +26,7 @@ class ModuleUpdateProducer {
 public:
     ModuleUpdateProducer(
         ModuleUpdateQueue &queue, std::unordered_map<int32_t, std::string> &saIdHmpMap,
-        std::unordered_set<std::string> &hmpSet, volatile sig_atomic_t &exit);
+        std::unordered_set<std::string> &moduleSet, volatile sig_atomic_t &exit);
     void Run();
 
 private:
@@ -34,7 +34,7 @@ private:
     void AddAbnormalApp();
     ModuleUpdateQueue &queue_;
     std::unordered_map<int32_t, std::string> &saIdHmpMap_;
-    std::unordered_set<std::string> &hmpNameSet_;
+    std::unordered_set<std::string> &moduleNameSet_;
     volatile sig_atomic_t &exit_;
 };
 } // SysInstaller

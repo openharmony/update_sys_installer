@@ -31,8 +31,6 @@ struct ModuleUpdateStatus {
     std::string hmpName;
     bool isPreInstalled {false};
     bool isAllMountSuccess {false};
-    bool isHotInstall {false};
-    HmpInstallType type {COLD_SA_TYPE};
 };
 
 class ModuleIpcHelper {

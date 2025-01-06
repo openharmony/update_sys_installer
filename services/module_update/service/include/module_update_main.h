@@ -30,7 +30,6 @@ namespace SysInstaller {
 class ModuleUpdateMain final : public Singleton<ModuleUpdateMain> {
     DECLARE_SINGLETON(ModuleUpdateMain);
 public:
-    bool DoHotInstall(ModuleUpdateStatus &status);
     int32_t CheckHmpName(const std::string &hmpName);
     int32_t UninstallModulePackage(const std::string &hmpName);
     int32_t GetModulePackageInfo(const std::string &hmpName,
@@ -38,7 +37,7 @@ public:
     int32_t ReportModuleUpdateStatus(const ModuleUpdateStatus &status);
     std::vector<HmpVersionInfo> GetHmpVersionInfo();
     void ExitModuleUpdate();
-    int32_t InstallModuleFile(const std::string &hmpName, const std::string &file, ModuleUpdateStatus &status) const;
+    int32_t InstallModuleFile(const std::string &hmpName, const std::string &file);
     void CollectModulePackageInfo(const std::string &hmpName, std::list<ModulePackageInfo> &modulePackageInfos) const;
     bool BackupActiveModules(const std::string &hmpName) const;
     bool GetHmpVersion(const std::string &hmpPath, HmpVersionInfo &versionInfo);
@@ -47,12 +46,7 @@ public:
     int32_t ReallyInstallModulePackage(const std::string &pkgPath, const sptr<ISysInstallerCallback> &updateCallback);
     void ParseHmpVersionInfo(std::vector<HmpVersionInfo> &versionInfos, const HmpVersionInfo &preInfo,
         const HmpVersionInfo &actInfo);
-
-    bool HotAppInstall(ModuleUpdateStatus &status);
-    void HotSaInstall(ModuleUpdateStatus &status);
-    void HotAppInstallWhenUpdateFail(ModuleUpdateStatus &status);
-    void FirstRevertInstallHotApp(ModuleUpdateStatus &status);
-    void SecondRevertInstallHotApp(ModuleUpdateStatus &status);
+    std::string GetWorkHmpImagePath(const std::string &hmpName);
 
     void ScanPreInstalledHmp();
     void Start();
@@ -60,12 +54,15 @@ public:
 
 private:
     int32_t ValidateVersion(ModuleFile &installFile, const std::string &hmpName) const;
+    int32_t PrepareResourceForReboot(const std::string &hmpName) const;
     sptr<ISystemAbilityManager> &GetSystemAbilityManager();
 
     sptr<ISystemAbilityManager> samgr_ = nullptr;
     std::unordered_set<std::string> hmpSet_;
+    std::unordered_set<std::string> moduleSet_;
     std::unordered_map<int32_t, std::string> saIdHmpMap_;
     std::mutex mlock_;
+    std::unordered_map<std::string, std::string> hmpWorkDirMap_;
 };
 } // namespace SysInstaller
 } // namespace OHOS

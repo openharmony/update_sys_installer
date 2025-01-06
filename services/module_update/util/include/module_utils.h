@@ -21,6 +21,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <vector>
+#include "module_file.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -32,22 +33,29 @@ std::string GetHmpName(const std::string &filePath);
 bool WaitForFile(const std::string &path, const std::chrono::nanoseconds &timeout);
 bool StartsWith(const std::string &str, const std::string &prefix);
 bool ReadFullyAtOffset(int fd, uint8_t *data, size_t count, off_t offset);
+bool WriteFullyAtOffset(int fd, const uint8_t *data, size_t count, off_t offset);
 uint16_t ReadLE16(const uint8_t *buff);
 uint32_t ReadLE32(const uint8_t *buff);
 std::string GetRealPath(const std::string &path);
 void Revert(const std::string &hmpName, bool reboot);
 bool IsHotSa(int32_t saId);
 bool IsRunning(int32_t saId);
-bool IsHotHmpPackage(int32_t type);
-bool IsHotHmpPackage(const std::string &hmpName);
 bool CheckBootComplete(void);
-void RemoveSpecifiedDir(const std::string &path);
+bool RemoveSpecifiedDir(const std::string &path, bool keepDir);
 std::string GetDeviceSaSdkVersion(void);
 int GetDeviceApiVersion(void);
 std::string GetContentFromZip(const std::string &zipPath, const std::string &fileName);
 bool CheckAndUpdateRevertResult(const std::string &hmpPath, const std::string &resultInfo, const std::string &keyWord);
-void KillProcessOnArkWeb(void);
-bool InstallHmpBundle(const std::string &hmpPath, bool revert);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+bool RevertImageCert(const std::string &hmpName);
+bool VerityInfoWrite(const ModuleFile &file);
+void MountModuleUpdateDir(void);
+#ifdef __cplusplus
+}
+#endif
 
 class Timer {
 public:

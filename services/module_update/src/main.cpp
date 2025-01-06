@@ -26,19 +26,11 @@ extern "C" {
 #endif
 #endif
 
-namespace {
-constexpr int SA_ARG_COUNT = 1;
-constexpr const char *MODULE_UPDATE_PATH = "/system/bin/check_module_update";
-}
-
 int main(int argc, char **argv)
 {
-    if (argc >= SA_ARG_COUNT && std::strcmp(argv[0], MODULE_UPDATE_PATH) == 0) {
-        LOG(INFO) << "enter module update main";
-        auto &instance = OHOS::SysInstaller::ModuleUpdate::GetInstance();
-        instance.CheckModuleUpdate();
-        return 0;
-    }
+    LOG(INFO) << "enter module update main";
+    auto &instance = OHOS::SysInstaller::ModuleUpdate::GetInstance();
+    instance.CheckModuleUpdate();
     return 0;
 }
 

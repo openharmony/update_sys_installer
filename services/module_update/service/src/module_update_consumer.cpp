@@ -19,7 +19,6 @@
 #include "log/log.h"
 #include "module_constants.h"
 #include "module_error_code.h"
-#include "module_update.h"
 #include "module_update_main.h"
 #include "module_utils.h"
 #include "parameter.h"
@@ -28,6 +27,49 @@
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
+namespace {
+// get all app name in moduleTrain
+void GetModuleInfoForBms(std::string &revertHmpName, std::unordered_set<std::string> &moduleNameSet)
+{
+    std::vector<std::string> files;
+    GetDirFiles(MODULE_PREINSTALL_DIR, files);
+    for (auto &file : files) {
+        if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
+            continue;
+        }
+        std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
+        if (moduleFile == nullptr) {
+            continue;
+        }
+        std::string hmpName = GetHmpName(file);
+        if (hmpName.empty()) {
+            continue;
+        }
+        for (const auto &[key, value] : moduleFile->GetVersionInfo().moduleMap) {
+            if (!value.bundleInfoList.empty()) {
+                moduleNameSet.emplace(key);
+            }
+        }
+        revertHmpName = hmpName;
+    }
+}
+
+// write all app name for bms revert
+int32_t NotifyBmsRevert(const std::unordered_set<std::string> &moduleNameSet)
+{
+    LOG(INFO) << "Start to collect hap or hsp name in module.";
+    int32_t result = 0;
+    for (const auto &moduleName : moduleNameSet) {
+        LOG(INFO) << "hmp package revert,module name=" << moduleName;
+        std::string attr = std::string(BMS_RESULT_PREFIX) + "." + moduleName;
+        if (SetParameter(attr.c_str(), "false") != 0) {
+            LOG(WARNING) << "Failed to set module params: " << attr;
+            result++;
+        }
+    }
+    return result;
+}
+}
 
 ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
     std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit)
@@ -35,46 +77,27 @@ ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
       saIdHmpMap_(saIdHmpMap),
       exit_(exit) {}
 
-void ModuleUpdateConsumer::DoInstall(ModuleUpdateStatus &status)
+void ModuleUpdateConsumer::DoRevert(int32_t code) const
 {
-    ON_SCOPE_EXIT(rmdir) {
-        RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName);
-    };
-    if (ModuleUpdate::GetInstance().DoModuleUpdate(status)) {
-        LOG(INFO) << "hmp package successful install, hmp name=" << status.hmpName;
-    } else {
-        LOG(ERROR) << "hmp package fail install, hmp name=" << status.hmpName;
-    }
-}
-
-void ModuleUpdateConsumer::DoRevert(const std::string &hmpName, int32_t saId)
-{
-    LOG(INFO) << "hmp package revert,hmp name=" << hmpName << "; said=" << saId;
-    bool isHotHmp = IsHotHmpPackage(hmpName);
-    ModuleUpdateStatus status;
-    status.hmpName = hmpName;
-    status.isHotInstall = isHotHmp;
-    Revert(hmpName, !isHotHmp);
-    DoInstall(status);
-}
-
-void ModuleUpdateConsumer::DoUnload(const std::string &hmpName, int32_t saId)
-{
-    LOG(INFO) << "hmp package unload,hmp name=" << hmpName << "; said=" << saId;
-    ModuleUpdateStatus status;
-    status.hmpName = hmpName;
-    status.isHotInstall = true;
-    if (IsRunning(saId)) {
-        LOG(INFO) << "sa is running, saId=" << saId;
+    std::string revertHmpName;
+    std::unordered_set<std::string> moduleNameSet;
+    GetModuleInfoForBms(revertHmpName, moduleNameSet);
+    if (revertHmpName.empty()) {
+        LOG(ERROR) << "hmp package revert, hmpName is empty.";
         return;
     }
-    // check whether install hmp exists
-    DoInstall(status);
+    Timer timer;
+    ModuleUpdateMain::GetInstance().SaveInstallerResult(revertHmpName, code, "revert", timer);
+    // need to notify bms revert all app
+    NotifyBmsRevert(moduleNameSet);
+    Revert(revertHmpName, true);
 }
 
 void ModuleUpdateConsumer::Run()
 {
     LOG(INFO) << "ModuleUpdateConsumer Consume";
+    ModuleErrorCode code = ModuleErrorCode::ERR_BMS_REVERT;
+    bool revertFlag = false;
     do {
         if (exit_ == 1 && queue_.IsEmpty()) {
             queue_.Stop();
@@ -85,11 +108,9 @@ void ModuleUpdateConsumer::Run()
             LOG(INFO) << "producer and consumer stop";
             break;
         }
-        Timer timer;
         if (saStatusPair.first == APP_SERIAL_NUMBER) {
-            ModuleUpdateMain::GetInstance().SaveInstallerResult(saStatusPair.second, ModuleErrorCode::ERR_BMS_REVERT,
-                saStatusPair.second + " revert", timer);
-            DoRevert(saStatusPair.second, APP_SERIAL_NUMBER);
+            LOG(INFO) << "hmp package revert, module name=" << saStatusPair.second;
+            revertFlag = true;
             continue;
         }
         int32_t saId = saStatusPair.first;
@@ -101,15 +122,18 @@ void ModuleUpdateConsumer::Run()
         }
         std::string hmpName = it->second;
         if (strcmp(saStatus.c_str(), LOAD_FAIL) == 0 || strcmp(saStatus.c_str(), CRASH) == 0) {
-            ModuleUpdateMain::GetInstance().SaveInstallerResult(hmpName, ModuleErrorCode::ERR_SAMGR_REVERT,
-                std::to_string(saId) + " revert", timer);
-            DoRevert(hmpName, saId);
+            code = ModuleErrorCode::ERR_SAMGR_REVERT;
+            LOG(INFO) << "hmp package revert, module name=" << hmpName << "; said=" << saId;
+            revertFlag = true;
         } else if (IsHotSa(saId) && strcmp(saStatus.c_str(), UNLOAD) == 0) {
-            DoUnload(hmpName, saId);
+            LOG(INFO) << "sa is unload, said=" << saId;
         } else {
             LOG(ERROR) << "sa status not exist, said=" << saId;
         }
     } while (true);
+    if (revertFlag) {
+        DoRevert(code);
+    }
     LOG(INFO) << "consumer exit";
 }
 } // SysInstaller
