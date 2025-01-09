@@ -35,6 +35,10 @@
 #include "string_ex.h"
 #include "utils.h"
 
+#ifdef SUPPORT_HVB
+#include "fs_hvb.h"
+#endif
+
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
@@ -111,45 +115,27 @@ bool CheckModulePackage(const std::string &mountPoint, const ModuleFile &moduleF
     }
     return true;
 }
+
+bool VerifyAndCreateDm(ModuleFile &moduleFile, string &blockDevice)
+{
+    LOG(ERROR) << "Verify and create dm.";
+    if (!moduleFile.VerifyModuleVerity()) {
+        LOG(ERROR) << "verify image failed of " << moduleFile.GetPath();
+        return false;
+    }
+    if (!CreateDmDevice(moduleFile, blockDevice)) {
+        LOG(ERROR) << "Could not create dm-verity device on " << blockDevice;
+        Loop::ClearDmLoopDevice(blockDevice, false);
+        return false;
+    }
+    return true;
+}
 }
 
 ModuleUpdate &ModuleUpdate::GetInstance()
 {
     static ModuleUpdate instance;
     return instance;
-}
-
-bool ModuleUpdate::RemoveMountPoint(const string &hmpName)
-{
-    string mountPoint = string(MODULE_ROOT_DIR) + "/" + hmpName;
-    LOG(INFO) << "Remove old mountpoint " << mountPoint;
-    if (!CheckPathExists(mountPoint)) {
-        LOG(INFO) << mountPoint << " doesn't exist.";
-        return true;
-    }
-
-    std::string prefixes[] = {MODULE_PREINSTALL_DIR, UPDATE_ACTIVE_DIR};
-    int ret = -1;
-    for (auto prefix : prefixes) {
-        std::string imagePath = prefix + "/" + hmpName + "/" + IMG_FILE_NAME;
-        if (Loop::RemoveDmLoopDevice(mountPoint, imagePath)) {
-            ret = 0;
-            LOG(INFO) << "Successful remove dm loop device, mountPoint=" << mountPoint
-                << ", imagePath=" << imagePath;
-            break;
-        }
-    }
-    if (ret != 0) {
-        LOG(ERROR) << "Fail remove dm loop device, mountPoint=" << mountPoint;
-        return false;
-    }
-    ret = rmdir(mountPoint.c_str());
-    if (ret != 0) {
-        LOG(WARNING) << "Could not rmdir " << mountPoint << " errno: " << errno;
-        return false;
-    }
-    LOG(INFO) << "Successful remove mountPoint, hmpName: " << hmpName;
-    return true;
 }
 
 std::unique_ptr<ModuleFile> ModuleUpdate::GetLatestUpdateModulePackage(const string &hmpName)
@@ -191,19 +177,7 @@ void ModuleUpdate::ProcessHmpFile(const string &hmpFile, const ModuleUpdateStatu
         LOG(ERROR) << "Process hmp file fail, module file is null";
         return;
     }
-    HmpInstallType type = moduleFile->GetHmpPackageType();
-    if (CheckBootComplete() && IsHotHmpPackage(static_cast<int32_t>(type))) {
-        if (type == HOT_SA_TYPE && IsRunning(moduleFile->GetVersionInfo().saInfoList.front().saId)) {
-            LOG(INFO) << "ondemand sa is running, saId=" << moduleFile->GetVersionInfo().saInfoList.front().saId;
-            return;
-        }
-        if (type == HOT_APP_TYPE) {
-            KillProcessOnArkWeb();
-        }
-        if (!RemoveMountPoint(status.hmpName)) {
-            return;
-        }
-    } else if (CheckMountComplete(status.hmpName)) {
+    if (CheckMountComplete(status.hmpName)) {
         LOG(INFO) << "Check mount complete, hmpName=" << status.hmpName;
         return;
     }
@@ -248,6 +222,7 @@ bool ModuleUpdate::DoModuleUpdate(ModuleUpdateStatus &status)
 
 void ModuleUpdate::CheckModuleUpdate()
 {
+    InitUpdaterLogger("CheckModuleUpdate", MODULE_UPDATE_LOG_FILE, "", "");
     LOG(INFO) << "CheckModuleUpdate begin";
     Timer timer;
     std::vector<std::string> files;
@@ -277,11 +252,14 @@ void ModuleUpdate::CheckModuleUpdate()
             LOG(ERROR) << "Failed to remove " << UPDATE_INSTALL_DIR << " err=" << errno;
         }
     };
+    if (!hmpNameSet.empty()) {
+        MountModuleUpdateDir();
+    }
     for (auto &hmpName : hmpNameSet) {
         instance.AddTask(hmpName);
     }
     while (instance.GetCurTaskNum() != 0) {
-        sleep(1);
+        usleep(3000); // 3000: 3ms
     }
 }
 
@@ -323,21 +301,20 @@ void ModuleUpdate::PrepareModuleFileList(const ModuleUpdateStatus &status)
             return;
         }
         // when choose preInstall hmp, remove activeHmp and backupHmp
-        RemoveSpecifiedDir(std::string(UPDATE_ACTIVE_DIR) + "/" + status.hmpName);
-        RemoveSpecifiedDir(std::string(UPDATE_BACKUP_DIR) + "/" + status.hmpName);
+        RemoveSpecifiedDir(std::string(UPDATE_ACTIVE_DIR) + "/" + status.hmpName, false);
+        RemoveSpecifiedDir(std::string(UPDATE_BACKUP_DIR) + "/" + status.hmpName, false);
     }
 }
 
 bool ModuleUpdate::ActivateModules(ModuleUpdateStatus &status, const Timer &timer)
 {
     // size = 1
-    for (const auto &moduleFile : moduleFileList_) {
+    for (auto &moduleFile : moduleFileList_) {
         if (!moduleFile.GetImageStat().has_value()) {
             LOG(INFO) << moduleFile.GetPath() << " is empty module package";
             continue;
         }
         status.isPreInstalled = repository_.IsPreInstalledModule(moduleFile);
-        status.isHotInstall = IsHotHmpPackage(static_cast<int32_t>(moduleFile.GetHmpPackageType()));
         status.isAllMountSuccess = MountModulePackage(moduleFile, !status.isPreInstalled);
         if (!status.isAllMountSuccess) {
             LOG(ERROR) << "Failed to mount module package " << moduleFile.GetPath();
@@ -361,16 +338,41 @@ void ModuleUpdate::WaitDevice(const std::string &blockDevice) const
     }
 }
 
-bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool mountOnVerity) const
+bool ModuleUpdate::VerifyImageAndCreateDm(ModuleFile &moduleFile, bool mountOnVerity, string &blockDevice)
 {
-    string mountPoint = string(MODULE_ROOT_DIR) + "/" + moduleFile.GetVersionInfo().hmpName;
+    if (!mountOnVerity) {
+        LOG(INFO) << "Current hmp path is preInstalled, do not check.";
+        return true;
+    }
+    if (ImageVerifyFunc_ != nullptr) {
+        return ImageVerifyFunc_(moduleFile, blockDevice);
+    }
+    LOG(ERROR) << "ImageVerifyFunc_ is nullptr, error.";
+    return false;
+}
+
+string ModuleUpdate::CreateMountPoint(const ModuleFile &moduleFile) const
+{
+    string mountPoint = string(MODULE_ROOT_DIR);
+    if (moduleFile.GetVersionInfo().type != HMP_TRAIN_TYPE) {
+        mountPoint = string(MODULE_ROOT_DIR) + "/" + moduleFile.GetVersionInfo().hmpName;
+    }
     LOG(INFO) << "Creating mount point: " << mountPoint;
-    Timer timer;
-    int ret = 0;
     if (!CreateDirIfNeeded(mountPoint, MOUNT_POINT_MODE)) {
         LOG(ERROR) << "Could not create mount point " << mountPoint << " errno: " << errno;
+        return "";
+    }
+    return mountPoint;
+}
+
+bool ModuleUpdate::MountModulePackage(ModuleFile &moduleFile, const bool mountOnVerity)
+{
+    string mountPoint = CreateMountPoint(moduleFile);
+    if (mountPoint.empty()) {
         return false;
     }
+    Timer timer;
+    int ret = 0;
     ON_SCOPE_EXIT(rmDir) {
         ret = rmdir(mountPoint.c_str());
         if (ret != 0) {
@@ -380,7 +382,6 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
     if (!CheckModulePackage(mountPoint, moduleFile)) {
         return false;
     }
-
     const string &fullPath = ExtractFilePath(moduleFile.GetPath()) + IMG_FILE_NAME;
     const ImageStat &imageStat = moduleFile.GetImageStat().value();
     Loop::LoopbackDeviceUniqueFd loopbackDevice;
@@ -390,12 +391,8 @@ bool ModuleUpdate::MountModulePackage(const ModuleFile &moduleFile, const bool m
     }
     LOG(INFO) << "Loopback device created: " << loopbackDevice.name << " fsType=" << imageStat.fsType;
     string blockDevice = loopbackDevice.name;
-    if (mountOnVerity) {
-        if (!CreateDmDevice(moduleFile, blockDevice)) {
-            LOG(ERROR) << "Could not create dm-verity device on " << blockDevice;
-            Loop::ClearDmLoopDevice(blockDevice, false);
-            return false;
-        }
+    if (!VerifyImageAndCreateDm(moduleFile, mountOnVerity, blockDevice)) {
+        return false;
     }
     WaitDevice(blockDevice);
     uint32_t mountFlags = MS_NOATIME | MS_NODEV | MS_DIRSYNC | MS_RDONLY;
@@ -420,11 +417,26 @@ void ModuleUpdate::ReportModuleUpdateStatus(const ModuleUpdateStatus &status) co
     }
     if (!status.isAllMountSuccess) {
         LOG(ERROR) << "ReportModuleUpdateStatus mount fail, hmp name=" << status.hmpName;
-        RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName);
-        Revert(status.hmpName, !status.isHotInstall);
+        RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName, false);
+        Revert(status.hmpName, true);
         return;
     }
     LOG(INFO) << "ReportModuleUpdateStatus mount success, hmp name=" << status.hmpName;
+}
+
+void ModuleUpdate::RegisterImageVerifyFunc(ImageVerifyFunc ptr, int32_t level)
+{
+    if (level <= registeredLevel_) {
+        LOG(WARNING) << "register level is smaller, " << level;
+        return;
+    }
+    registeredLevel_ = level;
+    ImageVerifyFunc_ = std::move(ptr);
+}
+
+extern "C" __attribute__((constructor)) void RegisterImgVerifyFunc(void)
+{
+    ModuleUpdate::GetInstance().RegisterImageVerifyFunc(VerifyAndCreateDm, REGISTER_LEVEL_ONE);
 }
 } // namespace SysInstaller
 } // namespace OHOS

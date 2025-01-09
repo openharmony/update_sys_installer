@@ -27,7 +27,6 @@ void TaskCallback(ModuleUpdateTask task)
     LOG(INFO) << "module update callback, hmp name=" << hmpName;
     ModuleUpdateStatus status;
     status.hmpName = hmpName;
-    status.isHotInstall = false;
     auto ret = ModuleUpdate::GetInstance().DoModuleUpdate(status);
     ModuleUpdateTaskManager::GetInstance().SetTaskResult(ret);
 }

@@ -16,6 +16,7 @@
 #include "module_update_verify.h"
 #include "cert_verify.h"
 #include "directory_ex.h"
+#include "diff_patch/diff_patch_interface.h" // update diff interface
 #include "hash_data_verifier.h"
 #include "log/log.h"
 #include "json_node.h"
@@ -46,6 +47,10 @@ bool GetHmpType(const JsonNode &root, std::string &type)
 
 bool CheckApiVersion(const std::string &apiVersion)
 {
+    if (apiVersion.empty()) {
+        LOG(INFO) << "apiVersion is empty, default is true.";
+        return true;
+    }
     int sysApiVersion = GetDeviceApiVersion();
     int hmpApiVersion = Utils::String2Int<int>(apiVersion, Utils::N_DEC);
     if (hmpApiVersion <= sysApiVersion) {
@@ -58,6 +63,10 @@ bool CheckApiVersion(const std::string &apiVersion)
 bool CheckSaSdkVersion(const std::string &saSdkVersion)
 {
     //sasdk_M.S.F.B
+    if (saSdkVersion.empty()) {
+        LOG(INFO) << "saSdkVersion is empty, default is true.";
+        return true;
+    }
     std::vector<std::string> saSdkVersionVec {};
     std::string sysSaSdkVersion = GetDeviceSaSdkVersion();
     if (!ParseVersion(sysSaSdkVersion, "_", saSdkVersionVec)) {
@@ -88,6 +97,18 @@ bool GetPackInfoVer(const JsonNode &root, const std::string &key, std::string &v
     LOG(INFO) << key << " " << version;
     return true;
 }
+
+bool GetPackageType(const JsonNode &root, std::string &type)
+{
+    const JsonNode &typeJson = root["packageType"];
+    std::optional<std::string> hmpPackageType = typeJson.As<std::string>();
+    if (!hmpPackageType.has_value()) {
+        LOG(ERROR) << "HmpInfo: Failed to get type val";
+        return false;
+    }
+    type = hmpPackageType.value();
+    return true;
+}
 }
 
 bool CheckPackInfoVer(const std::string &pkgPackInfoPath)
@@ -108,7 +129,7 @@ bool CheckPackInfoVer(const std::string &pkgPackInfoPath)
         GetPackInfoVer(root, HMP_SA_SDK_VERSION, saSdkVersion)) {
         return CheckSaSdkVersion(saSdkVersion);
     }
-    if (type == HMP_MIX_TYPE &&
+    if ((type == HMP_MIX_TYPE || type == HMP_TRAIN_TYPE) &&
         GetPackInfoVer(root, HMP_SA_SDK_VERSION, saSdkVersion) &&
         GetPackInfoVer(root, HMP_API_VERSION, apiVersion)) {
         return CheckApiVersion(apiVersion) && CheckSaSdkVersion(saSdkVersion);
@@ -123,6 +144,52 @@ void CleanErrDir(const std::string &path)
         LOG(INFO) << "delete err dir :"<< path;
         ForceRemoveDirectory(path.substr(0, path.rfind("/")));
     }
+}
+
+bool IsIncrementPackage(const std::string &pkgPackInfoPath)
+{
+    std::string packInfo = GetContentFromZip(pkgPackInfoPath, PACK_INFO_NAME);
+    JsonNode root(packInfo);
+    std::string packageType;
+    if (!GetPackageType(root, packageType)) {
+        LOG(INFO) << pkgPackInfoPath << " not support increment";
+        return false;
+    }
+    LOG(INFO) << pkgPackInfoPath << "; packageType = " << packageType;
+    if (packageType == HMP_INCR_PACKAGE_TYPE) {
+        return true;
+    }
+    return false;
+}
+
+bool RestorePackage(const std::string &dstFile, const std::string &sourceFile)
+{
+    LOG(INFO) << "Start restore file " << dstFile << "; source is " << sourceFile;
+    Timer timer;
+    if (dstFile.find(UPDATE_INSTALL_DIR) == std::string::npos) {
+        LOG(ERROR) << dstFile << " is not installDir, restore fail.";
+        return false;
+    }
+    std::string diffFile = ExtractFilePath(dstFile) + IMG_DIFF_FILE_NAME;
+    std::string restoreImgFile = ExtractFilePath(dstFile) + IMG_FILE_NAME;
+    if (!CheckPathExists(diffFile) || CheckPathExists(restoreImgFile)) {
+        LOG(ERROR) << diffFile << " is not exist or dest image exists, restore fail.";
+        return false;
+    }
+    if (!CheckPathExists(sourceFile)) {
+        LOG(ERROR) << sourceFile << " is not exist.";
+        return false;
+    }
+    int32_t result = Updater::ApplyPatch(diffFile, sourceFile, restoreImgFile);
+    if (result != 0) {
+        LOG(ERROR) << "Restore package failed, ret is " << result << " err:" << strerror(errno);
+        return false;
+    }
+    if (unlink(diffFile.c_str()) != 0) {
+        LOG(WARNING) << "Failed to unlink " << diffFile << " err:" << strerror(errno);
+    }
+    LOG(INFO) << "restore image succ, restore timer:" << timer;
+    return true;
 }
 }
 }

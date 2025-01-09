@@ -17,6 +17,7 @@
 #include <cerrno>
 #include <cstdio>
 #include <dirent.h>
+#include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <thread>
@@ -162,6 +163,20 @@ bool ReadFullyAtOffset(int fd, uint8_t *data, size_t count, off_t offset)
     return true;
 }
 
+bool WriteFullyAtOffset(int fd, const uint8_t *data, size_t count, off_t offset)
+{
+    while (count > 0) {
+        ssize_t writeSize = pwrite(fd, data, count, offset);
+        if (writeSize <= 0) {
+            return false;
+        }
+        data += writeSize;
+        count -= static_cast<size_t>(writeSize);
+        offset += writeSize;
+    }
+    return true;
+}
+
 uint16_t ReadLE16(const uint8_t *buff)
 {
     if (buff == nullptr) {
@@ -206,13 +221,36 @@ std::string GetRealPath(const std::string &filePath)
     return realPath;
 }
 
+__attribute__((weak)) void MountModuleUpdateDir(void)
+{
+    LOG(INFO) << "mount /module_update.";
+    if (mount("tmpfs", "/module_update", "tmpfs", MS_NOEXEC | MS_NODEV | MS_NOSUID, "mode=0755") != 0) {
+        LOG(ERROR) << "mount module_Update tmpfs fail, " << strerror(errno);
+    }
+    if (mount(nullptr, "/module_update", nullptr, MS_SHARED, nullptr) != 0) {
+        LOG(ERROR) << "mount module_Update shared fail, " << strerror(errno);
+    }
+}
+
+__attribute__((weak)) bool RevertImageCert(const std::string &hmpName)
+{
+    LOG(INFO) << "Revert image cert, default is true";
+    return true;
+}
+
+__attribute__((weak)) bool VerityInfoWrite(const ModuleFile &file)
+{
+    LOG(INFO) << "VerityInfoWrite, default is true.";
+    return true;
+}
+
 void Revert(const std::string &hmpName, bool reboot)
 {
-    LOG(INFO) << "RevertAndReboot, reboot: " << reboot;
+    LOG(INFO) << "RevertAndReboot, reboot: " << reboot << "; hmpName: " << hmpName;
     std::string installPath = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
     if (CheckPathExists(installPath)) {
         if (!ForceRemoveDirectory(installPath)) {
-            LOG(ERROR) << "Failed to remove installPath: " << installPath;
+            LOG(ERROR) << "Failed to remove installPath: " << installPath << " err=" << errno;
             return;
         }
     }
@@ -224,7 +262,7 @@ void Revert(const std::string &hmpName, bool reboot)
         return;
     }
     if (!ForceRemoveDirectory(activePath)) {
-        LOG(ERROR) << "Failed to remove " << activePath;
+        LOG(ERROR) << "Failed to remove " << activePath << " err=" << errno;
         return;
     }
 
@@ -238,10 +276,11 @@ void Revert(const std::string &hmpName, bool reboot)
             LOG(ERROR) << "Failed to restore original permissions for " << activePath << " err=" << errno;
         }
     }
+    RevertImageCert(hmpName);
     sync();
     if (reboot) {
         LOG(INFO) << "Rebooting";
-        DoReboot("");
+        DoReboot("module_update revert.");
     }
 }
 
@@ -291,26 +330,6 @@ bool CheckBootComplete(void)
     return strcmp(value, BOOT_SUCCESS_VALUE) == 0;
 }
 
-bool IsHotHmpPackage(int32_t type)
-{
-    return false;
-}
-
-bool IsHotHmpPackage(const std::string &hmpName)
-{
-    std::string preInstalledPath = std::string(MODULE_PREINSTALL_DIR) + "/" + hmpName + "/" + HMP_INFO_NAME;
-    if (!Utils::IsFileExist(preInstalledPath)) {
-        LOG(ERROR) << "preInstalled hmp is not exist: " << preInstalledPath;
-        return false;
-    }
-    std::unique_ptr<ModuleFile> preInstalledFile = ModuleFile::Open(preInstalledPath);
-    if (preInstalledFile == nullptr) {
-        LOG(ERROR) << "preInstalled file is invalid: " << preInstalledPath;
-        return false;
-    }
-    return IsHotHmpPackage(static_cast<int32_t>(preInstalledFile->GetHmpPackageType()));
-}
-
 std::string GetDeviceSaSdkVersion(void)
 {
     std::string sdkVersion = system::GetParameter("const.build.sa_sdk_version", "");
@@ -346,15 +365,33 @@ std::string GetContentFromZip(const std::string &zipPath, const std::string &fil
     return content;
 }
 
-void RemoveSpecifiedDir(const std::string &path)
+bool RemoveSpecifiedDir(const std::string &path, bool keepDir)
 {
     if (!CheckPathExists(path)) {
-        return;
+        return false;
     }
-    LOG(INFO) << "Remove specified dir: " << path;
-    if (!ForceRemoveDirectory(path)) {
-        LOG(ERROR) << "Failed to remove: " << path << ", err: " << errno;
+    LOG(INFO) << "Clear specified dir: " << path << "; keepdir: " << keepDir;
+    if (!keepDir) {
+        if (!ForceRemoveDirectory(path)) {
+            LOG(WARNING) << "Failed to remove: " << path << ", err: " << errno;
+            return false;
+        }
+        return true;
     }
+    if (!std::filesystem::is_directory(path)) {
+        LOG(WARNING) << "The file is not a directory: " << path.c_str();
+        return false;
+    }
+    bool ret = true;
+    for (const auto &entry : std::filesystem::directory_iterator(path)) {
+        std::error_code errorCode;
+        LOG(INFO) << "deleted " << entry.path().c_str() << ";";
+        if (!std::filesystem::remove_all(entry.path(), errorCode)) {
+            LOG(ERROR) << "Failed to deleted " << entry.path().c_str() << "; errorCode: " << errorCode.value();
+            ret = false;
+        }
+    }
+    return ret;
 }
 
 bool CheckAndUpdateRevertResult(const std::string &hmpPath, const std::string &resultInfo, const std::string &keyWord)
@@ -399,16 +436,6 @@ bool CheckAndUpdateRevertResult(const std::string &hmpPath, const std::string &r
     LOG(INFO) << "Update revert result succ";
     sync();
     return ret;
-}
-
-void KillProcessOnArkWeb(void)
-{
-}
-
-bool InstallHmpBundle(const std::string &hmpPath, bool revert)
-{
-    LOG(INFO) << "Start to install hmp bundle: " << hmpPath << " ,revert: " << revert;
-    return false;
 }
 } // namespace SysInstaller
 } // namespace OHOS

@@ -53,6 +53,7 @@ ohos_shared_library("module_update_utils") {
     "openssl:libcrypto_shared",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "updater:libdiff_patch_shared",
     "updater:libmiscinfo",
     "updater:libpackage_shared",
     "updater:libringbuffer",
@@ -62,7 +63,10 @@ ohos_shared_library("module_update_utils") {
   ]
 
   if (defined(global_parts_info.startup_hvb)) {
-    sources += [ "${sys_installer_path}/services/module_update/util/src/module_hvb_ops.cpp" ]
+    sources += [
+      "${sys_installer_path}/services/module_update/util/src/module_hvb_ops.cpp",
+      "${sys_installer_path}/services/module_update/util/src/module_hvb_utils.cpp",
+    ]
 
     defines = [ "SUPPORT_HVB" ]
 

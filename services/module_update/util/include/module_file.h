@@ -20,6 +20,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
 
 #ifdef SUPPORT_HVB
 #include "hvb.h"
@@ -31,12 +32,14 @@ namespace {
 constexpr size_t FS_TYPE_MAX_SIZE = 10;
 }
 
+constexpr const char *HMP_TRAIN_TYPE = "moduleTrain";
 constexpr const char *HMP_APP_TYPE = "APP";
 constexpr const char *HMP_SA_TYPE = "systemAbility";
 constexpr const char *HMP_SA_TYPE_OLD = "SYSTEM ability";
 constexpr const char *HMP_MIX_TYPE = "combineType";
 constexpr const char *HMP_API_VERSION = "apiVersion";
 constexpr const char *HMP_SA_SDK_VERSION = "saSdkVersion";
+constexpr const char *HMP_MODULE_INFO = "moduleInfo";
 
 bool ExtractZipFile(ModuleZipHelper &helper, const std::string &fileName, std::string &buf);
 bool ParseVersion(const std::string &version, const std::string &split, std::vector<std::string> &versionVec);
@@ -46,7 +49,6 @@ bool CompareSaSdkVersion(const std::vector<std::string> &smallVersion, const std
 extern "C" {
 #endif
 int32_t VerifyModulePackageSign(const std::string &path);
-bool EnhancedVerifyModule(const uint8_t *addr, uint64_t size);
 #ifdef __cplusplus
 }
 #endif
@@ -73,30 +75,24 @@ struct BundleInfo {
     std::string bundleVersion;
 };
 
+struct ModuleInfo {
+    std::list<SaInfo> saInfoList {};
+    std::list<BundleInfo> bundleInfoList {};
+};
+
 struct ModulePackageInfo {
     std::string hmpName;
     std::string version;
     std::string saSdkVersion;
     std::string type;
     int apiVersion {-1};
-    int hotApply {0};
-    std::list<SaInfo> saInfoList;
-    std::list<BundleInfo> bundleInfoList;
+    std::unordered_map<std::string, ModuleInfo> moduleMap {};
 };
 
 struct ImageStat {
     uint32_t imageOffset;
     uint32_t imageSize;
     char fsType[FS_TYPE_MAX_SIZE];
-};
-
-enum HmpInstallType {
-    COLD_SA_TYPE = 0x01,
-    COLD_APP_TYPE,
-    COLD_MIX_TYPE,
-    HOT_SA_TYPE = 0x10,
-    HOT_APP_TYPE,
-    HOT_MIX_TYPE
 };
 
 class ModuleFile {
@@ -109,7 +105,7 @@ public:
         : modulePath_(modulePath),
           versionInfo_(versionInfo),
           imageStat_(imageStat) {}
-    virtual ~ModuleFile() = default;
+    virtual ~ModuleFile();
     ModuleFile(const ModuleFile&) = default;
     ModuleFile& operator=(const ModuleFile&) = default;
     ModuleFile(ModuleFile&&) = default;
@@ -131,9 +127,9 @@ public:
     {
         modulePath_ = path;
     }
+    bool ProcessModuleUpdateVerityInfo(const std::string &partition) const;
     bool VerifyModuleVerity();
     void ClearVerifiedData();
-    HmpInstallType GetHmpPackageType(void) const;
 #ifdef SUPPORT_HVB
     struct hvb_verified_data *GetVerifiedData() const
     {

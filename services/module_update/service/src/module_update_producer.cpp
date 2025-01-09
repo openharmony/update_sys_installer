@@ -40,7 +40,7 @@ ModuleUpdateProducer::ModuleUpdateProducer(ModuleUpdateQueue &queue,
     volatile sig_atomic_t &exit)
     : queue_(queue),
       saIdHmpMap_(saIdHmpMap),
-      hmpNameSet_(hmpSet),
+      moduleNameSet_(hmpSet),
       exit_(exit) {}
 
 void ModuleUpdateProducer::AddAbnormalSa()
@@ -63,9 +63,8 @@ void ModuleUpdateProducer::AddAbnormalSa()
                 LOG(ERROR) << "Failed to get parameter " << BOOT_COMPLETE_PARAM;
                 continue;
             }
-            if (strcmp(saStatus, UNLOAD) != 0 || (strcmp(saStatus, UNLOAD) == 0 &&
-                strcmp(bootValue, BOOT_SUCCESS_VALUE) == 0 &&
-                IsHotSa(saId))) {
+            if (strcmp(bootValue, BOOT_SUCCESS_VALUE) != 0 &&
+                (strcmp(saStatus, LOAD_FAIL) == 0 || strcmp(saStatus, CRASH) == 0)) {
                 queue_.Put(saStatusPair);
             }
             SetParameter(attr.c_str(), "");
@@ -81,8 +80,8 @@ void ModuleUpdateProducer::AddAbnormalApp()
 {
     char appInstallRes[PARAM_VALUE_SIZE] = "";
     std::size_t resLength = strlen(BMS_INSTALL_FAIL);
-    for (const auto &hmpName : hmpNameSet_) {
-        std::string attr = std::string(BMS_RESULT_PREFIX) + "." + hmpName;
+    for (const auto &moduleName : moduleNameSet_) {
+        std::string attr = std::string(BMS_RESULT_PREFIX) + "." + moduleName;
         if (GetParameter(attr.c_str(), "", appInstallRes, PARAM_VALUE_SIZE) < 0) {
             LOG(ERROR) << "failed to get parameter " << attr;
             continue;
@@ -91,7 +90,7 @@ void ModuleUpdateProducer::AddAbnormalApp()
             (void)memset_s(appInstallRes, PARAM_VALUE_SIZE, 0, PARAM_VALUE_SIZE);
             continue;
         }
-        std::pair<int32_t, std::string> appResultPair = std::make_pair(APP_SERIAL_NUMBER, hmpName);
+        std::pair<int32_t, std::string> appResultPair = std::make_pair(APP_SERIAL_NUMBER, moduleName);
         queue_.Put(appResultPair);
         (void)memset_s(appInstallRes, PARAM_VALUE_SIZE, 0, PARAM_VALUE_SIZE);
     }
@@ -117,21 +116,18 @@ void ModuleUpdateProducer::Run()
             queue_.Stop();
             break;
         }
+        SetParameter(SA_START, SA_NORMAL);
+        SetParameter(BMS_START_INSTALL, NOTIFY_BMS_REVERT);
         if (strcmp(saValue, SA_ABNORMAL) == 0) {
-            SetParameter(SA_START, SA_NORMAL);
             AddAbnormalSa();
         }
         // bms write all hmp install result at once
         if (strcmp(appValue, BMS_REVERT) == 0) {
-            SetParameter(BMS_START_INSTALL, NOTIFY_BMS_REVERT);
             AddAbnormalApp();
         }
         (void)memset_s(saValue, PARAM_VALUE_SIZE, 0, PARAM_VALUE_SIZE);
         (void)memset_s(appValue, PARAM_VALUE_SIZE, 0, PARAM_VALUE_SIZE);
-        if (GetParameter(SA_START, "", saValue, PARAM_VALUE_SIZE) < 0 ||
-            GetParameter(BMS_START_INSTALL, "", appValue, PARAM_VALUE_SIZE) < 0) {
-            exit_ = 1;
-        }
+        exit_ = 1;
     } while (true);
     LOG(INFO) << "producer exit";
 }

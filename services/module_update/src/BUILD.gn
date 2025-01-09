@@ -15,11 +15,17 @@ import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
+
+config("module_update_exported_header") {
+  visibility = [ ":*" ]
+  include_dirs = [ "${sys_installer_path}/services/module_update/include" ]
+}
+
 check_module_update_gen("check_module_update") {
   include_dirs = [ "./include" ]
 
   deps = [ "${sys_installer_path}/services/module_update/src:check_module_update_staic" ]
-
+  output_name = "check_module_update_init"
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "updater:libupdaterlog_shared",
@@ -38,6 +44,8 @@ ohos_static_library("check_module_update_staic") {
     "${sys_installer_path}/services/module_update/src:module_update_static",
   ]
 
+  public_configs = [ ":module_update_exported_header" ]
+
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "updater:libupdaterlog_shared",
@@ -45,11 +53,6 @@ ohos_static_library("check_module_update_staic") {
 
   part_name = "sys_installer"
   subsystem_name = "updater"
-}
-
-config("module_update_exported_header") {
-  visibility = [ ":*" ]
-  include_dirs = [ "${sys_installer_path}/services/module_update/include" ]
 }
 
 ohos_static_library("module_update_static") {

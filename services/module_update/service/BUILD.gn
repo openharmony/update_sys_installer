@@ -26,7 +26,9 @@ config("module_update_service_exported_header") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/services/module_update/include",
+    "${sys_installer_path}/services/module_update/service/include",
     "${sys_installer_path}/services/module_update/util/include",
   ]
 }

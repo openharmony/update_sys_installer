@@ -13,17 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef MODULE_UPDATE_VERIFY_H
-#define MODULE_UPDATE_VERIFY_H
+#ifndef SYS_INSTALLER_MODULE_HVB_UTILS_H
+#define SYS_INSTALLER_MODULE_HVB_UTILS_H
 
 #include <string>
 
+#include "hvb.h"
+#include "hvb_footer.h"
+
 namespace OHOS {
 namespace SysInstaller {
-bool CheckPackInfoVer(const std::string &pkgPackInfoPath);
-void CleanErrDir(const std::string &path);
-bool IsIncrementPackage(const std::string &pkgPackInfoPath);
-bool RestorePackage(const std::string &dstFile, const std::string &sourceFile);
+bool DealModuleUpdateHvbInfo(const std::string &imagePath, uint64_t imageSize, const std::string &partition);
+bool WriteModuleUpdateBlock(const struct hvb_buf &pubkey, const std::string &partition);
+bool GetCertDataFromImage(int fd, uint64_t imageSize, uint64_t offset, uint8_t *pubkey, uint64_t keySize);
+bool GetFooterFromImage(int fd, uint64_t imageSize, struct hvb_footer &footer);
+bool SetModuleFooterData(struct hvb_footer &footer, uint64_t blockSize, uint64_t cert_size);
+uint64_t GetBlockDeviceSize(int fd);
 } // namespace SysInstaller
 } // namespace OHOS
-#endif // MODULE_UPDATE_VERIFY_H
+#endif // SYS_INSTALLER_MODULE_HVB_UTILS_H

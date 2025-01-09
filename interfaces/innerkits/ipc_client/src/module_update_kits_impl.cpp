@@ -18,6 +18,7 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "log/log.h"
+#include "module_constants.h"
 #include "module_error_code.h"
 #include "module_update_load_callback.h"
 #include "module_update_proxy.h"
@@ -176,7 +177,7 @@ int32_t ModuleUpdateKitsImpl::Init()
 
 int32_t ModuleUpdateKitsImpl::InitModuleUpdate()
 {
-    InitUpdaterLogger("ModuleUpdaterClient", "", "", "");
+    InitUpdaterLogger("ModuleUpdaterClient", MODULE_UPDATE_LOG_FILE, "", "");
     LOG(INFO) << "InitModuleUpdate";
     int ret = Init();
     if (ret != 0) {

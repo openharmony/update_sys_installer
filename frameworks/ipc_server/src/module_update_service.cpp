@@ -125,7 +125,7 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
     updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, 0, "");
     if (VerifyModulePackageSign(path) != 0) {
         LOG(ERROR) << "Verify sign failed " << path;
-        ret = ModuleErrorCode::ERR_VERIFY_SIGN_FAIL;
+        ret = ModuleErrorCode::ERR_VERIFY_FAIL;
         return ret;
     }
 
@@ -180,7 +180,7 @@ std::vector<HmpUpdateInfo> ModuleUpdateService::GetHmpUpdateResult()
 
 void ModuleUpdateService::OnStart(const SystemAbilityOnDemandReason &startReason)
 {
-    InitUpdaterLogger("ModuleUpdaterServer", "", "", "");
+    InitUpdaterLogger("ModuleUpdaterServer", MODULE_UPDATE_LOG_FILE, "", "");
     LOG(INFO) << "OnStart, startReason name: " << startReason.GetName() << ", id: " <<
         static_cast<int32_t>(startReason.GetId()) << ", value: " << startReason.GetValue();
     SysInstaller::ModuleUpdateMain& moduleUpdate = SysInstaller::ModuleUpdateMain::GetInstance();
@@ -193,6 +193,13 @@ void ModuleUpdateService::OnStart(const SystemAbilityOnDemandReason &startReason
         strcmp(startReason.GetValue().c_str(), SA_ABNORMAL) == 0) ||
         (strcmp(startReason.GetName().c_str(), BMS_START_INSTALL) == 0 &&
         strcmp(startReason.GetValue().c_str(), BMS_REVERT) == 0)) {
+        if (CheckBootComplete()) {
+            LOG(INFO) << "BootComplete finish, do not revert, reset param.";
+            Utils::SetParameter(SA_START, "");
+            Utils::SetParameter(BMS_START_INSTALL, "");
+            ExitModuleUpdate();
+            return;
+        }
         moduleUpdate.Start();
     }
     LOG(INFO) << "OnStart done";

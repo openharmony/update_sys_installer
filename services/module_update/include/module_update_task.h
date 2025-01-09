@@ -21,7 +21,6 @@
 #include "singleton.h"
 #include "thread_pool.h"
 
-
 namespace OHOS {
 namespace SysInstaller {
 class ModuleUpdateTask {

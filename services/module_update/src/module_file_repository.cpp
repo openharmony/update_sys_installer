@@ -45,9 +45,19 @@ void ModuleFileRepository::InitRepository(const string &hmpName, const Timer &ti
         const string checkDir = path + "/" + hmpName;
         GetDirFiles(checkDir, files);
         for (string &file : files) {
+            if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
+                continue;
+            }
+            // verifi zip before open it.
+            if (path != MODULE_PREINSTALL_DIR && VerifyModulePackageSign(file) != 0) {
+                LOG(ERROR) << "VerifyModulePackageSign failed of " << file;
+                SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_FAIL, "verify fail", timer);
+                continue;
+            }
             ProcessFile(hmpName, path, file, fileMap, timer);
         }
     }
+    LOG(INFO) << "InitRepository all timer:" << timer;
 }
 
 void ModuleFileRepository::SaveInstallerResult(const std::string &path, const std::string &hmpName,
@@ -56,7 +66,8 @@ void ModuleFileRepository::SaveInstallerResult(const std::string &path, const st
     if (path.find(UPDATE_INSTALL_DIR) == std::string::npos && path.find(UPDATE_ACTIVE_DIR) == std::string::npos) {
         return;
     }
-    if (!CheckFileSuffix(path, MODULE_PACKAGE_SUFFIX)) {
+    if (!CheckFileSuffix(path, MODULE_PACKAGE_SUFFIX) && !CheckFileSuffix(path, MODULE_IMAGE_SUFFIX)) {
+        LOG(WARNING) << "SaveInstallerResult path:" << path << "; break;";
         return;
     }
     if (!CheckPathExists(MODULE_RESULT_PATH)) {
@@ -85,36 +96,23 @@ void ModuleFileRepository::SaveInstallerResult(const std::string &path, const st
 void ModuleFileRepository::ProcessFile(const string &hmpName, const string &path, const string &file,
     std::unordered_map<std::string, ModuleFile> &fileMap, const Timer &timer) const
 {
-    if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
-        return;
-    }
     std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
     if (moduleFile == nullptr || moduleFile->GetVersionInfo().hmpName != hmpName) {
         return;
     }
     if (!moduleFile->GetImageStat().has_value()) {
         LOG(ERROR) << "verify failed, img is empty: " << file;
-        SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "img empty", timer);
+        SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_FAIL, "img empty", timer);
         return;
     }
     if (path != MODULE_PREINSTALL_DIR) {
         if (!CheckFilePath(*moduleFile, path)) {
             LOG(ERROR) << "Open " << file << " failed";
-            SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "get pub key fail", timer);
-            return;
-        }
-        if (VerifyModulePackageSign(file) != 0) {
-            LOG(ERROR) << "VerifyModulePackageSign failed of " << file;
-            SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "verify fail", timer);
-            return;
-        }
-        if (!moduleFile->VerifyModuleVerity()) {
-            LOG(ERROR) << "verify verity failed of " << file;
-            SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_SIGN_FAIL, "hvb fail", timer);
+            SaveInstallerResult(path, hmpName, ModuleErrorCode::ERR_VERIFY_FAIL, "get pub key fail", timer);
             return;
         }
     }
-    LOG(INFO) << "ProcessFile  " << file << " successful";
+    LOG(INFO) << "ProcessFile " << file << " successful";
     fileMap.insert(std::make_pair(path, std::move(*moduleFile)));
 }
 
@@ -171,7 +169,7 @@ void ModuleFileRepository::Clear()
     moduleFileMap_.clear();
 }
 
-std::unordered_map<std::string, std::unordered_map<std::string, ModuleFile>> &ModuleFileRepository::GetModuleMap(void)
+const std::unordered_map<string, std::unordered_map<string, ModuleFile>> &ModuleFileRepository::GetModuleMap(void)
 {
     return moduleFileMap_;
 }

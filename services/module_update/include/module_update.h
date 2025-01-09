@@ -26,27 +26,33 @@
 
 namespace OHOS {
 namespace SysInstaller {
+using ImageVerifyFunc = std::function<bool(ModuleFile &, std::string &)>;
+
 class ModuleUpdate {
 public:
     static ModuleUpdate &GetInstance();
     virtual ~ModuleUpdate() = default;
     void CheckModuleUpdate();
     bool DoModuleUpdate(ModuleUpdateStatus &status);
-    bool RemoveMountPoint(const std::string &hmpName);
+    void RegisterImageVerifyFunc(ImageVerifyFunc ptr, int32_t level);
 
 private:
     void PrepareModuleFileList(const ModuleUpdateStatus &status);
     bool ActivateModules(ModuleUpdateStatus &status, const Timer &timer);
-    bool MountModulePackage(const ModuleFile &moduleFile, const bool mountOnVerity) const;
+    bool MountModulePackage(ModuleFile &moduleFile, const bool mountOnVerity);
     void ReportModuleUpdateStatus(const ModuleUpdateStatus &status) const;
     void WaitDevice(const std::string &blockDevice) const;
     bool CheckMountComplete(const std::string &hmpName) const;
     void ProcessHmpFile(const std::string &hmpFile, const ModuleUpdateStatus &status, const Timer &timer);
     std::unique_ptr<ModuleFile> GetLatestUpdateModulePackage(const std::string &hmpName);
     bool CheckRevert(const std::string &hmpName);
+    std::string CreateMountPoint(const ModuleFile &moduleFile) const;
+    bool VerifyImageAndCreateDm(ModuleFile &moduleFile, bool mountOnVerity, std::string &blockDevice);
 
     std::list<ModuleFile> moduleFileList_;
     ModuleFileRepository repository_;
+    ImageVerifyFunc ImageVerifyFunc_ = nullptr;
+    int32_t registeredLevel_ = 0;
 };
 } // SysInstaller
 } // namespace OHOS
