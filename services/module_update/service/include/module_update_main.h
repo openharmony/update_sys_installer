@@ -63,6 +63,7 @@ private:
     std::unordered_map<int32_t, std::string> saIdHmpMap_;
     std::mutex mlock_;
     std::unordered_map<std::string, std::string> hmpWorkDirMap_;
+    std::unique_ptr<ModuleFile> installModule_ = nullptr;
 };
 } // namespace SysInstaller
 } // namespace OHOS

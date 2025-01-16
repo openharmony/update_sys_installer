@@ -12,3 +12,4 @@
 # limitations under the License.
 
 persist.moduleupdate.bms. = update:update:0775
+persist.hwmoduletrain.display. = update:update:0775

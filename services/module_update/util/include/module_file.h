@@ -83,6 +83,7 @@ struct ModuleInfo {
 struct ModulePackageInfo {
     std::string hmpName;
     std::string version;
+    std::string displayVersion;
     std::string saSdkVersion;
     std::string type;
     int apiVersion {-1};

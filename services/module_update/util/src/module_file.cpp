@@ -126,8 +126,14 @@ bool ParseHmpVersionInfo(const JsonNode &package, ModulePackageInfo &versionInfo
         LOG(ERROR) << "Hmpinfo: Failed to get hmp version val";
         return false;
     }
+    std::optional<string> displayVersion = package["displayVersion"].As<string>();
+    if (!displayVersion.has_value()) {
+        LOG(ERROR) << "Hmpinfo: Failed to get hmp display version val";
+        return false;
+    }
     versionInfo.hmpName = name.value();
     versionInfo.version = version.value();
+    versionInfo.displayVersion = displayVersion.value();
 
     if (versionInfo.type != HMP_SA_TYPE && versionInfo.type != HMP_SA_TYPE_OLD) {
         std::optional<string> apiVersion = package[HMP_API_VERSION].As<string>();
