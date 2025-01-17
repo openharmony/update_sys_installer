@@ -276,7 +276,6 @@ bool ModuleUpdate::CheckRevert(const std::string &hmpName)
         // only system hmp
         if (value.size() == 1) {
             LOG(ERROR) << "active dir destroyed, but backup dir exists, try to revert.";
-            Utils::SetParameter(BMS_START_INSTALL, NOTIFY_BMS_REVERT);
             return true;
         }
     }
@@ -403,6 +402,7 @@ bool ModuleUpdate::MountModulePackage(ModuleFile &moduleFile, const bool mountOn
         return false;
     }
     LOG(INFO) << "Successfully mounted module package " << fullPath << " on " << mountPoint << " duration=" << timer;
+    SetModuleVersion(moduleFile);
     loopbackDevice.CloseGood();
     CANCEL_SCOPE_EXIT_GUARD(rmDir);
     return true;

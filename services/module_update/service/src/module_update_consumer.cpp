@@ -27,49 +27,6 @@
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
-namespace {
-// get all app name in moduleTrain
-void GetModuleInfoForBms(std::string &revertHmpName, std::unordered_set<std::string> &moduleNameSet)
-{
-    std::vector<std::string> files;
-    GetDirFiles(MODULE_PREINSTALL_DIR, files);
-    for (auto &file : files) {
-        if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
-            continue;
-        }
-        std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(file);
-        if (moduleFile == nullptr) {
-            continue;
-        }
-        std::string hmpName = GetHmpName(file);
-        if (hmpName.empty()) {
-            continue;
-        }
-        for (const auto &[key, value] : moduleFile->GetVersionInfo().moduleMap) {
-            if (!value.bundleInfoList.empty()) {
-                moduleNameSet.emplace(key);
-            }
-        }
-        revertHmpName = hmpName;
-    }
-}
-
-// write all app name for bms revert
-int32_t NotifyBmsRevert(const std::unordered_set<std::string> &moduleNameSet)
-{
-    LOG(INFO) << "Start to collect hap or hsp name in module.";
-    int32_t result = 0;
-    for (const auto &moduleName : moduleNameSet) {
-        LOG(INFO) << "hmp package revert,module name=" << moduleName;
-        std::string attr = std::string(BMS_RESULT_PREFIX) + "." + moduleName;
-        if (SetParameter(attr.c_str(), "false") != 0) {
-            LOG(WARNING) << "Failed to set module params: " << attr;
-            result++;
-        }
-    }
-    return result;
-}
-}
 
 ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
     std::unordered_map<int32_t, std::string> &saIdHmpMap, volatile sig_atomic_t &exit)
@@ -79,17 +36,13 @@ ModuleUpdateConsumer::ModuleUpdateConsumer(ModuleUpdateQueue &queue,
 
 void ModuleUpdateConsumer::DoRevert(int32_t code) const
 {
-    std::string revertHmpName;
-    std::unordered_set<std::string> moduleNameSet;
-    GetModuleInfoForBms(revertHmpName, moduleNameSet);
+    std::string revertHmpName = GetCurrentHmpName();
     if (revertHmpName.empty()) {
         LOG(ERROR) << "hmp package revert, hmpName is empty.";
         return;
     }
     Timer timer;
     ModuleUpdateMain::GetInstance().SaveInstallerResult(revertHmpName, code, "revert", timer);
-    // need to notify bms revert all app
-    NotifyBmsRevert(moduleNameSet);
     Revert(revertHmpName, true);
 }
 

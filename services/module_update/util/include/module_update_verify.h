@@ -24,6 +24,8 @@ bool CheckPackInfoVer(const std::string &pkgPackInfoPath);
 void CleanErrDir(const std::string &path);
 bool IsIncrementPackage(const std::string &pkgPackInfoPath);
 bool RestorePackage(const std::string &dstFile, const std::string &sourceFile);
+bool ReadHashFromPackInfo(const std::string &pkgPackInfoPath, std::string &hashValue);
+bool CalculateSHA256(const std::string &filePath, std::string &digest);
 } // namespace SysInstaller
 } // namespace OHOS
 #endif // MODULE_UPDATE_VERIFY_H

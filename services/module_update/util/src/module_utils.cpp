@@ -28,6 +28,7 @@
 #include "iservice_registry.h"
 #include "directory_ex.h"
 #include "log/log.h"
+#include "package/package.h"
 #include "parameter.h"
 #include "parameters.h"
 #include "singleton.h"
@@ -232,7 +233,7 @@ __attribute__((weak)) void MountModuleUpdateDir(void)
     }
 }
 
-__attribute__((weak)) bool RevertImageCert(const std::string &hmpName)
+__attribute__((weak)) bool RevertImageCert(const std::string &hmpName, bool revertMore)
 {
     LOG(INFO) << "Revert image cert, default is true";
     return true;
@@ -242,6 +243,20 @@ __attribute__((weak)) bool VerityInfoWrite(const ModuleFile &file)
 {
     LOG(INFO) << "VerityInfoWrite, default is true.";
     return true;
+}
+
+__attribute__((weak)) bool PrepareFileToDestDir(const std::string &pkgPath, const std::string &outPath)
+{
+    if (ExtraPackageDir(pkgPath.c_str(), nullptr, nullptr, outPath.c_str()) != 0) {
+        LOG(ERROR) << "Failed to unpack hmp package " << pkgPath;
+        return false;
+    }
+    return true;
+}
+
+__attribute__((weak)) void SetModuleVersion(const ModuleFile &file)
+{
+    LOG(INFO) << "Set module version.";
 }
 
 void Revert(const std::string &hmpName, bool reboot)
@@ -276,7 +291,8 @@ void Revert(const std::string &hmpName, bool reboot)
             LOG(ERROR) << "Failed to restore original permissions for " << activePath << " err=" << errno;
         }
     }
-    RevertImageCert(hmpName);
+    RevertImageCert(hmpName, true);
+    NotifyBmsRevert(hmpName);
     sync();
     if (reboot) {
         LOG(INFO) << "Rebooting";
@@ -436,6 +452,47 @@ bool CheckAndUpdateRevertResult(const std::string &hmpPath, const std::string &r
     LOG(INFO) << "Update revert result succ";
     sync();
     return ret;
+}
+
+std::string GetCurrentHmpName(void)
+{
+    std::vector<std::string> files;
+    GetDirFiles(MODULE_PREINSTALL_DIR, files);
+    for (const auto &file : files) {
+        if (!CheckFileSuffix(file, MODULE_PACKAGE_SUFFIX)) {
+            continue;
+        }
+        std::string hmpName = GetHmpName(file);
+        if (hmpName.empty()) {
+            continue;
+        }
+        return hmpName;
+    }
+    return "";
+}
+
+int32_t NotifyBmsRevert(const std::string &hmpName)
+{
+    LOG(INFO) << "Start to collect module name which contains hap or hsp";
+    SetParameter(BMS_START_INSTALL, NOTIFY_BMS_REVERT);
+    std::string preInstalledPath = std::string(MODULE_PREINSTALL_DIR) + "/" + hmpName + "/" + HMP_INFO_NAME;
+    std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(preInstalledPath);
+    if (moduleFile == nullptr) {
+        LOG(ERROR) << "Invalid preinstalled file " << preInstalledPath;
+        return -1;
+    }
+    int32_t result = 0;
+    for (const auto &[key, value] : moduleFile->GetVersionInfo().moduleMap) {
+        if (value.bundleInfoList.empty()) {
+            continue;
+        }
+        std::string attr = std::string(BMS_RESULT_PREFIX) + "." + key;
+        if (SetParameter(attr.c_str(), BMS_INSTALL_FAIL) != 0) {
+            LOG(WARNING) << "Failed to set module params: " << attr;
+            result++;
+        }
+    }
+    return result;
 }
 } // namespace SysInstaller
 } // namespace OHOS

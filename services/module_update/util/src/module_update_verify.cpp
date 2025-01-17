@@ -20,6 +20,7 @@
 #include "hash_data_verifier.h"
 #include "log/log.h"
 #include "json_node.h"
+#include "openssl/sha.h"
 #include "parameters.h"
 #include "scope_guard.h"
 #include "utils.h"
@@ -162,6 +163,20 @@ bool IsIncrementPackage(const std::string &pkgPackInfoPath)
     return false;
 }
 
+bool ReadHashFromPackInfo(const std::string &pkgPackInfoPath, std::string &hashValue)
+{
+    std::string packInfo = GetContentFromZip(pkgPackInfoPath, PACK_INFO_NAME);
+    JsonNode root(packInfo);
+    const JsonNode &imageHashJson = root["imageHash"];
+    std::optional<std::string> imageHash = imageHashJson.As<std::string>();
+    if (!imageHash.has_value()) {
+        LOG(ERROR) << "HmpInfo: Failed to get imageHash val";
+        return false;
+    }
+    hashValue = imageHash.value();
+    return true;
+}
+
 bool RestorePackage(const std::string &dstFile, const std::string &sourceFile)
 {
     LOG(INFO) << "Start restore file " << dstFile << "; source is " << sourceFile;
@@ -189,6 +204,45 @@ bool RestorePackage(const std::string &dstFile, const std::string &sourceFile)
         LOG(WARNING) << "Failed to unlink " << diffFile << " err:" << strerror(errno);
     }
     LOG(INFO) << "restore image succ, restore timer:" << timer;
+
+    std::string hashValue;
+    if (!ReadHashFromPackInfo(dstFile, hashValue)) {
+        LOG(ERROR) << "read hash from pack.info fail";
+        return false;
+    }
+    LOG(INFO) << "read hash, " << hashValue;
+    std::string calculateHash;
+    if (!CalculateSHA256(restoreImgFile, calculateHash)) {
+        LOG(ERROR) << "calculate restore image hash fail";
+        return false;
+    }
+    return (hashValue == calculateHash);
+}
+
+bool CalculateSHA256(const std::string &filePath, std::string &digest)
+{
+    char realPath[PATH_MAX] = {0};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        LOG(ERROR) << "invalid file path, " << filePath;
+        return false;
+    }
+    std::ifstream readFile(realPath, std::ios::binary);
+    if (!readFile) {
+        LOG(ERROR) << "open file fail, " << realPath;
+        return false;
+    }
+    SHA256_CTX sha256Context;
+    SHA256_Init(&sha256Context);
+    constexpr int32_t bufferSize = 4096;
+    char buffer[bufferSize] = {0};
+    while (readFile.read(buffer, sizeof(buffer))) {
+        SHA256_Update(&sha256Context, buffer, readFile.gcount());
+    }
+    uint8_t digestBuffer[SHA256_DIGEST_LENGTH] = {0};
+    SHA256_Final(digestBuffer, &sha256Context);
+    digest = Utils::ConvertSha256Hex(digestBuffer, SHA256_DIGEST_LENGTH);
+    std::transform(digest.begin(), digest.end(), digest.begin(), ::toupper);
+    LOG(INFO) << "CalculateSHA256, " << digest;
     return true;
 }
 }

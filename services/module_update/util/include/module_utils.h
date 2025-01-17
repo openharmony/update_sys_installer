@@ -46,13 +46,17 @@ std::string GetDeviceSaSdkVersion(void);
 int GetDeviceApiVersion(void);
 std::string GetContentFromZip(const std::string &zipPath, const std::string &fileName);
 bool CheckAndUpdateRevertResult(const std::string &hmpPath, const std::string &resultInfo, const std::string &keyWord);
+std::string GetCurrentHmpName(void);
+int32_t NotifyBmsRevert(const std::string &hmpName);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-bool RevertImageCert(const std::string &hmpName);
+bool RevertImageCert(const std::string &hmpName, bool revertMore);
 bool VerityInfoWrite(const ModuleFile &file);
 void MountModuleUpdateDir(void);
+bool PrepareFileToDestDir(const std::string &pkgPath, const std::string &outPath);
+void SetModuleVersion(const ModuleFile &file);
 #ifdef __cplusplus
 }
 #endif

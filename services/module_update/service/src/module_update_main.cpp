@@ -139,10 +139,17 @@ int32_t ModuleUpdateMain::CheckHmpName(const std::string &hmpName)
  */
 int32_t ModuleUpdateMain::PrepareResourceForReboot(const std::string &hmpName) const
 {
-    std::string hmpDir = std::string(UPDATE_INSTALL_DIR) + "/" + hmpName;
+    if (installModule_ == nullptr) {
+        LOG(ERROR) << "install module is null";
+        return ModuleErrorCode::ERR_DEAL_HVB_INFO_FAIL;
+    }
     if (!BackupActiveModules(hmpName)) {
         LOG(ERROR) << "Failed to backup active hmp: " << hmpName;
         return ModuleErrorCode::ERR_BACKUP_FAIL;
+    }
+    if (!VerityInfoWrite(*installModule_)) {
+        LOG(ERROR) << "verity info write fail";
+        return ModuleErrorCode::ERR_DEAL_HVB_INFO_FAIL;
     }
     std::string hmpActiveDir = std::string(UPDATE_ACTIVE_DIR) + "/" + hmpName;
     if (SetParameter(BMS_START_INSTALL, BMS_UPDATE) != 0) {
@@ -171,9 +178,8 @@ int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
         RemoveSpecifiedDir(hmpDir, false);
     };
     std::string outPath = hmpDir + "/";
-    ret = ExtraPackageDir(pkgPath.c_str(), nullptr, nullptr, outPath.c_str());
-    if (ret != 0) {
-        LOG(ERROR) << "Failed to unpack hmp package " << pkgPath;
+    if (!PrepareFileToDestDir(pkgPath, outPath)) {
+        LOG(ERROR) << "Failed to prepare file, " << pkgPath;
         return ModuleErrorCode::ERR_INSTALL_FAIL;
     }
     std::vector<std::string> files;
@@ -192,7 +198,6 @@ int32_t ModuleUpdateMain::ReallyInstallModulePackage(const std::string &pkgPath,
     }
     ret = PrepareResourceForReboot(hmpName);
     if (ret != ModuleErrorCode::MODULE_UPDATE_SUCCESS) {
-        RevertImageCert(hmpName);
         return ret;
     }
     CANCEL_SCOPE_EXIT_GUARD(rmdir);
@@ -281,10 +286,7 @@ int32_t ModuleUpdateMain::InstallModuleFile(const std::string &hmpName, const st
         LOG(ERROR) << "Validate version fail: " << moduleFile->GetVersionInfo().version;
         return ret;
     }
-    if (!VerityInfoWrite(*moduleFile)) {
-        LOG(ERROR) << "verity info write fail";
-        return ModuleErrorCode::ERR_DEAL_HVB_INFO_FAIL;
-    }
+    installModule_ = std::move(moduleFile);
 
     return ModuleErrorCode::MODULE_UPDATE_SUCCESS;
 }
