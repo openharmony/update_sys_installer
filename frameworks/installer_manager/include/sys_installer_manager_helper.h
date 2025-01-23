@@ -13,23 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef SYS_INSTALLER_PROXY_H
-#define SYS_INSTALLER_PROXY_H
+#ifndef SYS_INSTALLER_MANAGER_HELPER_H
+#define SYS_INSTALLER_MANAGER_HELPER_H
 
-#include "iremote_proxy.h"
-#include "isys_installer.h"
+#include "status_manager.h"
 
 namespace OHOS {
 namespace SysInstaller {
-class SysInstallerProxy : public IRemoteProxy<ISysInstaller> {
+class SysInstallerManagerHelper {
 public:
-    explicit SysInstallerProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<ISysInstaller>(impl) {}
+    SysInstallerManagerHelper() = default;
+    virtual ~SysInstallerManagerHelper() = default;
 
-    virtual int32_t SysInstallerInit(bool bStreamUpgrade = false);
+    virtual int32_t SysInstallerInit();
     virtual int32_t StartUpdatePackageZip(const std::string &pkgPath);
-    virtual int32_t StartStreamUpdate();
-    virtual int32_t StopStreamUpdate();
-    virtual int32_t ProcessStreamData(const uint8_t *buffer, size_t size);
     virtual int32_t SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback);
     virtual int32_t GetUpdateStatus();
     virtual int32_t StartUpdateParaZip(const std::string &pkgPath,
@@ -38,9 +35,10 @@ public:
     virtual int32_t AccDecompressAndVerifyPkg(const std::string &srcPath,
         const std::string &dstPath, const uint32_t type);
     virtual int32_t AccDeleteDir(const std::string &dstPath);
-private:
-    static inline BrokerDelegator<SysInstallerProxy> delegator_;
+
+protected:
+    std::shared_ptr<StatusManager> statusManager_ {};
 };
-} // namespace SysInstaller
+} // SysInstaller
 } // namespace OHOS
-#endif // SYS_INSTALLER_PROXY_H
+#endif // SYS_INSTALLER_MANAGER_HELPER_H

@@ -18,11 +18,13 @@
 #include <iostream>
 #include <thread>
 #include "if_system_ability_manager.h"
-#include "installer_manager.h"
+#include "sys_installer_manager.h"
+#include "stream_installer_manager.h"
 #include "ipc_skeleton.h"
 #include "iremote_stub.h"
 #include "isys_installer.h"
 #include "status_manager.h"
+#include "stream_status_manager.h"
 #include "system_ability.h"
 #include "sys_installer_common.h"
 #include "sys_installer_stub.h"
@@ -36,8 +38,11 @@ public:
     SysInstallerServer(int32_t systemAbilityId, bool runOnCreate = false);
     ~SysInstallerServer() override;
 
-    int32_t SysInstallerInit() override;
+    int32_t SysInstallerInit(bool bStreamUpgrade = false) override;
     int32_t StartUpdatePackageZip(const std::string &pkgPath) override;
+    int32_t StartStreamUpdate() override;
+    int32_t StopStreamUpdate() override;
+    int32_t ProcessStreamData(const uint8_t *buffer, size_t size) override;
     int32_t SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback) override;
     int32_t GetUpdateStatus() override;
     int32_t StartUpdateParaZip(const std::string &pkgPath,
@@ -57,6 +62,7 @@ public:
 
 private:
     bool logInit_ = false;
+    bool bStreamUpgrade_ = false;
     std::mutex sysInstallerServerLock_;
 };
 } // namespace SysInstaller

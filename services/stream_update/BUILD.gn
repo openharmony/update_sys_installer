@@ -15,24 +15,30 @@ import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
-ohos_static_library("libstatusmanager") {
-  sources = [
-    "${sys_installer_path}/frameworks/status_manager/src/status_manager.cpp",
-    "${sys_installer_path}/frameworks/status_manager/src/stream_status_manager.cpp",
-  ]
+ohos_static_library("libstreamupdate") {
+  sources =
+      [ "${sys_installer_path}/services/stream_update/src/stream_update.cpp" ]
 
   include_dirs = [
     "${sys_installer_path}/common/include",
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
+    "${sys_installer_path}/frameworks/actions/include",
+    "${sys_installer_path}/frameworks/installer_manager/include",
     "${sys_installer_path}/frameworks/status_manager/include",
+    "${sys_installer_path}/include",
+    "${sys_installer_path}/services/stream_update/include",
   ]
 
   external_deps = [
-    "c_utils:utils",
+    "bounds_checking_function:libsec_static",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "updater:libupdaterlog",
+    "openssl:libcrypto_static",
+    "updater:libbinchunkupdate",
+    "updater:libringbuffer",
+    "updater:libupdater",
+    "updater:libutils",
   ]
   part_name = "sys_installer"
   subsystem_name = "updater"

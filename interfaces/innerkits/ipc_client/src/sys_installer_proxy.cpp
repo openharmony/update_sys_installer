@@ -25,7 +25,7 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 
-int32_t SysInstallerProxy::SysInstallerInit()
+int32_t SysInstallerProxy::SysInstallerInit(bool bStreamUpgrade)
 {
     LOG(INFO) << "SysInstallerInit";
     auto remote = Remote();
@@ -38,6 +38,7 @@ int32_t SysInstallerProxy::SysInstallerInit()
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         return ERR_FLATTEN_OBJECT;
     }
+    data.WriteBool(bStreamUpgrade);
     MessageParcel reply;
     MessageOption option;
     int32_t ret = remote->SendRequest(
@@ -70,6 +71,89 @@ int32_t SysInstallerProxy::StartUpdatePackageZip(const std::string &pkgPath)
     MessageOption option { MessageOption::TF_ASYNC};
     int32_t ret = remote->SendRequest(
         static_cast<uint32_t>(SysInstallerInterfaceCode::UPDATE_PACKAGE), data, reply, option);
+    if (ret != ERR_OK) {
+        LOG(ERROR) << "SendRequest error";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    return reply.ReadInt32();
+}
+
+int32_t SysInstallerProxy::StartStreamUpdate()
+{
+    LOG(INFO) << "StartStreamUpdate";
+    auto remote = Remote();
+    if (remote == nullptr) {
+        LOG(ERROR) << "Can not get remote";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOG(ERROR) << "WriteInterfaceToken error";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel reply;
+    MessageOption option { MessageOption::TF_SYNC};
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::START_STREAM_UPDATE), data, reply, option);
+    if (ret != ERR_OK) {
+        LOG(ERROR) << "SendRequest error";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    return reply.ReadInt32();
+}
+
+int32_t SysInstallerProxy::StopStreamUpdate()
+{
+    LOG(INFO) << "StopStreamUpdate";
+    auto remote = Remote();
+    if (remote == nullptr) {
+        LOG(ERROR) << "Can not get remote";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOG(ERROR) << "WriteInterfaceToken error";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel reply;
+    MessageOption option { MessageOption::TF_SYNC};
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::STOP_STREAM_UPDATE), data, reply, option);
+    if (ret != ERR_OK) {
+        LOG(ERROR) << "SendRequest error";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    return reply.ReadInt32();
+}
+
+int32_t SysInstallerProxy::ProcessStreamData(const uint8_t *buffer, size_t size)
+{
+    LOG(INFO) << "ProcessStreamData";
+    auto remote = Remote();
+    if (remote == nullptr) {
+        LOG(ERROR) << "Can not get remote";
+        return ERR_FLATTEN_OBJECT;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOG(ERROR) << "WriteInterfaceToken error";
+        return ERR_FLATTEN_OBJECT;
+    }
+    data.WriteInt32(size);
+    data.WriteBuffer(buffer, size);
+
+    MessageParcel reply;
+    MessageOption option { MessageOption::TF_SYNC};
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerInterfaceCode::PROCESS_STREAM_DATA), data, reply, option);
     if (ret != ERR_OK) {
         LOG(ERROR) << "SendRequest error";
         return ERR_FLATTEN_OBJECT;

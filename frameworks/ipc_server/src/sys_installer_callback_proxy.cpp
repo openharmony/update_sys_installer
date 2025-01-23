@@ -23,7 +23,8 @@ namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
 
-void SysInstallerCallbackProxy::OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg)
+void SysInstallerCallbackProxy::OnUpgradeProgress(UpdateStatus updateStatus, int percent,
+    const std::string &resultMsg)
 {
     LOG(INFO) << "OnUpgradeProgress";
     MessageParcel data;
@@ -46,6 +47,35 @@ void SysInstallerCallbackProxy::OnUpgradeProgress(UpdateStatus updateStatus, int
     data.WriteString(resultMsg);
     int32_t result = remote->SendRequest(
         static_cast<uint32_t>(SysInstallerCallbackInterfaceCode::UPDATE_RESULT), data, reply, option);
+    if (result != ERR_OK) {
+        LOG(ERROR) << "Can not SendRequest " << result;
+    }
+}
+
+void SysInstallerCallbackProxy::OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen,
+    const std::string &resultMsg)
+{
+    LOG(INFO) << "OnUpgradeDealLen";
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option { MessageOption::TF_SYNC };
+
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        LOG(INFO) << "UpdateCallbackProxy WriteInterfaceToken fail";
+        return;
+    }
+
+    auto remote = Remote();
+    if (remote == nullptr) {
+        LOG(ERROR) << "Can not get remote";
+        return;
+    }
+
+    data.WriteInt32(updateStatus);
+    data.WriteInt32(dealLen);
+    data.WriteString(resultMsg);
+    int32_t result = remote->SendRequest(
+        static_cast<uint32_t>(SysInstallerCallbackInterfaceCode::STREAM_UPDATE_RESULT), data, reply, option);
     if (result != ERR_OK) {
         LOG(ERROR) << "Can not SendRequest " << result;
     }

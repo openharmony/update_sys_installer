@@ -15,7 +15,7 @@
 
 #include "action_processer.h"
 
-#include "installer_manager.h"
+#include "sys_installer_manager.h"
 #include "log/log.h"
 
 namespace OHOS {
@@ -140,7 +140,6 @@ void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::strin
 
     StartNextAction();
 }
-
 
 void ActionProcesser::StartNextAction()
 {

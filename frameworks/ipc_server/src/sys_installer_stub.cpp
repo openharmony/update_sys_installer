@@ -37,6 +37,12 @@ SysInstallerStub::SysInstallerStub()
         bind(&SysInstallerStub::SysInstallerInitStub, this, _1, _2, _3, _4));
     requestFuncMap_.emplace(SysInstallerInterfaceCode::UPDATE_PACKAGE,
         bind(&SysInstallerStub::StartUpdatePackageZipStub, this, _1, _2, _3, _4));
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::START_STREAM_UPDATE,
+        bind(&SysInstallerStub::StartStreamUpdateStub, this, _1, _2, _3, _4));
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::STOP_STREAM_UPDATE,
+        bind(&SysInstallerStub::StopStreamUpdateStub, this, _1, _2, _3, _4));
+    requestFuncMap_.emplace(SysInstallerInterfaceCode::PROCESS_STREAM_DATA,
+        bind(&SysInstallerStub::ProcessStreamDataStub, this, _1, _2, _3, _4));
     requestFuncMap_.emplace(SysInstallerInterfaceCode::SET_UPDATE_CALLBACK,
         bind(&SysInstallerStub::SetUpdateCallbackStub, this, _1, _2, _3, _4));
     requestFuncMap_.emplace(SysInstallerInterfaceCode::GET_UPDATE_STATUS,
@@ -63,7 +69,8 @@ int32_t SysInstallerStub::SysInstallerInitStub(SysInstallerStub *service,
         LOG(ERROR) << "Invalid param";
         return -1;
     }
-    int ret = service->SysInstallerInit();
+    bool bStreamUpgrade = data.ReadBool();
+    int ret = service->SysInstallerInit(bStreamUpgrade);
     reply.WriteInt32(ret);
     return 0;
 }
@@ -77,6 +84,44 @@ int32_t SysInstallerStub::StartUpdatePackageZipStub(SysInstallerStub *service,
     }
     string pkgPath = Str16ToStr8(data.ReadString16());
     int ret = service->StartUpdatePackageZip(pkgPath);
+    reply.WriteInt32(ret);
+    return 0;
+}
+
+int32_t SysInstallerStub::StartStreamUpdateStub(SysInstallerStub *service,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (service == nullptr) {
+        LOG(ERROR) << "Invalid param";
+        return -1;
+    }
+    int ret = service->StartStreamUpdate();
+    reply.WriteInt32(ret);
+    return 0;
+}
+
+int32_t SysInstallerStub::StopStreamUpdateStub(SysInstallerStub *service,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (service == nullptr) {
+        LOG(ERROR) << "Invalid param";
+        return -1;
+    }
+    int ret = service->StopStreamUpdate();
+    reply.WriteInt32(ret);
+    return 0;
+}
+
+int32_t SysInstallerStub::ProcessStreamDataStub(SysInstallerStub *service,
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    if (service == nullptr) {
+        LOG(ERROR) << "Invalid param";
+        return -1;
+    }
+    uint32_t size = data.ReadUint32();
+    const uint8_t *buffer = data.ReadBuffer(size);
+    int ret = service->ProcessStreamData(buffer, size);
     reply.WriteInt32(ret);
     return 0;
 }

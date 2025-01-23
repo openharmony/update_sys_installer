@@ -36,7 +36,7 @@ SysInstallerServer::~SysInstallerServer()
 {
 }
 
-int32_t SysInstallerServer::SysInstallerInit()
+int32_t SysInstallerServer::SysInstallerInit(bool bStreamUpgrade)
 {
     std::lock_guard<std::mutex> lock(sysInstallerServerLock_);
     LOG(INFO) << "SysInstallerInit";
@@ -45,53 +45,84 @@ int32_t SysInstallerServer::SysInstallerInit()
         InitUpdaterLogger("SysInstaller", SYS_LOG_FILE, SYS_STAGE_FILE, SYS_ERROR_FILE);
         logInit_ = true;
     }
-
-    InstallerManager::GetInstance().SysInstallerInit();
+    bStreamUpgrade_ = bStreamUpgrade;
+    if (bStreamUpgrade_) {
+        StreamInstallerManager::GetInstance().SysInstallerInit();
+    } else {
+        SysInstallerManager::GetInstance().SysInstallerInit();
+    }
+    
     return 0;
 }
 
 int32_t SysInstallerServer::StartUpdatePackageZip(const std::string &pkgPath)
 {
     LOG(INFO) << "StartUpdatePackageZip";
-    return InstallerManager::GetInstance().StartUpdatePackageZip(pkgPath);
+    return SysInstallerManager::GetInstance().StartUpdatePackageZip(pkgPath);
+}
+
+int32_t SysInstallerServer::StartStreamUpdate()
+{
+    LOG(INFO) << "StartStreamUpdate";
+    return StreamInstallerManager::GetInstance().StartStreamUpdate();
+}
+
+int32_t SysInstallerServer::StopStreamUpdate()
+{
+    LOG(INFO) << "StopStreamUpdate";
+    return StreamInstallerManager::GetInstance().StopStreamUpdate();
+}
+
+int32_t SysInstallerServer::ProcessStreamData(const uint8_t *buffer, size_t size)
+{
+    LOG(INFO) << "ProcessStreamData";
+    return StreamInstallerManager::GetInstance().ProcessStreamData(buffer, size);
 }
 
 int32_t SysInstallerServer::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback)
 {
     LOG(INFO) << "SetUpdateCallback";
-    return InstallerManager::GetInstance().SetUpdateCallback(updateCallback);
+    if (bStreamUpgrade_) {
+        return StreamInstallerManager::GetInstance().SetUpdateCallback(updateCallback);
+    } else {
+        return SysInstallerManager::GetInstance().SetUpdateCallback(updateCallback);
+    }
 }
 
 int32_t SysInstallerServer::GetUpdateStatus()
 {
     LOG(INFO) << "GetUpdateStatus";
-    return InstallerManager::GetInstance().GetUpdateStatus();
+    if (bStreamUpgrade_) {
+        return StreamInstallerManager::GetInstance().GetUpdateStatus();
+    } else {
+        return SysInstallerManager::GetInstance().GetUpdateStatus();
+    }
 }
 
 int32_t SysInstallerServer::StartUpdateParaZip(const std::string &pkgPath,
     const std::string &location, const std::string &cfgDir)
 {
     LOG(INFO) << "StartUpdateParaZip";
-    return InstallerManager::GetInstance().StartUpdateParaZip(pkgPath, location, cfgDir);
+    return SysInstallerManager::GetInstance().StartUpdateParaZip(pkgPath, location, cfgDir);
 }
 
 int32_t SysInstallerServer::StartDeleteParaZip(const std::string &location, const std::string &cfgDir)
 {
     LOG(INFO) << "StartDeleteParaZip";
-    return InstallerManager::GetInstance().StartDeleteParaZip(location, cfgDir);
+    return SysInstallerManager::GetInstance().StartDeleteParaZip(location, cfgDir);
 }
 
 int32_t SysInstallerServer::AccDecompressAndVerifyPkg(const std::string &srcPath,
     const std::string &dstPath, const uint32_t type)
 {
     LOG(INFO) << "AccDecompressAndVerifyPkg";
-    return InstallerManager::GetInstance().AccDecompressAndVerifyPkg(srcPath, dstPath, type);
+    return SysInstallerManager::GetInstance().AccDecompressAndVerifyPkg(srcPath, dstPath, type);
 }
 
 int32_t SysInstallerServer::AccDeleteDir(const std::string &dstPath)
 {
     LOG(INFO) << "AccDeleteDir";
-    return InstallerManager::GetInstance().AccDeleteDir(dstPath);
+    return SysInstallerManager::GetInstance().AccDeleteDir(dstPath);
 }
 
 void SysInstallerServer::OnStart()

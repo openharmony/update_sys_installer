@@ -29,6 +29,8 @@ public:
 
     void OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) override;
 
+    void OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen, const std::string &resultMsg) override;
+
 private:
     static inline BrokerDelegator<SysInstallerCallbackProxy> delegator_;
 };
