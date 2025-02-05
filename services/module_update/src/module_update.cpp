@@ -296,6 +296,7 @@ void ModuleUpdate::PrepareModuleFileList(const ModuleUpdateStatus &status)
         moduleFileList_.emplace_back(std::move(*systemModuleFile));
         if (CheckRevert(status.hmpName)) {
             LOG(ERROR) << "some error happened, revert.";
+            NotifyBmsRevert(status.hmpName, true);
             Revert(status.hmpName, true);
             return;
         }
@@ -418,6 +419,7 @@ void ModuleUpdate::ReportModuleUpdateStatus(const ModuleUpdateStatus &status) co
     if (!status.isAllMountSuccess) {
         LOG(ERROR) << "ReportModuleUpdateStatus mount fail, hmp name=" << status.hmpName;
         RemoveSpecifiedDir(std::string(UPDATE_INSTALL_DIR) + "/" + status.hmpName, false);
+        NotifyBmsRevert(status.hmpName, true);
         Revert(status.hmpName, true);
         return;
     }
@@ -437,6 +439,51 @@ void ModuleUpdate::RegisterImageVerifyFunc(ImageVerifyFunc ptr, int32_t level)
 extern "C" __attribute__((constructor)) void RegisterImgVerifyFunc(void)
 {
     ModuleUpdate::GetInstance().RegisterImageVerifyFunc(VerifyAndCreateDm, REGISTER_LEVEL_ONE);
+}
+
+void ModuleUpdate::SetParameterFromFile(void) const
+{
+    const std::chrono::milliseconds waitTime(100); // 100ms: wait for file create
+    if (!WaitForFile(MODULE_UPDATE_PARAMS_FILE, waitTime)) {
+        LOG(ERROR) << "paramsFile is not ready.";
+        return;
+    }
+    std::ifstream fin {MODULE_UPDATE_PARAMS_FILE};
+    if (!fin.is_open()) {
+        LOG(ERROR) << "read params file fail " << MODULE_UPDATE_PARAMS_FILE;
+        return;
+    }
+    std::string line;
+    while (std::getline(fin, line)) {
+        size_t pos = line.find("=");
+        if (pos == std::string::npos) {
+            LOG(ERROR) << "read params error: " << line;
+            continue;
+        }
+        std::string paramName = line.substr(0, pos);
+        std::string paramValue = line.substr(pos + 1);
+        if (Utils::SetParameter(paramName.c_str(), paramValue.c_str()) != 0) {
+            LOG(WARNING) << "Failed to set module params: " << paramName << "; value is " << paramValue;
+        }
+    }
+    if (unlink(MODULE_UPDATE_PARAMS_FILE) != 0) {
+        LOG(WARNING) << "Failed to unlink params file, error is " << strerror(errno);
+    }
+}
+
+void ModuleUpdate::HandleExtraArgs(int argc, char **argv) const
+{
+    InitUpdaterLogger("CheckModuleUpdate", MODULE_UPDATE_LOG_FILE, "", "");
+    const std::unordered_map<std::string, std::function<void(void)>> handleFuncMap = {
+        {"setParam", [] () { return ModuleUpdate::GetInstance().SetParameterFromFile(); }},
+    };
+    for (int i = 1; i < argc; i++) {
+        LOG(INFO) << "i = " << i << "; argv[i] = " << argv[i];
+        auto iter = handleFuncMap.find(argv[i]);
+        if (iter != handleFuncMap.end()) {
+            iter->second();
+        }
+    }
 }
 } // namespace SysInstaller
 } // namespace OHOS

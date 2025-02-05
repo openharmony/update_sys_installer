@@ -35,6 +35,7 @@ public:
     void CheckModuleUpdate();
     bool DoModuleUpdate(ModuleUpdateStatus &status);
     void RegisterImageVerifyFunc(ImageVerifyFunc ptr, int32_t level);
+    void HandleExtraArgs(int argc, char **argv) const;
 
 private:
     void PrepareModuleFileList(const ModuleUpdateStatus &status);
@@ -48,6 +49,7 @@ private:
     bool CheckRevert(const std::string &hmpName);
     std::string CreateMountPoint(const ModuleFile &moduleFile) const;
     bool VerifyImageAndCreateDm(ModuleFile &moduleFile, bool mountOnVerity, std::string &blockDevice);
+    void SetParameterFromFile(void) const;
 
     std::list<ModuleFile> moduleFileList_;
     ModuleFileRepository repository_;

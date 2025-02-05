@@ -30,7 +30,11 @@ int main(int argc, char **argv)
 {
     LOG(INFO) << "enter module update main";
     auto &instance = OHOS::SysInstaller::ModuleUpdate::GetInstance();
-    instance.CheckModuleUpdate();
+    if (argc <= 1) {
+        instance.CheckModuleUpdate();
+        return 0;
+    }
+    instance.HandleExtraArgs(argc, argv);
     return 0;
 }
 
