@@ -43,6 +43,7 @@ void ModuleUpdateConsumer::DoRevert(int32_t code) const
     }
     Timer timer;
     ModuleUpdateMain::GetInstance().SaveInstallerResult(revertHmpName, code, "revert", timer);
+    NotifyBmsRevert(revertHmpName, false);
     Revert(revertHmpName, true);
 }
 

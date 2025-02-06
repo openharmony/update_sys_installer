@@ -292,7 +292,6 @@ void Revert(const std::string &hmpName, bool reboot)
         }
     }
     RevertImageCert(hmpName, true);
-    NotifyBmsRevert(hmpName);
     sync();
     if (reboot) {
         LOG(INFO) << "Rebooting";
@@ -471,7 +470,7 @@ std::string GetCurrentHmpName(void)
     return "";
 }
 
-int32_t NotifyBmsRevert(const std::string &hmpName)
+int32_t NotifyBmsRevert(const std::string &hmpName, bool record)
 {
     LOG(INFO) << "Start to collect module name which contains hap or hsp";
     SetParameter(BMS_START_INSTALL, NOTIFY_BMS_REVERT);
@@ -482,17 +481,40 @@ int32_t NotifyBmsRevert(const std::string &hmpName)
         return -1;
     }
     int32_t result = 0;
+    std::ostringstream oss;
+    oss << BMS_START_INSTALL << "=" << NOTIFY_BMS_REVERT << "\n";
     for (const auto &[key, value] : moduleFile->GetVersionInfo().moduleMap) {
         if (value.bundleInfoList.empty()) {
             continue;
         }
         std::string attr = std::string(BMS_RESULT_PREFIX) + "." + key;
-        if (SetParameter(attr.c_str(), BMS_INSTALL_FAIL) != 0) {
+        if (!record && SetParameter(attr.c_str(), BMS_INSTALL_FAIL) != 0) {
             LOG(WARNING) << "Failed to set module params: " << attr;
             result++;
         }
+        oss << attr << "=" << BMS_INSTALL_FAIL << "\n";
+    }
+    if (record) {
+        WriteStringToFile(MODULE_UPDATE_PARAMS_FILE, oss.str());
     }
     return result;
+}
+
+int32_t WriteStringToFile(const std::string &filePath, const std::string &content)
+{
+    // if file not exist, create file or appead
+    std::ofstream file (filePath, std::ios::app);
+    if (!file.is_open()) {
+        LOG(ERROR) << "open file fail: " << filePath << "; err is " << strerror(errno);
+        return -1;
+    }
+    file << content;
+    if (file.bad()) {
+        LOG(ERROR) << "write to file fail, " << filePath;
+    }
+    file.close();
+    sync();
+    return 0;
 }
 } // namespace SysInstaller
 } // namespace OHOS

@@ -35,6 +35,7 @@ static constexpr const char *IMG_DIFF_FILE_NAME = "module.diff";
 static constexpr const char *PACK_INFO_NAME = "pack.info";
 static constexpr const char *MODULE_RESULT_PATH = "/data/updater/module_update_result";
 static constexpr const char *MODULE_UPDATE_LOG_FILE = "/data/updater/log/module_update.log";
+static constexpr const char *MODULE_UPDATE_PARAMS_FILE = "/data/updater/module_update_params";
 static constexpr const char *SA_ABNORMAL = "true";
 static constexpr const char *SA_NORMAL = "false";
 static constexpr const char *SA_START = "persist.samgr.moduleupdate.start";
