@@ -25,12 +25,15 @@ config("libinstallermanager_exported_headers") {
     "${sys_installer_path}/frameworks/installer_manager/include",
     "${sys_installer_path}/frameworks/status_manager/include",
     "${sys_installer_path}/services/ab_update/include",
+    "${sys_installer_path}/services/stream_update/include",
   ]
 }
 ohos_static_library("libinstallermanager") {
   sources = [
-    "${sys_installer_path}/frameworks/installer_manager/src/installer_manager.cpp",
-    "${sys_installer_path}/frameworks/installer_manager/src/installer_manager_helper.cpp",
+    "${sys_installer_path}/frameworks/installer_manager/src/stream_installer_manager.cpp",
+    "${sys_installer_path}/frameworks/installer_manager/src/stream_installer_manager_helper.cpp",
+    "${sys_installer_path}/frameworks/installer_manager/src/sys_installer_manager.cpp",
+    "${sys_installer_path}/frameworks/installer_manager/src/sys_installer_manager_helper.cpp",
   ]
 
   include_dirs = [
@@ -43,18 +46,22 @@ ohos_static_library("libinstallermanager") {
     "${sys_installer_path}/frameworks/installer_manager/include",
     "${sys_installer_path}/frameworks/status_manager/include",
     "${sys_installer_path}/services/ab_update/include",
+    "${sys_installer_path}/services/stream_update/include",
   ]
 
   deps = [
     "${sys_installer_path}/frameworks/action_processer:libactionprocesser",
     "${sys_installer_path}/frameworks/actions/verify_action:libverifyaction",
     "${sys_installer_path}/services/ab_update:libabupdate",
+    "${sys_installer_path}/services/stream_update:libstreamupdate",
   ]
   public_configs = [ ":libinstallermanager_exported_headers" ]
   external_deps = [
+    "bounds_checking_function:libsec_static",
     "hilog:libhilog",
     "openssl:libcrypto_shared",
     "openssl:libssl_static",
+    "updater:libbinchunkupdate",
     "updater:libpackageExt",
     "updater:libringbuffer",
     "updater:libupdater",

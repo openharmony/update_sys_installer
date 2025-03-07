@@ -22,7 +22,11 @@ namespace OHOS {
 namespace SysInstaller {
 class ISysInstallerCallbackFunc : public virtual RefBase {
 public:
-    virtual void OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) = 0;
+    virtual void OnUpgradeProgress(UpdateStatus updateStatus, int percent,
+        const std::string &resultMsg) = 0;
+
+    virtual void OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen,
+        const std::string &resultMsg) = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS

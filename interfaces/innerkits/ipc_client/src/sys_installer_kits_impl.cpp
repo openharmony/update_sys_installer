@@ -129,7 +129,7 @@ int32_t SysInstallerKitsImpl::Init()
     return 0;
 }
 
-int32_t SysInstallerKitsImpl::SysInstallerInit()
+int32_t SysInstallerKitsImpl::SysInstallerInit(bool bStreamUpgrade)
 {
     LOG(INFO) << "SysInstallerInit";
     int ret = Init();
@@ -143,7 +143,7 @@ int32_t SysInstallerKitsImpl::SysInstallerInit()
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    updateService->SysInstallerInit();
+    updateService->SysInstallerInit(bStreamUpgrade);
     return 0;
 }
 
@@ -157,6 +157,45 @@ int32_t SysInstallerKitsImpl::StartUpdatePackageZip(const std::string &pkgPath)
     }
     int32_t ret = updateService->StartUpdatePackageZip(pkgPath);
     LOG(INFO) << "StartUpdatePackageZip ret:" << ret;
+    return ret;
+}
+
+int32_t SysInstallerKitsImpl::StartStreamUpdate()
+{
+    LOG(INFO) << "StartStreamUpdate";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->StartStreamUpdate();
+    LOG(INFO) << "StartStreamUpdate ret:" << ret;
+    return ret;
+}
+
+int32_t SysInstallerKitsImpl::StopStreamUpdate()
+{
+    LOG(INFO) << "StopStreamUpdate";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->StopStreamUpdate();
+    LOG(INFO) << "StopStreamUpdate ret:" << ret;
+    return ret;
+}
+
+int32_t SysInstallerKitsImpl::ProcessStreamData(const uint8_t *buffer, size_t size)
+{
+    LOG(INFO) << "ProcessStreamData";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->ProcessStreamData(buffer, size);
+    LOG(INFO) << "ProcessStreamData ret:" << ret;
     return ret;
 }
 

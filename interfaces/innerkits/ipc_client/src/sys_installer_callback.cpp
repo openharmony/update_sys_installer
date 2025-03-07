@@ -43,6 +43,12 @@ int32_t SysInstallerCallbackStub::OnRemoteRequest(uint32_t code,
             OnUpgradeProgress(static_cast<UpdateStatus>(updateStatus), percent, data.ReadString());
             break;
         }
+        case static_cast<uint32_t>(SysInstallerCallbackInterfaceCode::STREAM_UPDATE_RESULT): {
+            int updateStatus = data.ReadInt32();
+            int dealLen = data.ReadInt32();
+            OnUpgradeDealLen(static_cast<UpdateStatus>(updateStatus), dealLen, data.ReadString());
+            break;
+        }
         default: {
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
@@ -50,11 +56,21 @@ int32_t SysInstallerCallbackStub::OnRemoteRequest(uint32_t code,
     return 0;
 }
 
-void SysInstallerCallback::OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg)
+void SysInstallerCallback::OnUpgradeProgress(UpdateStatus updateStatus, int percent,
+    const std::string &resultMsg)
 {
-    LOG(INFO) << "progress: " << updateStatus << " percent:" << percent << " msg:" << resultMsg;
+    LOG(INFO) << "updateStatus: " << updateStatus << " percent:" << percent << " msg:" << resultMsg;
     if (callback_ != nullptr) {
         callback_->OnUpgradeProgress(updateStatus, percent, resultMsg);
+    }
+}
+
+void SysInstallerCallback::OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen,
+    const std::string &resultMsg)
+{
+    LOG(INFO) << "updateStatus: " << updateStatus << " dealLen:" << dealLen << " msg:" << resultMsg;
+    if (callback_ != nullptr) {
+        callback_->OnUpgradeDealLen(updateStatus, dealLen, resultMsg);
     }
 }
 

@@ -25,6 +25,9 @@ group("fuzztest") {
 group("unittest") {
   testonly = true
   if (!use_libfuzzer) {
-    deps = [ "test/unittest:sys_installer_unittest" ]
+    deps = [
+      "test/unittest/ipc_test:sys_installer_unittest",
+      "test/unittest/stream_update:stream_update_unittest",
+    ]
   }
 }

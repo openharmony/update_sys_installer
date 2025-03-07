@@ -17,7 +17,7 @@
 #define SYS_INSTALLER_AB_UPDATE_H
 
 #include "iaction.h"
-#include "installer_manager.h"
+#include "sys_installer_manager.h"
 #include "updater/updater.h"
 
 namespace OHOS {

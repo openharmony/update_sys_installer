@@ -41,6 +41,12 @@ private:
         MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t StartUpdatePackageZipStub(SysInstallerStub *service,
         MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t StartStreamUpdateStub(SysInstallerStub *service,
+        MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t StopStreamUpdateStub(SysInstallerStub *service,
+        MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t ProcessStreamDataStub(SysInstallerStub *service,
+        MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t SetUpdateCallbackStub(SysInstallerStub *service,
         MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int32_t GetUpdateStatusStub(SysInstallerStub *service,

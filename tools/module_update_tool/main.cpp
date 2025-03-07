@@ -117,6 +117,10 @@ public:
     {
         printf("ProgressCallback progress %d percent %d msg %s\n", updateStatus, percent, resultMsg.c_str());
     }
+    void OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen, const std::string &resultMsg) override
+    {
+        printf("ProgressCallback progress %d dealLen %d msg %s\n", updateStatus, dealLen, resultMsg.c_str());
+    }
 };
 
 static int UpdateModulePackage(const std::string &path)
