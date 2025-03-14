@@ -15,7 +15,7 @@ import("//base/update/sys_installer/sys_installer_default_cfg.gni")
 import("//build/test.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
-module_output_path = "sys_installer/sys_installer_test"
+module_output_path = "sys_installer/sys_installer"
 
 config("utest_config") {
   visibility = [ ":*" ]
