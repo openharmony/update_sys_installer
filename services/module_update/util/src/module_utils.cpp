@@ -27,6 +27,7 @@
 #include "iremote_object.h"
 #include "iservice_registry.h"
 #include "directory_ex.h"
+#include "file_ex.h"
 #include "log/log.h"
 #include "package/package.h"
 #include "parameter.h"
@@ -472,7 +473,7 @@ std::string GetCurrentHmpName(void)
 
 int32_t NotifyBmsRevert(const std::string &hmpName, bool record)
 {
-    LOG(INFO) << "Start to collect module name which contains hap or hsp";
+    LOG(INFO) << "Start to collect module name which contains hap or hsp, record is " << record;
     SetParameter(BMS_START_INSTALL, NOTIFY_BMS_REVERT);
     std::string preInstalledPath = std::string(MODULE_PREINSTALL_DIR) + "/" + hmpName + "/" + HMP_INFO_NAME;
     std::unique_ptr<ModuleFile> moduleFile = ModuleFile::Open(preInstalledPath);
@@ -495,26 +496,11 @@ int32_t NotifyBmsRevert(const std::string &hmpName, bool record)
         oss << attr << "=" << BMS_INSTALL_FAIL << "\n";
     }
     if (record) {
-        WriteStringToFile(MODULE_UPDATE_PARAMS_FILE, oss.str());
+        if (!OHOS::SaveStringToFile(MODULE_UPDATE_PARAMS_FILE, oss.str(), false)) {
+            LOG(ERROR) << "save revert params to file fail";
+        }
     }
     return result;
-}
-
-int32_t WriteStringToFile(const std::string &filePath, const std::string &content)
-{
-    // if file not exist, create file or appead
-    std::ofstream file (filePath, std::ios::app);
-    if (!file.is_open()) {
-        LOG(ERROR) << "open file fail: " << filePath << "; err is " << strerror(errno);
-        return -1;
-    }
-    file << content;
-    if (file.bad()) {
-        LOG(ERROR) << "write to file fail, " << filePath;
-    }
-    file.close();
-    sync();
-    return 0;
 }
 } // namespace SysInstaller
 } // namespace OHOS
