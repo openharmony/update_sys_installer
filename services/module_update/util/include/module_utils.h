@@ -48,7 +48,6 @@ std::string GetContentFromZip(const std::string &zipPath, const std::string &fil
 bool CheckAndUpdateRevertResult(const std::string &hmpPath, const std::string &resultInfo, const std::string &keyWord);
 std::string GetCurrentHmpName(void);
 int32_t NotifyBmsRevert(const std::string &hmpName, bool record);
-int32_t WriteStringToFile(const std::string &filePath, const std::string &content);
 
 #ifdef __cplusplus
 extern "C" {
