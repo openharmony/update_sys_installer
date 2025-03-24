@@ -32,6 +32,8 @@ using namespace Updater;
 constexpr uint32_t BUFFER_SIZE = 50 * 1024;
 constexpr uint16_t MAX_RING_BUFFER_NUM = 2;
 constexpr uint32_t MAX_UPDATER_BUFFER_SIZE = 2 * BUFFER_SIZE;
+constexpr uint16_t TOTAL_TL_BYTES = 6;
+constexpr uint16_t ONE_BYTE = 8;
 
 StreamInstallProcesser &StreamInstallProcesser::GetInstance()
 {
@@ -46,7 +48,7 @@ uint16_t ReadLE16(const uint8_t *buff)
         return 0;
     }
     uint16_t value16 = buff[0];
-    value16 += static_cast<uint16_t>(buff[1] << 8);
+    value16 += static_cast<uint16_t>(buff[1] << ONE_BYTE);
     return value16;
 }
 
@@ -58,7 +60,7 @@ uint32_t ReadLE32(const uint8_t *buff)
     }
     uint16_t low = ReadLE16(buff);
     uint16_t high = ReadLE16(buff + sizeof(uint16_t));
-    uint32_t value = ((static_cast<uint32_t>(high)) << (8 * sizeof(uint16_t))) | low;
+    uint32_t value = ((static_cast<uint32_t>(high)) << (ONE_BYTE * sizeof(uint16_t))) | low;
     return value;
 }
 
@@ -127,64 +129,82 @@ void StreamInstallProcesser::ThreadExecuteFunc()
     }
 }
 
-void StreamInstallProcesser::ProcessPartialData() {
-    LOG(INFO) << "StreamInstallProcesser ProcessPartialData enter";
-    while (!partial_data_.empty() && !isExitThread_) {
-        if (!header_processed_) {
-            if (partial_data_.size() >= 6) {
-                const uint16_t type = ReadLE16(partial_data_.data());
-                LOG(INFO) << "type = " << type;
-                if (type == ZIP_HEADER_TLV_TYPE) {
-                    const uint32_t length = ReadLE32(partial_data_.data() + 2);
-                    LOG(INFO) << "Lenght = " << length;
-                    skip_remaining_ = length;
-                    
-                    partial_data_.erase(partial_data_.begin(), 
-                                      partial_data_.begin() + 6);
-                }
-                header_processed_ = true;
-            } else {
-                break;
+bool StreamInstallProcesser::ProcessHeader()
+{
+    if (!header_processed_) {
+        if (partial_data_.size() >= TOTAL_TL_BYTES) {
+            const uint16_t type = ReadLE16(partial_data_.data());
+            if (type == ZIP_HEADER_TLV_TYPE) {
+                const uint32_t length = ReadLE32(partial_data_.data() + 2);
+                LOG(INFO) << "Length = " << length;
+                skip_remaining_ = length;
+                partial_data_.erase(partial_data_.begin(), partial_data_.begin() + TOTAL_TL_BYTES);
             }
+            header_processed_ = true;
+        } else {
+            return false; // 数据不足，无法处理头部
+        }
+    }
+    return true;
+}
+
+bool StreamInstallProcesser::SkipTargetData()
+{
+    if (skip_remaining_ > 0) {
+        const size_t skip = std::min<size_t>(skip_remaining_, partial_data_.size());
+        partial_data_.erase(partial_data_.begin(), partial_data_.begin() + skip);
+        skip_remaining_ -= skip;
+        LOG(INFO) << "skip_remaining_ = " << skip_remaining_;
+        return true; // 跳过数据后继续循环
+    }
+    return false;
+}
+
+bool StreamInstallProcesser::ProcessValidData()
+{
+    const size_t process_size = std::min<size_t>(partial_data_.size(), BUFFER_SIZE);
+    if (process_size == 0) {
+        return true; // 无数据可处理，退出循环
+    }
+    uint8_t buffer[BUFFER_SIZE]{0};
+    errno_t ret = memcpy_s(buffer, BUFFER_SIZE, partial_data_.data(), process_size);
+    if (ret != 0) {
+        LOG(ERROR) << "ProcessStreamData memcpy_s failed: " << ret;
+        return false;
+    }
+    partial_data_.erase(partial_data_.begin(), partial_data_.begin() + process_size);
+    uint32_t dealLen = 0;
+    const UpdateResultCode ret_update = binChunkUpdate_->StartBinChunkUpdate(buffer, process_size, dealLen);
+    if (ret_update == STREAM_UPDATE_SUCCESS) {
+        LOG(INFO) << "StreamInstallProcesser ThreadExecuteFunc STREAM_UPDATE_SUCCESS";
+        UpdateResult(UPDATE_STATE_ONGOING, dealLen, "");
+    } else if (ret_update == STREAM_UPDATE_FAILURE) {
+        LOG(ERROR) << "StreamInstallProcesser ThreadExecuteFunc STREAM_UPDATE_FAILURE";
+        UpdateResult(UPDATE_STATE_FAILED, dealLen, "");
+        isExitThread_ = true;
+    } else if (ret_update == STREAM_UPDATE_COMPLETE) {
+        LOG(INFO) << "StreamInstallProcesser ThreadExecuteFunc STREAM_UPDATE_COMPLETE";
+        UpdateResult(UPDATE_STATE_SUCCESSFUL, dealLen, "");
+        isExitThread_ = true;
+    }
+    return isExitThread_;
+}
+
+void StreamInstallProcesser::ProcessPartialData()
+{
+    while (!partial_data_.empty() && !isExitThread_) {
+        // 阶段1：处理头部数据
+        if (!ProcessHeader()) {
+            break;
         }
 
         // 阶段2：跳过目标数据
-        if (skip_remaining_ > 0) {
-            const size_t skip = std::min<size_t>(skip_remaining_, 
-                                               partial_data_.size());
-            partial_data_.erase(partial_data_.begin(), 
-                              partial_data_.begin() + skip);
-            skip_remaining_ -= skip;
-            LOG(INFO) << "skip_remaining_ = " << skip_remaining_;
+        if (SkipTargetData()) {
             continue;
         }
 
         // 阶段3：处理有效数据
-        const size_t process_size = std::min<size_t>(partial_data_.size(), 
-                                                    BUFFER_SIZE);
-        if (process_size == 0) break;
-
-        uint8_t buffer[BUFFER_SIZE]{0};
-        memcpy(buffer, partial_data_.data(), process_size);
-        partial_data_.erase(partial_data_.begin(), 
-                          partial_data_.begin() + process_size);
-
-        uint32_t dealLen = 0;
-        const UpdateResultCode ret = binChunkUpdate_->StartBinChunkUpdate(
-            buffer, process_size, dealLen);
-        
-        if (ret == STREAM_UPDATE_SUCCESS) {
-            LOG(INFO) << "StreamInstallProcesser ThreadExecuteFunc STREM_UPDATE_SUCCESS";
-            UpdateResult(UPDATE_STATE_ONGOING, dealLen, "");
-        } else if (ret == STREAM_UPDATE_FAILURE) {
-            LOG(ERROR) << "StreamInstallProcesser ThreadExecuteFunc STREM_UPDATE_FAILURE";
-            UpdateResult(UPDATE_STATE_FAILED, dealLen, "");
-            isExitThread_ = true;
-            break;
-        } else if (ret == STREAM_UPDATE_COMPLETE) {
-            LOG(INFO) << "StreamInstallProcesser ThreadExecuteFunc STREM_UPDATE_COMPLETE";
-            UpdateResult(UPDATE_STATE_SUCCESSFUL, dealLen, "");
-            isExitThread_ = true;
+        if (ProcessValidData()) {
             break;
         }
     }

@@ -57,6 +57,9 @@ private:
     uint32_t skip_remaining_ = 0;
     std::vector<uint8_t> partial_data_;
     void ProcessPartialData();
+    bool ProcessHeader();
+    bool SkipTargetData();
+    bool ProcessValidData();
 };
 } // SysInstaller
 } // namespace OHOS
