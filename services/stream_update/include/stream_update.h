@@ -53,6 +53,10 @@ private:
     std::atomic<bool> isExitThread_ = false;
     std::thread *pComsumeThread_ { nullptr };
     bool isRunning_ = false;
+    bool header_processed_ = false;
+    uint32_t skip_remaining_ = 0;
+    std::vector<uint8_t> partial_data_;
+    void ProcessPartialData();
 };
 } // SysInstaller
 } // namespace OHOS
