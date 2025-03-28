@@ -24,7 +24,6 @@
 #include "utils.h"
 #include <thread>
 
-#define ZIP_HEADER_TLV_TYPE 0xaa
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
@@ -34,6 +33,7 @@ constexpr uint16_t MAX_RING_BUFFER_NUM = 2;
 constexpr uint32_t MAX_UPDATER_BUFFER_SIZE = 2 * BUFFER_SIZE;
 constexpr uint16_t TOTAL_TL_BYTES = 6;
 constexpr uint16_t ONE_BYTE = 8;
+constexpr uint8_t ZIP_HEADER_TLV_TYPE = 0xaa;
 
 StreamInstallProcesser &StreamInstallProcesser::GetInstance()
 {
@@ -41,25 +41,31 @@ StreamInstallProcesser &StreamInstallProcesser::GetInstance()
     return instance;
 }
 
-uint16_t ReadLE16(const uint8_t *buff)
+uint16_t ReadLE16(const uint8_t *buff, size_t length)
 {
     if (buff == nullptr) {
         LOG(ERROR) << "buff is null";
         return 0;
+    }
+    if (length < sizeof(uint16_t)) {
+        LOG(ERROR) << "Buffer length is insufficient for ReadLE16";
     }
     uint16_t value16 = buff[0];
     value16 += static_cast<uint16_t>(buff[1] << ONE_BYTE);
     return value16;
 }
 
-uint32_t ReadLE32(const uint8_t *buff)
+uint32_t ReadLE32(const uint8_t *buff, size_t length)
 {
     if (buff == nullptr) {
         LOG(ERROR) << "buff is null";
         return 0;
     }
-    uint16_t low = ReadLE16(buff);
-    uint16_t high = ReadLE16(buff + sizeof(uint16_t));
+    if (length < sizeof(uint32_t)) {
+        LOG(ERROR) << "Buffer length is insufficient for ReadLE32";
+    }
+    uint16_t low = ReadLE16(buff, length);
+    uint16_t high = ReadLE16(buff + sizeof(uint16_t), length - sizeof(uint16_t));
     uint32_t value = ((static_cast<uint32_t>(high)) << (ONE_BYTE * sizeof(uint16_t))) | low;
     return value;
 }
@@ -115,49 +121,56 @@ void StreamInstallProcesser::ThreadExecuteFunc()
 {
     LOG(INFO) << "StreamInstallProcesser ThreadExecuteFunc enter";
     while (!isExitThread_) {
-        uint8_t temp_buffer[BUFFER_SIZE]{0};
+        uint8_t temporaryBuffer[BUFFER_SIZE]{0};
         uint32_t len = 0;
-        if (!ringBuffer_.Pop(temp_buffer, sizeof(temp_buffer), len)) {
+        if (!ringBuffer_.Pop(temporaryBuffer, sizeof(temporaryBuffer), len)) {
             if (!partial_data_.empty()) {
                 ProcessPartialData();
             }
             break;
         }
 
-        partial_data_.insert(partial_data_.end(), temp_buffer, temp_buffer + len);
+        partial_data_.insert(partial_data_.end(), temporaryBuffer, temporaryBuffer + len);
         ProcessPartialData();
     }
 }
 
 bool StreamInstallProcesser::ProcessHeader()
 {
-    if (!header_processed_) {
-        if (partial_data_.size() >= TOTAL_TL_BYTES) {
-            const uint16_t type = ReadLE16(partial_data_.data());
-            if (type == ZIP_HEADER_TLV_TYPE) {
-                const uint32_t length = ReadLE32(partial_data_.data() + 2);
-                LOG(INFO) << "Length = " << length;
-                skip_remaining_ = length;
-                partial_data_.erase(partial_data_.begin(), partial_data_.begin() + TOTAL_TL_BYTES);
-            }
-            header_processed_ = true;
-        } else {
-            return false; // 数据不足，无法处理头部
-        }
+    if (header_processed_) {
+        return true;
     }
+
+    if (partial_data_.size() < TOTAL_TL_BYTES) {
+        return false;
+    }
+    
+    const uint16_t type = ReadLE16(partial_data_.data(), partial_data_.size());
+    if (type != ZIP_HEADER_TLV_TYPE) {
+        header_processed_ = true;
+        LOG(ERROR) << "No match type: " << type;
+        return true;
+    }
+    const uint32_t length = ReadLE32(partial_data_.data() + 2, partial_data_.size() - 2);
+    LOG(INFO) << "Length = " << length;
+    skip_remaining_ = length;
+    partial_data_.erase(partial_data_.begin(), partial_data_.begin() + TOTAL_TL_BYTES);
+    header_processed_ = true;
+
     return true;
 }
 
 bool StreamInstallProcesser::SkipTargetData()
 {
-    if (skip_remaining_ > 0) {
-        const size_t skip = std::min<size_t>(skip_remaining_, partial_data_.size());
-        partial_data_.erase(partial_data_.begin(), partial_data_.begin() + skip);
-        skip_remaining_ -= skip;
-        LOG(INFO) << "skip_remaining_ = " << skip_remaining_;
-        return true; // 跳过数据后继续循环
+    if (skip_remaining_ <= 0) {
+        LOG(ERROR) << "no valid skip_remaining_ = " << skip_remaining_;
+        return false; // 不需要跳过数据，直接返回
     }
-    return false;
+    const size_t skip = std::min<size_t>(skip_remaining_, partial_data_.size());
+    partial_data_.erase(partial_data_.begin(), partial_data_.begin() + skip);
+    skip_remaining_ -= skip;
+    LOG(INFO) << "skip_remaining_ = " << skip_remaining_;
+    return true; // 跳过数据后继续循环
 }
 
 bool StreamInstallProcesser::ProcessValidData()
