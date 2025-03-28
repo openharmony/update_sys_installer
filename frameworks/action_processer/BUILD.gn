@@ -28,6 +28,12 @@ ohos_static_library("libactionprocesser") {
     "${sys_installer_path}/frameworks/installer_manager/include",
   ]
 
+  deps = [ "${sys_installer_path}/interfaces/innerkits/ipc_client:sysinstaller_interface" ]
+
+  public_configs = [
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:idl_file_headers",
+  ]
+
   external_deps = [
     "hilog:libhilog",
     "ipc:ipc_core",

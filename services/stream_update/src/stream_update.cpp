@@ -55,7 +55,7 @@ int32_t StreamInstallProcesser::Start()
         LOG(ERROR) << "StreamInstallProcesser Start new pComsumeThread_ failed";
         return -1;
     }
-    UpdateResult(UPDATE_STATE_INIT, 0, "");
+    UpdateResult(UpdateStatus::UPDATE_STATE_INIT, 0, "");
     return 0;
 }
 
@@ -96,14 +96,14 @@ void StreamInstallProcesser::ThreadExecuteFunc()
         UpdateResultCode ret = binChunkUpdate_->StartBinChunkUpdate(buffer, len, dealLen);
         if (STREAM_UPDATE_SUCCESS == ret) {
             LOG(INFO) << "StreamInstallProcesser ThreadExecuteFunc STREM_UPDATE_SUCCESS";
-            UpdateResult(UPDATE_STATE_ONGOING, dealLen, "");
+            UpdateResult(UpdateStatus::UPDATE_STATE_ONGOING, dealLen, "");
         } else if (STREAM_UPDATE_FAILURE == ret) {
             LOG(ERROR) << "StreamInstallProcesser ThreadExecuteFunc STREM_UPDATE_FAILURE";
-            UpdateResult(UPDATE_STATE_FAILED, dealLen, "");
+            UpdateResult(UpdateStatus::UPDATE_STATE_FAILED, dealLen, "");
             break;
         } else if (STREAM_UPDATE_COMPLETE == ret) {
             LOG(INFO) << "StreamInstallProcesser ThreadExecuteFunc STREM_UPDATE_COMPLETE";
-            UpdateResult(UPDATE_STATE_SUCCESSFUL, dealLen, "");
+            UpdateResult(UpdateStatus::UPDATE_STATE_SUCCESSFUL, dealLen, "");
             break;
         }
     }
@@ -118,10 +118,10 @@ void StreamInstallProcesser::ThreadExitProc()
     ringBuffer_.Reset();
 }
 
-int32_t StreamInstallProcesser::ProcessStreamData(const uint8_t *buffer, size_t size)
+int32_t StreamInstallProcesser::ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size)
 {
     uint8_t tmpBuff[BUFFER_SIZE]{0};
-    errno_t ret = memcpy_s(tmpBuff, BUFFER_SIZE, buffer, size);
+    errno_t ret = memcpy_s(tmpBuff, BUFFER_SIZE, buffer.data(), buffer.size());
     if (ret != 0) {
         LOG(ERROR) << "ProcessStreamData memcpy_s failed: " << ret;
         return -1;

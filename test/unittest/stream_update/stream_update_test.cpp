@@ -45,8 +45,8 @@ HWTEST_F(StreamInstallProcesserTest, ProcessStreamDataSuccess, TestSize.Level1)
 {
     EXPECT_EQ(StreamInstallProcesser::GetInstance().Start(), 0);
 
-    uint8_t data[1024] = {0};
-    std::fill_n(data, sizeof(data), 0x55);
+    std::vector<uint8_t> data(1024, 0);
+    std::fill_n(data.begin(), data.size(), 0x55);
 
     EXPECT_EQ(StreamInstallProcesser::GetInstance().ProcessStreamData(data, sizeof(data)), 0);
     StreamInstallProcesser::GetInstance().Stop();
@@ -55,8 +55,8 @@ HWTEST_F(StreamInstallProcesserTest, ProcessStreamDataSuccess, TestSize.Level1)
 HWTEST_F(StreamInstallProcesserTest, UpdateResultTest, TestSize.Level1)
 {
     // 预期 UpdateCallback 方法被调用
-    EXPECT_CALL(*statusManager, UpdateCallback(UPDATE_STATE_INIT, 0, "Initializing")).Times(1);
-    StreamInstallProcesser::GetInstance().UpdateResult(UPDATE_STATE_INIT, 0, "Initializing");
+    EXPECT_CALL(*statusManager, UpdateCallback(UpdateStatus::UPDATE_STATE_INIT, 0, "Initializing")).Times(1);
+    StreamInstallProcesser::GetInstance().UpdateResult(UpdateStatus::UPDATE_STATE_INIT, 0, "Initializing");
 }
 
 } // namespace SysInstaller

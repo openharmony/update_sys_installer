@@ -19,22 +19,17 @@
 #include "iremote_stub.h"
 #include "isys_installer_callback.h"
 #include "isys_installer_callback_func.h"
+#include "sys_installer_callback_stub.h"
 
 namespace OHOS {
 namespace SysInstaller {
-class SysInstallerCallbackStub : public IRemoteStub<ISysInstallerCallback> {
-public:
-    int32_t OnRemoteRequest(uint32_t code,
-        MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-};
-
 class SysInstallerCallback : public SysInstallerCallbackStub {
 public:
     SysInstallerCallback() = default;
     ~SysInstallerCallback() = default;
 
-    void OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) override;
-    void OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen, const std::string &resultMsg) override;
+    ErrCode OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) override;
+    ErrCode OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen, const std::string &resultMsg) override;
     void RegisterCallback(sptr<ISysInstallerCallbackFunc> callback);
 
 private:

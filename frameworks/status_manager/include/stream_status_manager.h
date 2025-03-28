@@ -34,7 +34,7 @@ public:
     virtual void UpdateCallback(UpdateStatus updateStatus, int dealLen, const std::string &resultMsg);
 
 protected:
-    UpdateStatus updateStatus_ = UPDATE_STATE_INIT;
+    UpdateStatus updateStatus_ = UpdateStatus::UPDATE_STATE_INIT;
     std::mutex updateCbMutex_ {};
     sptr<ISysInstallerCallback> updateCallback_ {};
 };

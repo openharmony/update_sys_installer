@@ -37,7 +37,7 @@ public:
     float GetUpdateProgress();
 
 protected:
-    UpdateStatus updateStatus_ = UPDATE_STATE_INIT;
+    UpdateStatus updateStatus_ = UpdateStatus::UPDATE_STATE_INIT;
     int percent_ = 0;
     std::mutex updateCbMutex_ {};
     sptr<ISysInstallerCallback> updateCallback_ {};

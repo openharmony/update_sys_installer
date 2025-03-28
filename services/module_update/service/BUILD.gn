@@ -37,7 +37,6 @@ ohos_static_library("libmodule_update_service_static") {
   sources = [
     "${sys_installer_path}/frameworks/ipc_server/src/module_update_service.cpp",
     "${sys_installer_path}/frameworks/ipc_server/src/module_update_stub.cpp",
-    "${sys_installer_path}/frameworks/ipc_server/src/sys_installer_callback_proxy.cpp",
     "${sys_installer_path}/services/module_update/service/src/module_update_consumer.cpp",
     "${sys_installer_path}/services/module_update/service/src/module_update_main.cpp",
     "${sys_installer_path}/services/module_update/service/src/module_update_producer.cpp",
@@ -55,9 +54,13 @@ ohos_static_library("libmodule_update_service_static") {
     "${sys_installer_path}/services/module_update/include",
   ]
 
-  public_configs = [ ":module_update_service_exported_header" ]
+  public_configs = [
+    ":module_update_service_exported_header",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:idl_file_headers",
+  ]
 
   deps = [
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update_stub",
     "${sys_installer_path}/services/module_update/src:module_update_static",
   ]
 

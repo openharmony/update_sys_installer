@@ -57,7 +57,7 @@ void ActionProcesser::Start()
 
     isRunning_ = true;
     isSuspend_ = false;
-    statusManager_->UpdateCallback(UPDATE_STATE_ONGOING, 0, "");
+    statusManager_->UpdateCallback(UpdateStatus::UPDATE_STATE_ONGOING, 0, "");
     curAction_ = std::move(actionQue_.front());
     actionQue_.pop_front();
     if (curAction_ == nullptr) {
@@ -126,7 +126,7 @@ void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::strin
     if (errCode != SYS_UPDATE_SUCCESS) {
         isRunning_ = false;
         isSuspend_ = false;
-        statusManager_->UpdateCallback(UPDATE_STATE_FAILED, 100, errStr); // 100 : action failed
+        statusManager_->UpdateCallback(UpdateStatus::UPDATE_STATE_FAILED, 100, errStr); // 100 : action failed
         actionQue_.clear();
         LOG(ERROR) << "CompletedAction errCode:" << errCode << " str:" << errStr;
         SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_POST_EVENT);
@@ -147,7 +147,7 @@ void ActionProcesser::StartNextAction()
         LOG(INFO) << "Action queue empty, successful";
         isRunning_ = false;
         isSuspend_ = false;
-        statusManager_->UpdateCallback(UPDATE_STATE_SUCCESSFUL, 100, ""); // 100 : action completed
+        statusManager_->UpdateCallback(UpdateStatus::UPDATE_STATE_SUCCESSFUL, 100, ""); // 100 : action completed
         return;
     }
 
