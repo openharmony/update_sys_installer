@@ -38,11 +38,11 @@ public:
     SysInstallerServer(int32_t systemAbilityId, bool runOnCreate = false);
     ~SysInstallerServer() override;
 
-    int32_t SysInstallerInit(bool bStreamUpgrade = false) override;
+    int32_t SysInstallerInit(bool bStreamUpgrade) override;
     int32_t StartUpdatePackageZip(const std::string &pkgPath) override;
     int32_t StartStreamUpdate() override;
     int32_t StopStreamUpdate() override;
-    int32_t ProcessStreamData(const uint8_t *buffer, size_t size) override;
+    int32_t ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size) override;
     int32_t SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback) override;
     int32_t GetUpdateStatus() override;
     int32_t StartUpdateParaZip(const std::string &pkgPath,

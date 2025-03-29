@@ -111,8 +111,8 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
     ON_SCOPE_EXIT(saveResult) {
         ModuleUpdateMain::GetInstance().SaveInstallerResult(path, ret, std::to_string(ret), timer);
         if (updateCallback != nullptr) {
-            updateCallback->OnUpgradeProgress(ret == 0 ? UPDATE_STATE_SUCCESSFUL : UPDATE_STATE_FAILED,
-                100, ""); // 100 : 100% percent
+            updateCallback->OnUpgradeProgress(ret == 0 ? UpdateStatus::UPDATE_STATE_SUCCESSFUL :
+                UpdateStatus::UPDATE_STATE_FAILED, 100, ""); // 100 : 100% percent
         }
     };
     LOG(INFO) << "StartUpdateHmpPackage " << path;
@@ -122,7 +122,7 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
         return ret;
     }
 
-    updateCallback->OnUpgradeProgress(UPDATE_STATE_ONGOING, 0, "");
+    updateCallback->OnUpgradeProgress(UpdateStatus::UPDATE_STATE_ONGOING, 0, "");
     if (VerifyModulePackageSign(path) != 0) {
         LOG(ERROR) << "Verify sign failed " << path;
         ret = ModuleErrorCode::ERR_VERIFY_FAIL;

@@ -31,7 +31,7 @@ public:
     virtual int32_t SysInstallerInit();
     virtual int32_t StartStreamUpdate();
     virtual int32_t StopStreamUpdate();
-    virtual int32_t ProcessStreamData(const uint8_t *buffer, size_t size);
+    virtual int32_t ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size);
     virtual int32_t SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback);
     virtual int32_t GetUpdateStatus();
 

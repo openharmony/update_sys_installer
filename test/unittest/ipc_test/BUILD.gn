@@ -54,6 +54,7 @@ ohos_unittest("sys_installer_unittest") {
     "bounds_checking_function:libsec_static",
     "googletest:gmock_main",
     "googletest:gtest_main",
+    "hilog:libhilog",
     "updater:libupdaterlog",
   ]
 
@@ -86,6 +87,7 @@ ohos_executable("sys_installer_client_test") {
   external_deps = [
     "bounds_checking_function:libsec_static",
     "c_utils:utils",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

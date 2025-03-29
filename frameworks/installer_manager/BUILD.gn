@@ -52,10 +52,16 @@ ohos_static_library("libinstallermanager") {
   deps = [
     "${sys_installer_path}/frameworks/action_processer:libactionprocesser",
     "${sys_installer_path}/frameworks/actions/verify_action:libverifyaction",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:sysinstaller_interface",
     "${sys_installer_path}/services/ab_update:libabupdate",
     "${sys_installer_path}/services/stream_update:libstreamupdate",
   ]
-  public_configs = [ ":libinstallermanager_exported_headers" ]
+
+  public_configs = [
+    ":libinstallermanager_exported_headers",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:idl_file_headers",
+  ]
+
   external_deps = [
     "bounds_checking_function:libsec_static",
     "hilog:libhilog",

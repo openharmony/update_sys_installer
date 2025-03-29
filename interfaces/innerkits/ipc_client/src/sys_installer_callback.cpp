@@ -28,50 +28,24 @@
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
-
-int32_t SysInstallerCallbackStub::OnRemoteRequest(uint32_t code,
-    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+ErrCode SysInstallerCallback::OnUpgradeProgress(UpdateStatus updateStatus, int percent,
+    const std::string &resultMsg)
 {
-    if (data.ReadInterfaceToken() != GetDescriptor()) {
-        LOG(ERROR) << "ReadInterfaceToken fail";
-        return -1;
-    }
-    switch (code) {
-        case static_cast<uint32_t>(SysInstallerCallbackInterfaceCode::UPDATE_RESULT): {
-            int updateStatus = data.ReadInt32();
-            int percent = data.ReadInt32();
-            OnUpgradeProgress(static_cast<UpdateStatus>(updateStatus), percent, data.ReadString());
-            break;
-        }
-        case static_cast<uint32_t>(SysInstallerCallbackInterfaceCode::STREAM_UPDATE_RESULT): {
-            int updateStatus = data.ReadInt32();
-            int dealLen = data.ReadInt32();
-            OnUpgradeDealLen(static_cast<UpdateStatus>(updateStatus), dealLen, data.ReadString());
-            break;
-        }
-        default: {
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-        }
+    LOG(INFO) << "updateStatus:" << static_cast<int>(updateStatus) << " percent:" << percent << " msg:" << resultMsg;
+    if (callback_ != nullptr) {
+        callback_->OnUpgradeProgress(updateStatus, percent, resultMsg);
     }
     return 0;
 }
 
-void SysInstallerCallback::OnUpgradeProgress(UpdateStatus updateStatus, int percent,
+ErrCode SysInstallerCallback::OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen,
     const std::string &resultMsg)
 {
-    LOG(INFO) << "updateStatus: " << updateStatus << " percent:" << percent << " msg:" << resultMsg;
-    if (callback_ != nullptr) {
-        callback_->OnUpgradeProgress(updateStatus, percent, resultMsg);
-    }
-}
-
-void SysInstallerCallback::OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen,
-    const std::string &resultMsg)
-{
-    LOG(INFO) << "updateStatus: " << updateStatus << " dealLen:" << dealLen << " msg:" << resultMsg;
+    LOG(INFO) << "updateStatus: " << static_cast<int>(updateStatus) << " dealLen:" << dealLen << " msg:" << resultMsg;
     if (callback_ != nullptr) {
         callback_->OnUpgradeDealLen(updateStatus, dealLen, resultMsg);
     }
+    return 0;
 }
 
 void SysInstallerCallback::RegisterCallback(sptr<ISysInstallerCallbackFunc> callback)
