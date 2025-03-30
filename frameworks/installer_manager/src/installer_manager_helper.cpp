@@ -51,7 +51,9 @@ int32_t InstallerManagerHelper::StartUpdatePackageZip(const std::string &pkgPath
         LOG(ERROR) << "ActionProcesser IsRunning";
         return -1;
     }
-    ActionProcesser::GetInstance().AddAction(std::make_unique<PkgVerify>(statusManager_, pkgPath));
+    std::vector<std::string> filePath = {};
+    filePath.push_back(pkgPath);
+    ActionProcesser::GetInstance().AddAction(std::make_unique<PkgVerify>(statusManager_, filePath));
     ActionProcesser::GetInstance().AddAction(std::make_unique<ABUpdate>(statusManager_, pkgPath));
     ActionProcesser::GetInstance().Start();
     return 0;
@@ -93,6 +95,31 @@ int32_t InstallerManagerHelper::AccDecompressAndVerifyPkg(const std::string &src
 }
 
 int32_t InstallerManagerHelper::AccDeleteDir(const std::string &dstPath)
+{
+    return -1;
+}
+
+int32_t InstallerManagerHelper::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
+{
+    return -1;
+}
+
+int32_t InstallerManagerHelper::StartVabMerge()
+{
+    return -1;
+}
+
+int32_t InstallerManagerHelper::EnableVabCheckpoint()
+{
+    return -1;
+}
+
+int32_t InstallerManagerHelper::AbortVabActiveSnapshot()
+{
+    return -1;
+}
+
+int32_t InstallerManagerHelper::ClearVabMetadataAndCow()
 {
     return -1;
 }

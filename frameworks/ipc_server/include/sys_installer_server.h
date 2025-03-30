@@ -51,6 +51,11 @@ public:
     int32_t AccDecompressAndVerifyPkg(const std::string &srcPath,
         const std::string &dstPath, const uint32_t type) override;
     int32_t AccDeleteDir(const std::string &dstPath) override;
+    int32_t StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath) override;
+    int32_t StartVabMerge() override;
+    int32_t EnableVabCheckpoint() override;
+    int32_t AbortVabActiveSnapshot() override;
+    int32_t ClearVabMetadataAndCow() override;
 
 #ifndef UPDATER_UT
 private:

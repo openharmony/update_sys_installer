@@ -25,7 +25,7 @@ namespace SysInstaller {
 class PkgVerify : public IAction {
 public:
     PkgVerify(std::shared_ptr<StatusManager> statusManager,
-        const std::string &pkgPath) : statusManager_(statusManager), pkgPath_(pkgPath) {}
+        const std::vector<std::string> &pkgPath) : statusManager_(statusManager), pkgPath_(pkgPath) {}
     virtual ~PkgVerify() = default;
 
     void PerformAction() override;
@@ -36,12 +36,12 @@ public:
 
 protected:
     virtual void Init();
-    virtual int Verify(const std::string &pkgPath);
+    virtual int Verify(const std::vector<std::string> &pkgPath);
 
 protected:
     bool verifyInit_ = false;
     std::shared_ptr<StatusManager> statusManager_ {};
-    std::string pkgPath_;
+    std::vector<std::string> pkgPath_;
 };
 } // SysInstaller
 } // namespace OHOS

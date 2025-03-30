@@ -27,6 +27,11 @@ REGISTER_SYSTEM_ABILITY_BY_ID(SysInstallerServer, SYS_INSTALLER_DISTRIBUTED_SERV
 
 using namespace Updater;
 
+void __attribute__((weak)) InitSysLogger(const std::string &tag)
+{
+    InitUpdaterLogger(tag, SYS_LOG_FILE, SYS_STAGE_FILE, SYS_ERROR_FILE);
+}
+
 SysInstallerServer::SysInstallerServer(int32_t systemAbilityId, bool runOnCreate)
     : SystemAbility(systemAbilityId, runOnCreate)
 {
@@ -123,6 +128,36 @@ int32_t SysInstallerServer::AccDeleteDir(const std::string &dstPath)
 {
     LOG(INFO) << "AccDeleteDir";
     return SysInstallerManager::GetInstance().AccDeleteDir(dstPath);
+}
+
+int32_t SysInstallerServer::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
+{
+    LOG(INFO) << "StartUpdateVabPackageZip";
+    return SysInstallerManager::GetInstance().StartUpdateVabPackageZip(pkgPath);
+}
+
+int32_t SysInstallerServer::StartVabMerge()
+{
+    LOG(INFO) << "StartVabMerge";
+    return SysInstallerManager::GetInstance().StartVabMerge();
+}
+
+int32_t SysInstallerServer::EnableVabCheckpoint()
+{
+    LOG(INFO) << "EnableVabCheckpoint";
+    return SysInstallerManager::GetInstance().EnableVabCheckpoint();
+}
+
+int32_t SysInstallerServer::AbortVabActiveSnapshot()
+{
+    LOG(INFO) << "AbortVabActiveSnapshot";
+    return SysInstallerManager::GetInstance().AbortVabActiveSnapshot();
+}
+
+int32_t SysInstallerServer::ClearVabMetadataAndCow()
+{
+    LOG(INFO) << "ClearVabMetadataAndCow";
+    return SysInstallerManager::GetInstance().ClearVabMetadataAndCow();
 }
 
 void SysInstallerServer::OnStart()
