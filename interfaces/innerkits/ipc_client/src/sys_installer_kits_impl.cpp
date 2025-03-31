@@ -300,82 +300,82 @@ int32_t SysInstallerKitsImpl::AccDeleteDir(const std::string &dstPath)
 
 int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
 {
-LOG(INFO) << "StartUpdateVabPackageZip";
-auto updateService = GetService();
-if (updateService == nullptr) {
-LOG(ERROR) << "Get updateService failed";
-return -1;
-}
-int32_t ret = updateService->StartUpdateVabPackageZip(pkgPath);
-LOG(INFO) << "StartUpdateVabPackageZip ret:" << ret;
-#ifdef UPDATER_UT
+    LOG(INFO) << "StartUpdateVabPackageZip";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->StartUpdateVabPackageZip(pkgPath);
+    LOG(INFO) << "StartUpdateVabPackageZip ret:" << ret;
+    #ifdef UPDATER_UT
     return -1;
-#endif
-return ret;
+    #endif
+    return ret;
 }
 
 int32_t SysInstallerKitsImpl::StartVabMerge()
 {
-LOG(INFO) << "StartVabMerge";
-auto updateService = GetService();
-if (updateService == nullptr) {
-LOG(ERROR) << "Get updateService failed";
-return -1;
-}
-int32_t ret = updateService->StartVabMerge();
-LOG(INFO) << "StartVabMerge ret:" << ret;
-#ifdef UPDATER_UT
+    LOG(INFO) << "StartVabMerge";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->StartVabMerge();
+    LOG(INFO) << "StartVabMerge ret:" << ret;
+    #ifdef UPDATER_UT
     return -1;
-#endif
-return ret;
+    #endif
+    return ret;
 }
 
 int32_t SysInstallerKitsImpl::EnableVabCheckpoint()
 {
-LOG(INFO) << "EnableVabCheckpoint";
-auto updateService = GetService();
-if (updateService == nullptr) {
-LOG(ERROR) << "Get updateService failed";
-return -1;
-}
-int32_t ret = updateService->EnableVabCheckpoint();
-LOG(INFO) << "EnableVabCheckpoint ret:" << ret;
-#ifdef UPDATER_UT
+    LOG(INFO) << "EnableVabCheckpoint";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->EnableVabCheckpoint();
+    LOG(INFO) << "EnableVabCheckpoint ret:" << ret;
+    #ifdef UPDATER_UT
     return -1;
-#endif
-return ret;
+    #endif
+    return ret;
 }
 
 int32_t SysInstallerKitsImpl::AbortVabActiveSnapshot()
 {
-LOG(INFO) << "AbortVabActiveSnapshot";
-auto updateService = GetService();
-if (updateService == nullptr) {
-LOG(ERROR) << "Get updateService failed";
-return -1;
-}
-int32_t ret = updateService->AbortVabActiveSnapshot();
-LOG(INFO) << "AbortVabActiveSnapshot ret:" << ret;
-#ifdef UPDATER_UT
+    LOG(INFO) << "AbortVabActiveSnapshot";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->AbortVabActiveSnapshot();
+    LOG(INFO) << "AbortVabActiveSnapshot ret:" << ret;
+    #ifdef UPDATER_UT
     return -1;
-#endif
-return ret;
+    #endif
+    return ret;
 }
 
 int32_t SysInstallerKitsImpl::ClearVabMetadataAndCow()
 {
-LOG(INFO) << "ClearVabMetadataAndCow";
-auto updateService = GetService();
-if (updateService == nullptr) {
-LOG(ERROR) << "Get updateService failed";
-return -1;
-}
-int32_t ret = updateService->ClearVabMetadataAndCow();
-LOG(INFO) << "ClearVabMetadataAndCow ret:" << ret;
-#ifdef UPDATER_UT
+    LOG(INFO) << "ClearVabMetadataAndCow";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->ClearVabMetadataAndCow();
+    LOG(INFO) << "ClearVabMetadataAndCow ret:" << ret;
+    #ifdef UPDATER_UT
     return -1;
-#endif
-return ret;
+    #endif
+    return ret;
 }
 
 void SysInstallerKitsImpl::LoadServiceSuccess()
