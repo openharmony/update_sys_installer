@@ -115,10 +115,10 @@ int32_t InstallerManager::AccDeleteDir(const std::string &dstPath)
 
 int32_t InstallerManager::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
 {
-if (helper_ == nullptr) {
-LOG(ERROR) << "helper_ null";
-    return -1;
-}
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
     return helper_->StartUpdateVabPackageZip(pkgPath);
 }
 
