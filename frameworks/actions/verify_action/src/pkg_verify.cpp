@@ -26,12 +26,13 @@ namespace SysInstaller {
 using namespace Updater;
 using namespace Hpackage;
 
+constexpr size_t PKG_VERIFY_PERCENT = 4;
 void PkgVerify::Init()
 {
     CertVerify::GetInstance().RegisterCertHelper(std::make_unique<SingleCertHelper>());
 }
 
-int PkgVerify::Verify(const std::string &pkgPath)
+int PkgVerify::Verify(const std::vector<std::string> &pkgPath)
 {
     if (statusManager_ == nullptr) {
         LOG(ERROR) << "statusManager_ nullptr";
@@ -42,20 +43,36 @@ int PkgVerify::Verify(const std::string &pkgPath)
         Init();
         verifyInit_ = true;
     }
-
-    std::string realPath {};
-    if (!Utils::PathToRealPath(pkgPath, realPath)) {
-        LOG(ERROR) << "get real path failed";
-        return -1;
+    std::vector<std::string> pkgList {};
+    for (auto &pkg : pkgPath) {
+        if (pkg != "") {
+            pkgList.push_back(pkg);
+        }
     }
-
+    size_t pkgNum = pkgList.size();
+    if (pkgNum == 0) {
+        LOG(INFO) << "there is no package";
+        return 0;
+    }
+    size_t count = 0;
     statusManager_->SetUpdatePercent(1); // 1 : 1%
-    int ret = VerifyPackage(realPath.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0);
-    if (ret != 0) {
-        LOG(ERROR) << "VerifyPackage failed:" << ret;
-        return ret;
+    for (const auto &file : pkgList) {
+        count++;
+        std::string realpath {};
+        if (!Utils::PathToRealPath(file, realpath)) {
+            LOG(ERROR) << "get real path failed: " << file;
+            return -1;
+        }
+        int ret = VerifyPackage(realpath.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0);
+        if (ret != 0) {
+            LOG(ERROR) << "VerifyPackage failed: " << file << ", " << ret;
+            return ret;
+        }
+        int percent = static_cast<int>(
+            PKG_VERIFY_PERCENT * static_cast<double>(count) / static_cast<double>(pkgNum));
+        statusManager_->SetUpdatePercent(percent + 1); // 1 : 1%
+        LOG(INFO) << "VerifyPackage success: " << file;
     }
-
     statusManager_->SetUpdatePercent(5); // 5 : %5
     LOG(INFO) << "UpdatePreCheck successful";
     return 0;

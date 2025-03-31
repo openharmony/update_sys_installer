@@ -38,6 +38,11 @@ public:
     virtual int32_t AccDecompressAndVerifyPkg(const std::string &srcPath,
         const std::string &dstPath, const uint32_t type);
     virtual int32_t AccDeleteDir(const std::string &dstPath);
+    virtual int32_t StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath);
+    virtual int32_t StartVabMerge();
+    virtual int32_t EnableVabCheckpoint();
+    virtual int32_t AbortVabActiveSnapshot();
+    virtual int32_t ClearVabMetadataAndCow();
 
 protected:
     std::unique_ptr<SysInstallerManagerHelper> helper_ {};

@@ -112,5 +112,50 @@ int32_t InstallerManager::AccDeleteDir(const std::string &dstPath)
     }
     return helper_->AccDeleteDir(dstPath);
 }
+
+int32_t InstallerManager::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->StartUpdateVabPackageZip(pkgPath);
+}
+
+int32_t InstallerManager::StartVabMerge()
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->StartVabMerge();
+}
+
+int32_t InstallerManager::EnableVabCheckpoint()
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->EnableVabCheckpoint();
+}
+
+int32_t InstallerManager::AbortVabActiveSnapshot()
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->AbortVabActiveSnapshot();
+}
+
+int32_t InstallerManager::ClearVabMetadataAndCow()
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->ClearVabMetadataAndCow();
+}
 } // namespace SysInstaller
 } // namespace OHOS

@@ -69,6 +69,24 @@ void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent, const
     updateCallback_->OnUpgradeProgress(updateStatus_, percent_, resultMsg);
 }
 
+void StatusManager::CallbackWithoutCheck(UpdateStatus updateStatus, int percent, const std::string &resultMsg)
+{
+    std::lock_guard<std::mutex> lock(updateCbMutex_);
+    if (updateCallback_ == nullptr) {
+        LOG(ERROR) << "updateCallback_ null";
+        return;
+    }
+
+    if (updateStatus > UpdateStatus::UPDATE_STATE_MAX) {
+        LOG(INFO) << "status error:" << static_cast<int32_t>(updateStatus);
+        return;
+    }
+
+    updateStatus_ = updateStatus;
+    LOG(INFO) << "status:" << static_cast<int32_t>(updateStatus_) << " percent:"  << percent_ << " msg:" << resultMsg;
+    updateCallback_->OnUpgradeProgress(updateStatus_, percent_, resultMsg);
+}
+
 void StatusManager::SetUpdatePercent(int percent)
 {
     UpdateCallback(updateStatus_, percent, "");

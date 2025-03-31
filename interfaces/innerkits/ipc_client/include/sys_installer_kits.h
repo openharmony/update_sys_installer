@@ -49,6 +49,11 @@ public:
     virtual int32_t AccDecompressAndVerifyPkg(const std::string &srcPath,
         const std::string &dstPath, const uint32_t type) = 0;
     virtual int32_t AccDeleteDir(const std::string &dstPath) = 0;
+    virtual int32_t StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath) = 0;
+    virtual int32_t StartVabMerge() = 0;
+    virtual int32_t EnableVabCheckpoint() = 0;
+    virtual int32_t AbortVabActiveSnapshot() = 0;
+    virtual int32_t ClearVabMetadataAndCow() = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS

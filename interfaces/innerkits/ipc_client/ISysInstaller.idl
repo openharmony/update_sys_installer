@@ -26,4 +26,9 @@ interface OHOS.SysInstaller.ISysInstaller {
     void StartDeleteParaZip([in] String location, [in] String cfgDir);
     void AccDecompressAndVerifyPkg([in] String srcPath, [in] String dstPath, [in] unsigned int type);
     void AccDeleteDir([in] String dstPath);
+    [oneway] void StartUpdateVabPackageZip([in] List<String> pkgPath);
+    [oneway] void StartVabMerge();
+    [oneway] void EnableVabCheckpoint();
+    [oneway] void AbortVabActiveSnapshot();
+    [oneway] void ClearVabMetadataAndCow();
 }
