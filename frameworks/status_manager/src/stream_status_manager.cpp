@@ -25,7 +25,7 @@ using namespace Updater;
 
 void StreamStatusManager::Init()
 {
-    updateStatus_ = UPDATE_STATE_INIT;
+    updateStatus_ = UpdateStatus::UPDATE_STATE_INIT;
 }
 
 int StreamStatusManager::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback)
@@ -42,7 +42,7 @@ int StreamStatusManager::SetUpdateCallback(const sptr<ISysInstallerCallback> &up
 
 int StreamStatusManager::GetUpdateStatus()
 {
-    return updateStatus_;
+    return static_cast<int>(updateStatus_);
 }
 
 void StreamStatusManager::UpdateCallback(UpdateStatus updateStatus, int dealLen, const std::string &resultMsg)
@@ -53,13 +53,13 @@ void StreamStatusManager::UpdateCallback(UpdateStatus updateStatus, int dealLen,
         return;
     }
 
-    if (updateStatus > UPDATE_STATE_MAX) {
-        LOG(INFO) << "status error:" << updateStatus;
+    if (updateStatus > UpdateStatus::UPDATE_STATE_MAX) {
+        LOG(INFO) << "status error:" << static_cast<int>(updateStatus);
         return;
     }
 
     updateStatus_ = updateStatus;
-    LOG(INFO) << "status:" << updateStatus_ << " dealLen:"  << dealLen << " msg:" << resultMsg;
+    LOG(INFO) << "status:" << static_cast<int>(updateStatus_) << " dealLen:"  << dealLen << " msg:" << resultMsg;
     updateCallback_->OnUpgradeDealLen(updateStatus_, dealLen, resultMsg);
 }
 

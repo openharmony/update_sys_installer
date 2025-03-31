@@ -31,7 +31,7 @@ public:
     virtual int32_t StartUpdatePackageZip(const std::string &pkgPath);
     virtual int32_t StartStreamUpdate();
     virtual int32_t StopStreamUpdate();
-    virtual int32_t ProcessStreamData(const uint8_t *buffer, size_t size);
+    virtual int32_t ProcessStreamData(uint8_t *buffer, uint32_t size);
     virtual int32_t SetUpdateCallback(sptr<ISysInstallerCallbackFunc> callback);
     virtual int32_t GetUpdateStatus();
     virtual int32_t StartUpdateParaZip(const std::string &pkgPath,

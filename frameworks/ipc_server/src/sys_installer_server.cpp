@@ -73,7 +73,7 @@ int32_t SysInstallerServer::StopStreamUpdate()
     return StreamInstallerManager::GetInstance().StopStreamUpdate();
 }
 
-int32_t SysInstallerServer::ProcessStreamData(const uint8_t *buffer, size_t size)
+int32_t SysInstallerServer::ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size)
 {
     LOG(INFO) << "ProcessStreamData";
     return StreamInstallerManager::GetInstance().ProcessStreamData(buffer, size);

@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//base/update/sys_installer/sys_installer_default_cfg.gni")
+import("//build/config/components/idl_tool/idl.gni")
 import("//build/ohos.gni")
 
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
@@ -24,7 +25,60 @@ config("libsysinstallerkits_exported_headers") {
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
+    "${target_gen_dir}",
   ]
+}
+
+config("idl_file_headers") {
+  include_dirs = [ "${target_gen_dir}" ]
+}
+
+idl_gen_interface("sysinstaller_interface") {
+  sources = [ "ISysInstaller.idl" ]
+  sources_callback = [ "ISysInstallerCallback.idl" ]
+
+  log_domainid = "0xD002E01"
+  log_tag = "SysInstaller"
+
+  part_name = "sys_installer"
+  subsystem_name = "updater"
+}
+
+ohos_source_set("sys_installer_stub") {
+  sources = [
+    "${target_gen_dir}/sys_installer_callback_proxy.cpp",
+    "${target_gen_dir}/sys_installer_stub.cpp",
+  ]
+
+  include_dirs = [ "${target_gen_dir}" ]
+
+  deps = [ ":sysinstaller_interface" ]
+
+  external_deps = [
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  part_name = "sys_installer"
+  subsystem_name = "updater"
+}
+
+ohos_source_set("module_update_stub") {
+  sources = [ "${target_gen_dir}/sys_installer_callback_proxy.cpp" ]
+
+  include_dirs = [ "${target_gen_dir}" ]
+
+  deps = [ ":sysinstaller_interface" ]
+
+  external_deps = [
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  part_name = "sys_installer"
+  subsystem_name = "updater"
 }
 
 ohos_shared_library("libsysinstaller_shared") {
@@ -33,7 +87,8 @@ ohos_shared_library("libsysinstaller_shared") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_callback.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_kits_impl.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_load_callback.cpp",
-    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_proxy.cpp",
+    "${target_gen_dir}/sys_installer_callback_stub.cpp",
+    "${target_gen_dir}/sys_installer_proxy.cpp",
   ]
 
   include_dirs = [
@@ -42,11 +97,12 @@ ohos_shared_library("libsysinstaller_shared") {
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
+    "${target_gen_dir}",
   ]
 
   public_configs = [ ":libsysinstallerkits_exported_headers" ]
 
-  deps = []
+  deps = [ ":sysinstaller_interface" ]
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
@@ -77,7 +133,8 @@ ohos_static_library("libsysinstallerkits") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_callback.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_kits_impl.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_load_callback.cpp",
-    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_proxy.cpp",
+    "${target_gen_dir}/sys_installer_callback_stub.cpp",
+    "${target_gen_dir}/sys_installer_proxy.cpp",
   ]
 
   include_dirs = [
@@ -86,11 +143,12 @@ ohos_static_library("libsysinstallerkits") {
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
+    "${target_gen_dir}",
   ]
 
   public_configs = [ ":libsysinstallerkits_exported_headers" ]
 
-  deps = []
+  deps = [ ":sysinstaller_interface" ]
 
   external_deps = [
     "bounds_checking_function:libsec_static",
@@ -154,6 +212,7 @@ config("exported_header_files") {
     "${sys_installer_path}/services/module_update/util/include",
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/include",
+    "${target_gen_dir}",
   ]
 }
 
@@ -166,6 +225,7 @@ ohos_executable("module_update_client") {
 
   external_deps = [
     "c_utils:utils",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
     "updater:libupdaterlog",
@@ -182,9 +242,12 @@ ohos_static_library("module_update_client_static") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_proxy.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_callback.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
+    "${target_gen_dir}/sys_installer_callback_stub.cpp",
   ]
 
   include_dirs = [ "${sys_installer_path}/common/include" ]
+
+  deps = [ ":sysinstaller_interface" ]
 
   public_configs = [ ":exported_header_files" ]
 
@@ -193,6 +256,7 @@ ohos_static_library("module_update_client_static") {
   external_deps = [
     "bounds_checking_function:libsec_static",
     "c_utils:utils",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -211,9 +275,12 @@ ohos_shared_library("libmodule_update_shared") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/module_update_proxy.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_callback.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
+    "${target_gen_dir}/sys_installer_callback_stub.cpp",
   ]
 
   include_dirs = [ "${sys_installer_path}/common/include" ]
+
+  deps = [ ":sysinstaller_interface" ]
 
   public_configs = [ ":exported_header_files" ]
 
@@ -222,6 +289,7 @@ ohos_shared_library("libmodule_update_shared") {
   external_deps = [
     "bounds_checking_function:libsec_static",
     "c_utils:utils",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

@@ -186,7 +186,7 @@ int32_t SysInstallerKitsImpl::StopStreamUpdate()
     return ret;
 }
 
-int32_t SysInstallerKitsImpl::ProcessStreamData(const uint8_t *buffer, size_t size)
+int32_t SysInstallerKitsImpl::ProcessStreamData(uint8_t *buffer, uint32_t size)
 {
     LOG(INFO) << "ProcessStreamData";
     auto updateService = GetService();
@@ -194,7 +194,8 @@ int32_t SysInstallerKitsImpl::ProcessStreamData(const uint8_t *buffer, size_t si
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->ProcessStreamData(buffer, size);
+    std::vector<uint8_t> vecBuffer(buffer, buffer + size);
+    int32_t ret = updateService->ProcessStreamData(vecBuffer, size);
     LOG(INFO) << "ProcessStreamData ret:" << ret;
     return ret;
 }

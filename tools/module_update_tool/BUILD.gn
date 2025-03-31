@@ -25,8 +25,14 @@ ohos_executable("module_update_tool") {
     "${sys_installer_path}/services/module_update/util/include",
   ]
 
-  deps =
-      [ "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update" ]
+  public_configs = [
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:idl_file_headers",
+  ]
+
+  deps = [
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:module_update",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:sysinstaller_interface",
+  ]
 
   external_deps = [
     "c_utils:utils",

@@ -25,7 +25,7 @@ using namespace Updater;
 
 void StatusManager::Init()
 {
-    updateStatus_ = UPDATE_STATE_INIT;
+    updateStatus_ = UpdateStatus::UPDATE_STATE_INIT;
     percent_ = 0;
 }
 
@@ -43,7 +43,7 @@ int StatusManager::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCa
 
 int StatusManager::GetUpdateStatus()
 {
-    return updateStatus_;
+    return static_cast<int32_t>(updateStatus_);
 }
 
 void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent, const std::string &resultMsg)
@@ -54,18 +54,18 @@ void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent, const
         return;
     }
 
-    if (updateStatus > UPDATE_STATE_MAX) {
-        LOG(INFO) << "status error:" << updateStatus;
+    if (updateStatus > UpdateStatus::UPDATE_STATE_MAX) {
+        LOG(INFO) << "status error:" << static_cast<int32_t>(updateStatus);
         return;
     }
-    if (updateStatus == UPDATE_STATE_SUCCESSFUL || updateStatus == UPDATE_STATE_FAILED) {
+    if (updateStatus == UpdateStatus::UPDATE_STATE_SUCCESSFUL || updateStatus == UpdateStatus::UPDATE_STATE_FAILED) {
         percent_ = 100; // 100 : max percent
     } else if (percent >= 0 && percent <= 100 && percent > percent_) { // 100 : max percent
         percent_ = percent;
     }
 
     updateStatus_ = updateStatus;
-    LOG(INFO) << "status:" << updateStatus_ << " percent:"  << percent_ << " msg:" << resultMsg;
+    LOG(INFO) << "status:" << static_cast<int32_t>(updateStatus_) << " percent:"  << percent_ << " msg:" << resultMsg;
     updateCallback_->OnUpgradeProgress(updateStatus_, percent_, resultMsg);
 }
 

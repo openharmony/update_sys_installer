@@ -39,8 +39,12 @@ ohos_static_library("libverifyaction") {
     "${sys_installer_path}/frameworks/status_manager/include",
   ]
 
-  deps = []
-  public_configs = [ ":libverifyaction_exported_headers" ]
+  deps = [ "${sys_installer_path}/interfaces/innerkits/ipc_client:sysinstaller_interface" ]
+
+  public_configs = [
+    ":libverifyaction_exported_headers",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:idl_file_headers",
+  ]
 
   external_deps = [
     "hilog:libhilog",

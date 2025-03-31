@@ -30,6 +30,12 @@ ohos_static_library("libstreamupdate") {
     "${sys_installer_path}/services/stream_update/include",
   ]
 
+  deps = [ "${sys_installer_path}/interfaces/innerkits/ipc_client:sysinstaller_interface" ]
+
+  public_configs = [
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:idl_file_headers",
+  ]
+
   external_deps = [
     "bounds_checking_function:libsec_static",
     "hilog:libhilog",
