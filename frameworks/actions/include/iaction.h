@@ -35,7 +35,8 @@ public:
     }
     virtual void PerformAction() = 0;
     virtual std::string GetActionName() = 0;
-    virtual bool TerminateAction() {
+    virtual bool TerminateAction()
+    {
         return false;
     };
     virtual void SuspendAction() {}
