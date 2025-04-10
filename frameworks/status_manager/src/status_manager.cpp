@@ -38,8 +38,8 @@ int StatusManager::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCa
     }
 
     updateCallback_ = updateCallback;
-    updateCallback_->OnUpgradeProgress(updateStatus_, percent_,
-        "reset progress when reset callback");
+    updateCallback_->OnUpgradeProgress(updateStatus_, percent_, "");
+    LOG(INFO) << "reset progress when reset callback " << percent_ << " " << updateStatus_;
     return 0;
 }
 
