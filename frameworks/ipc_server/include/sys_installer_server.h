@@ -52,6 +52,7 @@ public:
         const std::string &dstPath, const uint32_t type) override;
     int32_t AccDeleteDir(const std::string &dstPath) override;
     int32_t StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath) override;
+    int32_t CancelUpdateVabPackageZip(void) override;
     int32_t StartVabMerge() override;
     int32_t EnableVabCheckpoint() override;
     int32_t AbortVabActiveSnapshot() override;

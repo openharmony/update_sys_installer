@@ -38,6 +38,8 @@ int StatusManager::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCa
     }
 
     updateCallback_ = updateCallback;
+    updateCallback_->OnUpgradeProgress(updateStatus_, percent_,
+        "reset progress when reset callback");
     return 0;
 }
 
@@ -58,6 +60,9 @@ void StatusManager::UpdateCallback(UpdateStatus updateStatus, int percent, const
         LOG(INFO) << "status error:" << static_cast<int32_t>(updateStatus);
         return;
     }
+    if (updateStatus_ == updateStatus && percent == percent_) {
+        return;
+    }
     if (updateStatus == UpdateStatus::UPDATE_STATE_SUCCESSFUL || updateStatus == UpdateStatus::UPDATE_STATE_FAILED) {
         percent_ = 100; // 100 : max percent
     } else if (percent >= 0 && percent <= 100 && percent > percent_) { // 100 : max percent
@@ -76,7 +81,9 @@ void StatusManager::CallbackWithoutCheck(UpdateStatus updateStatus, int percent,
         LOG(ERROR) << "updateCallback_ null";
         return;
     }
-
+    if (updateStatus_ == updateStatus && percent == percent_) {
+        return;
+    }
     if (updateStatus > UpdateStatus::UPDATE_STATE_MAX) {
         LOG(INFO) << "status error:" << static_cast<int32_t>(updateStatus);
         return;

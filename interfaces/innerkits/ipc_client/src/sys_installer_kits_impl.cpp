@@ -298,6 +298,19 @@ int32_t SysInstallerKitsImpl::AccDeleteDir(const std::string &dstPath)
     return ret;
 }
 
+int32_t SysInstallerKitsImpl::CancelUpdateVabPackageZip(void)
+{
+    LOG(INFO) << "CancelUpdateVabPackageZip";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->CancelUpdateVabPackageZip();
+    LOG(INFO) << "CancelUpdateVabPackageZip ret:" << ret;
+    return ret;
+}
+
 int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
 {
     LOG(INFO) << "StartUpdateVabPackageZip";
