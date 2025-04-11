@@ -36,7 +36,7 @@ public:
     bool IsRunning();
     void AddAction(std::unique_ptr<IAction> action);
     void Start();
-    void Stop();
+    bool Stop();
     void Suspend();
     void Resume();
     void CompletedAction(InstallerErrCode errCode, const std::string &errStr);

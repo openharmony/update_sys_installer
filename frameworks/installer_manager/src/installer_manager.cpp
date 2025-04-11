@@ -122,6 +122,15 @@ int32_t InstallerManager::StartUpdateVabPackageZip(const std::vector<std::string
     return helper_->StartUpdateVabPackageZip(pkgPath);
 }
 
+int32_t InstallerManager::CancelUpdateVabPackageZip(void)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->CancelUpdateVabPackageZip();
+}
+
 int32_t InstallerManager::StartVabMerge()
 {
     if (helper_ == nullptr) {

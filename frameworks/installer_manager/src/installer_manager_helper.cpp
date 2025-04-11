@@ -99,6 +99,11 @@ int32_t InstallerManagerHelper::AccDeleteDir(const std::string &dstPath)
     return -1;
 }
 
+int32_t InstallerManagerHelper::CancelUpdateVabPackageZip(void)
+{
+    return -1;
+}
+
 int32_t InstallerManagerHelper::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
 {
     return -1;

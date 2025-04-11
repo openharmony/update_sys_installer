@@ -39,6 +39,7 @@ public:
 
 protected:
     UpdateStatus updateStatus_ = UpdateStatus::UPDATE_STATE_INIT;
+    std::string resultMsg_;
     int percent_ = 0;
     std::mutex updateCbMutex_ {};
     sptr<ISysInstallerCallback> updateCallback_ {};

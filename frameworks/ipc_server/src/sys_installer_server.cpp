@@ -136,6 +136,12 @@ int32_t SysInstallerServer::StartUpdateVabPackageZip(const std::vector<std::stri
     return SysInstallerManager::GetInstance().StartUpdateVabPackageZip(pkgPath);
 }
 
+int32_t SysInstallerServer::CancelUpdateVabPackageZip(void)
+{
+    LOG(INFO) << "CancelUpdateVabPackageZip";
+    return SysInstallerManager::GetInstance().CancelUpdateVabPackageZip();
+}
+
 int32_t SysInstallerServer::StartVabMerge()
 {
     LOG(INFO) << "StartVabMerge";

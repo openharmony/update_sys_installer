@@ -68,22 +68,26 @@ void ActionProcesser::Start()
     curAction_->PerformAction();
 }
 
-void ActionProcesser::Stop()
+bool ActionProcesser::Stop()
 {
     if (!isRunning_) {
         LOG(WARNING) << "Action not running";
-        return;
+        return false;
     }
-
+    bool ret = false;
     if (curAction_ != nullptr) {
         LOG(INFO) << "Stop " << curAction_->GetActionName();
-        curAction_->TerminateAction();
+        ret = curAction_->TerminateAction();
     }
-
+    if (!ret) {
+        LOG(INFO) << "Stop " << curAction_->GetActionName() << " failed, directly returned";
+        return false;
+    }
     isRunning_ = false;
     isSuspend_ = false;
     curAction_.reset();
     actionQue_.clear();
+    return ret;
 }
 
 void ActionProcesser::Suspend()

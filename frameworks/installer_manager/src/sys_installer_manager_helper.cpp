@@ -31,7 +31,10 @@ using namespace Updater;
 int32_t SysInstallerManagerHelper::SysInstallerInit()
 {
     LOG(INFO) << "SysInstallerInit";
-
+    if (ActionProcesser::GetInstance().IsRunning()) {
+        LOG(WARNING) << "ActionProcesser IsRunning";
+        return 0;
+    }
     if (statusManager_ == nullptr) {
         statusManager_ = std::make_shared<StatusManager>();
     }
@@ -100,6 +103,11 @@ int32_t SysInstallerManagerHelper::AccDeleteDir(const std::string &dstPath)
 }
 
 int32_t SysInstallerManagerHelper::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
+{
+    return -1;
+}
+
+int32_t SysInstallerManagerHelper::CancelUpdateVabPackageZip(void)
 {
     return -1;
 }
