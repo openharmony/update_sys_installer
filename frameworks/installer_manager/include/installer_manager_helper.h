@@ -40,7 +40,6 @@ public:
     virtual int32_t EnableVabCheckpoint() = 0;
     virtual int32_t AbortVabActiveSnapshot() = 0;
     virtual int32_t ClearVabMetadataAndCow() = 0;
-    virtual int32_t MergeRollbackReasonFile() = 0;
 };
 
 class InstallerManagerHelper : public IInstallerManagerHelper {
