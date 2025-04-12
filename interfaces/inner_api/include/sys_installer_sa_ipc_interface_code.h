@@ -47,6 +47,7 @@ enum SysInstallerInterfaceCode {
     DELETE_PARA_PACKAGE,
     DECOMPRESS_ACC_PACKAGE,
     DELETE_ACC_PACKAGE,
+    VAB_MERAGE_ROLLBACK_FILE,
 };
 } // namespace SysInstaller
 } // namespace OHOS
