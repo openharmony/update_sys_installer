@@ -44,7 +44,6 @@ public:
     virtual int32_t EnableVabCheckpoint();
     virtual int32_t AbortVabActiveSnapshot();
     virtual int32_t ClearVabMetadataAndCow();
-    virtual int32_t MergeRollbackReasonFile();
 
 protected:
     std::unique_ptr<IInstallerManagerHelper> helper_ {};
