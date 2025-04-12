@@ -46,6 +46,7 @@ public:
     virtual int32_t EnableVabCheckpoint();
     virtual int32_t AbortVabActiveSnapshot();
     virtual int32_t ClearVabMetadataAndCow();
+    virtual int32_t MergeRollbackReasonFile();
     virtual void ResetService(const wptr<IRemoteObject> &remote);
     sptr<ISysInstaller> GetService();
 
