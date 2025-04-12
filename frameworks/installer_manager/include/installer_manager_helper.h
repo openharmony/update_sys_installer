@@ -40,6 +40,7 @@ public:
     virtual int32_t EnableVabCheckpoint() = 0;
     virtual int32_t AbortVabActiveSnapshot() = 0;
     virtual int32_t ClearVabMetadataAndCow() = 0;
+    virtual int32_t MergeRollbackReasonFile() = 0;
 };
 
 class InstallerManagerHelper : public IInstallerManagerHelper {
@@ -63,6 +64,7 @@ public:
     virtual int32_t EnableVabCheckpoint();
     virtual int32_t AbortVabActiveSnapshot();
     virtual int32_t ClearVabMetadataAndCow();
+    virtual int32_t MergeRollbackReasonFile();
 
 protected:
     std::shared_ptr<StatusManager> statusManager_ {};
