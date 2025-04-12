@@ -391,6 +391,22 @@ int32_t SysInstallerKitsImpl::ClearVabMetadataAndCow()
     return ret;
 }
 
+int32_t SysInstallerKitsImpl::MergeRollbackReasonFile()
+{
+    LOG(INFO) << "MergeRollbackReasonFile";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->MergeRollbackReasonFile();
+    LOG(INFO) << "MergeRollbackReasonFile ret:" << ret;
+    #ifdef UPDATER_UT
+    return -1;
+    #endif
+    return ret;
+}
+
 void SysInstallerKitsImpl::LoadServiceSuccess()
 {
     serviceCv_.notify_all();
