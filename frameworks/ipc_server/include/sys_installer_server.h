@@ -54,6 +54,7 @@ public:
     int32_t StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath) override;
     int32_t CancelUpdateVabPackageZip(void) override;
     int32_t StartVabMerge() override;
+    int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo) override;
     int32_t EnableVabCheckpoint() override;
     int32_t AbortVabActiveSnapshot() override;
     int32_t ClearVabMetadataAndCow() override;
