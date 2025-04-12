@@ -148,6 +148,12 @@ int32_t SysInstallerServer::StartVabMerge()
     return SysInstallerManager::GetInstance().StartVabMerge();
 }
 
+int32_t SysInstallerServer::CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo)
+{
+    LOG(INFO) << "CreateVabSnapshotCowImg";
+    return SysInstallerManager::GetInstance().CreateVabSnapshotCowImg(partitionInfo);
+}
+
 int32_t SysInstallerServer::EnableVabCheckpoint()
 {
     LOG(INFO) << "EnableVabCheckpoint";

@@ -51,6 +51,7 @@ public:
     virtual int32_t AccDeleteDir(const std::string &dstPath) = 0;
     virtual int32_t CancelUpdateVabPackageZip(void) = 0;
     virtual int32_t StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath) = 0;
+    virtual int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo) = 0;
     virtual int32_t StartVabMerge() = 0;
     virtual int32_t EnableVabCheckpoint() = 0;
     virtual int32_t AbortVabActiveSnapshot() = 0;

@@ -321,9 +321,25 @@ int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::vector<std::st
     }
     int32_t ret = updateService->StartUpdateVabPackageZip(pkgPath);
     LOG(INFO) << "StartUpdateVabPackageZip ret:" << ret;
-    #ifdef UPDATER_UT
+#ifdef UPDATER_UT
     return -1;
-    #endif
+#endif
+    return ret;
+}
+
+int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo)
+{
+    LOG(INFO) << "CreateVabSnapshotCowImg";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->CreateVabSnapshotCowImg(partitionInfo);
+    LOG(INFO) << "CreateVabSnapshotCowImg ret:" << ret;
+#ifdef UPDATER_UT
+    return -1;
+#endif
     return ret;
 }
 
@@ -337,9 +353,9 @@ int32_t SysInstallerKitsImpl::StartVabMerge()
     }
     int32_t ret = updateService->StartVabMerge();
     LOG(INFO) << "StartVabMerge ret:" << ret;
-    #ifdef UPDATER_UT
+#ifdef UPDATER_UT
     return -1;
-    #endif
+#endif
     return ret;
 }
 
@@ -353,9 +369,9 @@ int32_t SysInstallerKitsImpl::EnableVabCheckpoint()
     }
     int32_t ret = updateService->EnableVabCheckpoint();
     LOG(INFO) << "EnableVabCheckpoint ret:" << ret;
-    #ifdef UPDATER_UT
+#ifdef UPDATER_UT
     return -1;
-    #endif
+#endif
     return ret;
 }
 
@@ -369,9 +385,9 @@ int32_t SysInstallerKitsImpl::AbortVabActiveSnapshot()
     }
     int32_t ret = updateService->AbortVabActiveSnapshot();
     LOG(INFO) << "AbortVabActiveSnapshot ret:" << ret;
-    #ifdef UPDATER_UT
+#ifdef UPDATER_UT
     return -1;
-    #endif
+#endif
     return ret;
 }
 
@@ -385,9 +401,9 @@ int32_t SysInstallerKitsImpl::ClearVabMetadataAndCow()
     }
     int32_t ret = updateService->ClearVabMetadataAndCow();
     LOG(INFO) << "ClearVabMetadataAndCow ret:" << ret;
-    #ifdef UPDATER_UT
+#ifdef UPDATER_UT
     return -1;
-    #endif
+#endif
     return ret;
 }
 

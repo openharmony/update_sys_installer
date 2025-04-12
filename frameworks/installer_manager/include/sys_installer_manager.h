@@ -40,6 +40,7 @@ public:
     virtual int32_t AccDeleteDir(const std::string &dstPath);
     virtual int32_t CancelUpdateVabPackageZip(void);
     virtual int32_t StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath);
+    virtual int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo);
     virtual int32_t StartVabMerge();
     virtual int32_t EnableVabCheckpoint();
     virtual int32_t AbortVabActiveSnapshot();

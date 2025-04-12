@@ -140,6 +140,15 @@ int32_t SysInstallerManager::StartVabMerge()
     return helper_->StartVabMerge();
 }
 
+int32_t SysInstallerManager::CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->CreateVabSnapshotCowImg(partitionInfo);
+}
+
 int32_t SysInstallerManager::EnableVabCheckpoint()
 {
     if (helper_ == nullptr) {
