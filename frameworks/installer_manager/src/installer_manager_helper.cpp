@@ -128,10 +128,5 @@ int32_t InstallerManagerHelper::ClearVabMetadataAndCow()
 {
     return -1;
 }
-
-int32_t InstallerManagerHelper::MergeRollbackReasonFile()
-{
-    return -1;
-}
 } // namespace SysInstaller
 } // namespace OHOS
