@@ -50,6 +50,11 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
     upParams.callbackProgress = [this](float value) {
         this->SetProgress(value);
         };
+    if ((pkgPath.find(PATCH_PACKAGE_NAME) != std::string::npos) &&
+        (SetUpdateSlotParam(upParams, true) != UPDATE_SUCCESS)) {
+        LOG(ERROR) << "set slot param failed";
+        return UPDATE_ERROR;
+    }
     UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, upParams, HOTA_UPDATE);
     if (updateRet != UPDATE_SUCCESS) {
         LOG(INFO) << "Install package failed!";
