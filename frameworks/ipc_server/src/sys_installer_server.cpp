@@ -172,6 +172,12 @@ int32_t SysInstallerServer::ClearVabMetadataAndCow()
     return SysInstallerManager::GetInstance().ClearVabMetadataAndCow();
 }
 
+int32_t SysInstallerServer::MergeRollbackReasonFile()
+{
+    LOG(INFO) << "MergeRollbackReasonFile";
+    return SysInstallerManager::GetInstance().MergeRollbackReasonFile();
+}
+
 void SysInstallerServer::OnStart()
 {
     LOG(INFO) << "OnStart";
