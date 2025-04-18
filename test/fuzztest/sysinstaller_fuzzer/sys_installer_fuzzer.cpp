@@ -43,7 +43,8 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     SysInstallerKitsImpl::GetInstance().AccDeleteDir(std::string(reinterpret_cast<const char*>(data), size));
     SysInstallerKitsImpl::GetInstance().ClearVabMetadataAndCow();
     SysInstallerKitsImpl::GetInstance().MergeRollbackReasonFile();
-    SysInstallerKitsImpl::GetInstance().GetMetadataUpdateStatus(1);
+    int32_t metadataStatus = 0;
+    SysInstallerKitsImpl::GetInstance().GetMetadataUpdateStatus(metadataStatus);
     SysInstallerKitsImpl::GetInstance().StartVabMerge();
     SysInstallerKitsImpl::GetInstance().EnableVabCheckpoint();
     SysInstallerKitsImpl::GetInstance().AbortVabActiveSnapshot();
