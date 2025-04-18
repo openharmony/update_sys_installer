@@ -32,6 +32,7 @@ interface OHOS.SysInstaller.ISysInstaller {
     [oneway] void EnableVabCheckpoint();
     [oneway] void AbortVabActiveSnapshot();
     [oneway] void ClearVabMetadataAndCow();
-    [oneway] void MergeRollbackReasonFile();
+    void MergeRollbackReasonFile();
+    void GetMetadataUpdateStatus([out] int metadataStatus);
     void CreateVabSnapshotCowImg([in] Map<String, unsigned long> partitionInfo);
 }

@@ -48,6 +48,7 @@ public:
     virtual int32_t AbortVabActiveSnapshot();
     virtual int32_t ClearVabMetadataAndCow();
     virtual int32_t MergeRollbackReasonFile();
+    virtual int32_t GetMetadataUpdateStatus(int32_t &metadataStatus);
     virtual void ResetService(const wptr<IRemoteObject> &remote);
     sptr<ISysInstaller> GetService();
 

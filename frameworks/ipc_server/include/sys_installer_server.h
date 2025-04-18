@@ -59,6 +59,7 @@ public:
     int32_t AbortVabActiveSnapshot() override;
     int32_t ClearVabMetadataAndCow() override;
     int32_t MergeRollbackReasonFile() override;
+    int32_t GetMetadataUpdateStatus(int32_t &metadataStatus) override;
 
 #ifndef UPDATER_UT
 private:

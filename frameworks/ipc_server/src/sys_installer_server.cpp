@@ -178,6 +178,12 @@ int32_t SysInstallerServer::MergeRollbackReasonFile()
     return SysInstallerManager::GetInstance().MergeRollbackReasonFile();
 }
 
+int32_t SysInstallerServer::GetMetadataUpdateStatus(int32_t &metadataStatus)
+{
+    LOG(INFO) << "GetMetadataUpdateStatus";
+    return SysInstallerManager::GetInstance().GetMetadataUpdateStatus(metadataStatus);
+}
+
 void SysInstallerServer::OnStart()
 {
     LOG(INFO) << "OnStart";

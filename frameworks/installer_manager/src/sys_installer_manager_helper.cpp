@@ -142,5 +142,10 @@ int32_t SysInstallerManagerHelper::MergeRollbackReasonFile()
 {
     return -1;
 }
+
+int32_t SysInstallerManagerHelper::GetMetadataUpdateStatus(int32_t &metadataStatus)
+{
+    return -1;
+}
 } // namespace SysInstaller
 } // namespace OHOS
