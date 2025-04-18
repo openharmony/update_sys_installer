@@ -46,6 +46,7 @@ public:
     virtual int32_t AbortVabActiveSnapshot();
     virtual int32_t ClearVabMetadataAndCow();
     virtual int32_t MergeRollbackReasonFile();
+    virtual int32_t GetMetadataUpdateStatus(int32_t &metadataStatus);
 
 protected:
     std::unique_ptr<SysInstallerManagerHelper> helper_ {};

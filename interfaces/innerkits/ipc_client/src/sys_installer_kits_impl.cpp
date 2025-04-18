@@ -417,9 +417,26 @@ int32_t SysInstallerKitsImpl::MergeRollbackReasonFile()
     }
     int32_t ret = updateService->MergeRollbackReasonFile();
     LOG(INFO) << "MergeRollbackReasonFile ret:" << ret;
-    #ifdef UPDATER_UT
+#ifdef UPDATER_UT
     return -1;
-    #endif
+#endif
+    return ret;
+}
+
+
+int32_t SysInstallerKitsImpl::GetMetadataUpdateStatus(int32_t &metadataStatus)
+{
+    LOG(INFO) << "GetMetadataUpdateStatus";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->GetMetadataUpdateStatus(metadataStatus);
+    LOG(INFO) << "GetMetadataUpdateStatus ret:" << ret;
+#ifdef UPDATER_UT
+    return -1;
+#endif
     return ret;
 }
 
