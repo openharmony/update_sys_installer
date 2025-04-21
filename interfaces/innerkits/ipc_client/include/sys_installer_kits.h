@@ -36,12 +36,12 @@ public:
     static SysInstallerKits &GetInstance();
 
     virtual int32_t Init() = 0;
-    virtual int32_t SysInstallerInit(const std::string &taskId = "", bool bStreamUpgrade = false) = 0;
+    virtual int32_t SysInstallerInit(const std::string &taskId, bool bStreamUpgrade = false) = 0;
     virtual int32_t StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath) = 0;
     virtual int32_t StartStreamUpdate() = 0;
     virtual int32_t StopStreamUpdate() = 0;
     virtual int32_t ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size) = 0;
-    virtual int32_t SetUpdateCallback(const std::string &taskId = "", const sptr<ISysInstallerCallback> &cb) = 0;
+    virtual int32_t SetUpdateCallback(const std::string &taskId, const sptr<ISysInstallerCallback> &cb) = 0;
     virtual int32_t GetUpdateStatus(const std::string &taskId) = 0;
     virtual int32_t StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir) = 0;

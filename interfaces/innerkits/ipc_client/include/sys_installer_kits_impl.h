@@ -27,12 +27,12 @@ class SysInstallerKitsImpl {
 public:
     DISALLOW_COPY_AND_MOVE(SysInstallerKitsImpl);
     static SysInstallerKitsImpl &GetInstance();
-    virtual int32_t SysInstallerInit(const std::string &taskId = "", bool bStreamUpgrade = false);
+    virtual int32_t SysInstallerInit(const std::string &taskId, bool bStreamUpgrade = false);
     virtual int32_t StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath);
     virtual int32_t StartStreamUpdate();
     virtual int32_t StopStreamUpdate();
     virtual int32_t ProcessStreamData(uint8_t *buffer, uint32_t size);
-    virtual int32_t SetUpdateCallback(const std::string &taskId = "", sptr<ISysInstallerCallbackFunc> callback);
+    virtual int32_t SetUpdateCallback(const std::string &taskId, sptr<ISysInstallerCallbackFunc> callback);
     virtual int32_t GetUpdateStatus(const std::string &taskId);
     virtual int32_t StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir);
