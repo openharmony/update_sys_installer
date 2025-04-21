@@ -193,7 +193,7 @@ std::string  SysInstallerManager::GetUpdateResult(const std::string &taskId, con
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
-        return -1;
+        return std::string("");
     }
     return helper_->GetUpdateResult(taskId, taskType, resultType);
 }

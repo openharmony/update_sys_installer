@@ -77,7 +77,8 @@ int32_t SysInstallerManagerHelper::StartUpdatePackageZip(const std::string &task
     return 0;
 }
 
-int32_t SysInstallerManagerHelper::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback)
+int32_t SysInstallerManagerHelper::SetUpdateCallback(const std::string &taskId,
+    const sptr<ISysInstallerCallback> &updateCallback)
 {
     std::shared_ptr<StatusManager> statusManager = GetStatusManager(taskId);
     if (statusManager == nullptr) {
@@ -87,7 +88,7 @@ int32_t SysInstallerManagerHelper::SetUpdateCallback(const sptr<ISysInstallerCal
     return statusManager->SetUpdateCallback(updateCallback);
 }
 
-int32_t SysInstallerManagerHelper::GetUpdateStatus()
+int32_t SysInstallerManagerHelper::GetUpdateStatus(const std::string &taskId)
 {
     std::shared_ptr<StatusManager> statusManager = GetStatusManager(taskId);
     if (statusManager == nullptr) {
@@ -160,7 +161,7 @@ int32_t SysInstallerManagerHelper::MergeRollbackReasonFile()
     return -1;
 }
 
-std::string SysInstallerManagerHelper::GetUpdateResult(const std::string &taskId, cosnt std::string &taskType,
+std::string SysInstallerManagerHelper::GetUpdateResult(const std::string &taskId, const std::string &taskType,
     const std::string &resultType)
 {
     LOG(INFO) << "GetUpdateResult start taskId : " << taskId;
