@@ -56,7 +56,7 @@ HWTEST_F(SysInstallerIpcUnitTest, SysInstallerInit001, TestSize.Level1)
 {
     cout << " SysInstallerInit001 start " << std::endl;
 
-    auto ret = SysInstallerKitsImpl::GetInstance().SysInstallerInit();
+    auto ret = SysInstallerKitsImpl::GetInstance().SysInstallerInit("ipc_ut_test");
     ASSERT_EQ(ret, 0);
 }
 
@@ -81,7 +81,7 @@ HWTEST_F(SysInstallerIpcUnitTest, SetCallBackTest001, TestSize.Level1)
 {
     cout << " SetCallBackTest001 start " << std::endl;
     sptr<ISysInstallerCallbackFunc> callback = new ProcessCallbackTest;
-    auto ret = SysInstallerKitsImpl::GetInstance().SetUpdateCallback(callback);
+    auto ret = SysInstallerKitsImpl::GetInstance().SetUpdateCallback("ipc_ut_test", callback);
     ASSERT_EQ(ret, 0);
 }
 
@@ -89,7 +89,7 @@ HWTEST_F(SysInstallerIpcUnitTest, SetCallBackTest001, TestSize.Level1)
 HWTEST_F(SysInstallerIpcUnitTest, GetStatusTest001, TestSize.Level1)
 {
     cout << " GetStatusTest001 start " << std::endl;
-    auto ret = SysInstallerKitsImpl::GetInstance().GetUpdateStatus();
+    auto ret = SysInstallerKitsImpl::GetInstance().GetUpdateStatus("ipc_ut_test");
     ASSERT_EQ(ret, 0);
 }
 
@@ -97,7 +97,7 @@ HWTEST_F(SysInstallerIpcUnitTest, GetStatusTest001, TestSize.Level1)
 HWTEST_F(SysInstallerIpcUnitTest, UpdatePackageTest001, TestSize.Level1)
 {
     cout << " UpdatePackageTest001 start " << std::endl;
-    auto ret = SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(
+    auto ret = SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip("ipc_ut_test",
         "/data/ota_package/update.zip");
     cout << " UpdatePackageTest001 ret " << ret << std::endl;
     ASSERT_EQ(ret, 0);
@@ -107,20 +107,20 @@ HWTEST_F(SysInstallerIpcUnitTest, UpdatePackageTest001, TestSize.Level1)
 HWTEST_F(SysInstallerIpcUnitTest, AccUpdatePkgTest001, TestSize.Level1)
 {
     cout << "AccUpdatePkgTest001 start " << std::endl;
-    auto ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
+    auto ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg("ipc_ut_test",
         "invalid path", "", 1);
     ASSERT_NE(ret, 0);
-    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
+    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg("ipc_ut_test",
         "", "/data/test/", 1);
     ASSERT_NE(ret, 0);
-    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
+    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg("ipc_ut_test",
         "invalid path", "/data/test/", 1);
     ASSERT_NE(ret, 0);
-    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
+    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg("ipc_ut_test",
         "/data/ota_package/update.zip", "invalid path", 1);
     ASSERT_NE(ret, 0);
 
-    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
+    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg("ipc_ut_test",
         "/data/ota_package/update.zip", "/data/test/", 1);
     ASSERT_NE(ret, 0);
 
@@ -132,11 +132,11 @@ HWTEST_F(SysInstallerIpcUnitTest, AccUpdatePkgTest001, TestSize.Level1)
         tmpFile.open(filePath.c_str());
         if (tmpFile.is_open()) {
             tmpFile.close();
-            ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir(path);
+            ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("ipc_ut_test", path);
         }
     }
 
-    ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("");
+    ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("ipc_ut_test", "");
     ASSERT_NE(ret, 0);
 }
 
@@ -149,7 +149,7 @@ HWTEST_F(SysInstallerIpcUnitTest, StartUpdateParaZipTest, TestSize.Level1)
     sysInstallerLoadCallback.OnLoadSystemAbilityFail(4101); // 4041 : SYS_INSTALLER_DISTRIBUTED_SERVICE_ID
     sptr<IRemoteObject> callback {};
     SysInstallerProxy env(callback);
-    auto ret = env.StartUpdateParaZip("", "", "");
+    auto ret = env.StartUpdateParaZip("ipc_ut_test", "", "", "");
     ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
 }
 
@@ -159,7 +159,7 @@ HWTEST_F(SysInstallerIpcUnitTest, StartDeleteParaZipTest, TestSize.Level1)
     cout << " StartDeleteParaZip start " << std::endl;
     sptr<IRemoteObject> callback {};
     SysInstallerProxy env(callback);
-    auto ret = env.StartDeleteParaZip("", "");
+    auto ret = env.StartDeleteParaZip("ipc_ut_test", "", "");
     ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
 }
 
@@ -169,7 +169,7 @@ HWTEST_F(SysInstallerIpcUnitTest, AccDecompressAndVerifyPkgTest, TestSize.Level1
     cout << " AccDecompressAndVerifyPkgTest start " << std::endl;
     sptr<IRemoteObject> callback {};
     SysInstallerProxy env(callback);
-    auto ret = env.AccDecompressAndVerifyPkg("", "", 0);
+    auto ret = env.AccDecompressAndVerifyPkg("ipc_ut_test", "", "", 0);
     ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
 }
 
@@ -179,7 +179,7 @@ HWTEST_F(SysInstallerIpcUnitTest, AccDeleteDirTest, TestSize.Level1)
     cout << " AccDeleteDirTest start " << std::endl;
     sptr<IRemoteObject> callback {};
     SysInstallerProxy env(callback);
-    auto ret = env.AccDeleteDir("");
+    auto ret = env.AccDeleteDir("ipc_ut_test", "");
     ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
 }
 
@@ -189,13 +189,13 @@ HWTEST_F(SysInstallerIpcUnitTest, SysInstallerKitsImplTest, TestSize.Level1)
     cout << " SysInstallerKitsImplTest start " << std::endl;
     wptr<IRemoteObject> remote;
     SysInstallerKitsImpl::GetInstance().ResetService(remote);
-    auto ret = SysInstallerKitsImpl::GetInstance().StartUpdateParaZip("", "", "");
+    auto ret = SysInstallerKitsImpl::GetInstance().StartUpdateParaZip("ipc_ut_test", "", "", "");
     ASSERT_EQ(ret, -1);
-    ret = SysInstallerKitsImpl::GetInstance().StartDeleteParaZip("", "");
+    ret = SysInstallerKitsImpl::GetInstance().StartDeleteParaZip("ipc_ut_test", "", "");
     ASSERT_EQ(ret, -1);
-    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg("", "", 0);
+    ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg("ipc_ut_test", "", "", 0);
     ASSERT_EQ(ret, -1);
-    ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("");
+    ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("ipc_ut_test", "");
     ASSERT_EQ(ret, -1);
 }
 } // SysInstaller

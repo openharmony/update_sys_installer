@@ -451,7 +451,7 @@ std::string SysInstallerKitsImpl::GetUpdateResult(const std::string &taskId, con
     auto updateService = GetService();
     if (updateService == nullptr) {
         LOG(ERROR) << "Get updateService failed";
-        return -1;
+        return std::string("");
     }
     std::string updateResult;
     int32_t ret = updateService->GetUpdateResult(taskId, taskType, resultType, updateResult);

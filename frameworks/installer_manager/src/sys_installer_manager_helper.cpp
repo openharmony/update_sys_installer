@@ -71,8 +71,8 @@ int32_t SysInstallerManagerHelper::StartUpdatePackageZip(const std::string &task
     }
     std::vector<std::string> filePath = {};
     filePath.push_back(pkgPath);
-    actionProcesser->AddAction(std::make_unique<PkgVerify>(statusManager_, filePath));
-    actionProcesser->AddAction(std::make_unique<ABUpdate>(statusManager_, pkgPath));
+    actionProcesser->AddAction(std::make_unique<PkgVerify>(statusManager, filePath));
+    actionProcesser->AddAction(std::make_unique<ABUpdate>(statusManager, pkgPath));
     actionProcesser->Start();
     return 0;
 }
@@ -203,7 +203,7 @@ std::shared_ptr<StatusManager> SysInstallerManagerHelper::GetStatusManager(const
     return nullptr;
 }
 
-std::shared_ptr<StatusManager> SysInstallerManagerHelper::GetActionProcesser(const std::string &taskId)
+std::shared_ptr<ActionProcesser> SysInstallerManagerHelper::GetActionProcesser(const std::string &taskId)
 {
     std::lock_guard<std::recursive_mutex> lock(processerLock_);
     auto inter = actionProcesserMap_.find(taskId);

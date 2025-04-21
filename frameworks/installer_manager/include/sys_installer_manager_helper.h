@@ -48,7 +48,7 @@ public:
     virtual int32_t AbortVabActiveSnapshot();
     virtual int32_t ClearVabMetadataAndCow();
     virtual int32_t MergeRollbackReasonFile();
-    virtual std::string GetUpdateResult(const std::string &taskId, cosnt std::string &taskType,
+    virtual std::string GetUpdateResult(const std::string &taskId, const std::string &taskType,
         const std::string &resultType);
     virtual int32_t GetMetadataUpdateStatus(int32_t &metadataStatus);
 
@@ -60,7 +60,7 @@ protected:
 
 protected:
     std::shared_ptr<StatusManager> GetStatusManager(const std::string &taskId);
-    std::shared_ptr<StatusManager> GetActionProcesser(const std::string &taskId);
+    std::shared_ptr<ActionProcesser> GetActionProcesser(const std::string &taskId);
 };
 } // SysInstaller
 } // namespace OHOS
