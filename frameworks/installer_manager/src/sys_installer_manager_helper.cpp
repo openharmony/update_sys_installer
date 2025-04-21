@@ -98,29 +98,31 @@ int32_t SysInstallerManagerHelper::GetUpdateStatus(const std::string &taskId)
     return statusManager->GetUpdateStatus();
 }
 
-int32_t SysInstallerManagerHelper::StartUpdateParaZip(const std::string &pkgPath,
+int32_t SysInstallerManagerHelper::StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
     const std::string &location, const std::string &cfgDir)
 {
     return -1;
 }
 
-int32_t SysInstallerManagerHelper::StartDeleteParaZip(const std::string &location, const std::string &cfgDir)
+int32_t SysInstallerManagerHelper::StartDeleteParaZip(const std::string &taskId,
+    const std::string &location, const std::string &cfgDir)
 {
     return -1;
 }
 
-int32_t SysInstallerManagerHelper::AccDecompressAndVerifyPkg(const std::string &srcPath,
-    const std::string &dstPath, const uint32_t type)
+int32_t SysInstallerManagerHelper::AccDecompressAndVerifyPkg(const std::string &taskId,
+    const std::string &srcPath, const std::string &dstPath, const uint32_t type)
 {
     return -1;
 }
 
-int32_t SysInstallerManagerHelper::AccDeleteDir(const std::string &dstPath)
+int32_t SysInstallerManagerHelper::AccDeleteDir(const std::string &taskId, const std::string &dstPath)
 {
     return -1;
 }
 
-int32_t SysInstallerManagerHelper::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
+int32_t SysInstallerManagerHelper::StartUpdateVabPackageZip(const std::string &taskId,
+    const std::vector<std::string> &pkgPath)
 {
     return -1;
 }
@@ -130,7 +132,7 @@ int32_t SysInstallerManagerHelper::CancelUpdateVabPackageZip(void)
     return -1;
 }
 
-int32_t SysInstallerManagerHelper::StartVabMerge()
+int32_t SysInstallerManagerHelper::StartVabMerge(const std::string &taskId)
 {
     return -1;
 }
