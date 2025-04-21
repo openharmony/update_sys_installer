@@ -25,13 +25,9 @@
 namespace OHOS {
 namespace SysInstaller {
 class ActionProcesser {
-    DISALLOW_COPY_MOVE(ActionProcesser);
 public:
-    static ActionProcesser &GetInstance();
-    void SetStatusManager(std::shared_ptr<StatusManager> statusManager)
-    {
-        statusManager_ = statusManager;
-    }
+    ActionProcesser(std::shared_ptr<StatusManager> statusManager) : statusManager_(statusManager) {}
+    ~ActionProcesser() = default;
 
     bool IsRunning();
     void AddAction(std::unique_ptr<IAction> action);
@@ -42,8 +38,6 @@ public:
     void CompletedAction(InstallerErrCode errCode, const std::string &errStr);
 
 private:
-    ActionProcesser() = default;
-    ~ActionProcesser() = default;
     void StartNextAction();
 
     std::shared_ptr<StatusManager> statusManager_ {};

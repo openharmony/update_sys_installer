@@ -38,27 +38,30 @@ public:
     SysInstallerServer(int32_t systemAbilityId, bool runOnCreate = false);
     ~SysInstallerServer() override;
 
-    int32_t SysInstallerInit(bool bStreamUpgrade) override;
-    int32_t StartUpdatePackageZip(const std::string &pkgPath) override;
+    int32_t SysInstallerInit(const std::string &taskId, bool bStreamUpgrade) override;
+    int32_t StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath) override;
     int32_t StartStreamUpdate() override;
     int32_t StopStreamUpdate() override;
     int32_t ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size) override;
-    int32_t SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback) override;
-    int32_t GetUpdateStatus() override;
-    int32_t StartUpdateParaZip(const std::string &pkgPath,
+    int32_t SetUpdateCallback(const std::string &taskId, const sptr<ISysInstallerCallback> &updateCallback) override;
+    int32_t GetUpdateStatus(const std::string &taskId) override;
+    int32_t StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir) override;
-    int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir) override;
-    int32_t AccDecompressAndVerifyPkg(const std::string &srcPath,
+    int32_t StartDeleteParaZip(const std::string &taskId, const std::string &location,
+        const std::string &cfgDir) override;
+    int32_t AccDecompressAndVerifyPkg(const std::string &taskId, const std::string &srcPath,
         const std::string &dstPath, const uint32_t type) override;
-    int32_t AccDeleteDir(const std::string &dstPath) override;
-    int32_t StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath) override;
+    int32_t AccDeleteDir(const std::string &taskId, const std::string &dstPath) override;
+    int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath) override;
     int32_t CancelUpdateVabPackageZip(void) override;
-    int32_t StartVabMerge() override;
+    int32_t StartVabMerge(const std::string &taskId) override;
     int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo) override;
     int32_t EnableVabCheckpoint() override;
     int32_t AbortVabActiveSnapshot() override;
     int32_t ClearVabMetadataAndCow() override;
     int32_t MergeRollbackReasonFile() override;
+    int32_t GetUpdateResult(const std::string &taskId, const std::string &taskType,
+        const std::string &resultType, std::string &updateResult) override;
     int32_t GetMetadataUpdateStatus(int32_t &metadataStatus) override;
 
 #ifndef UPDATER_UT

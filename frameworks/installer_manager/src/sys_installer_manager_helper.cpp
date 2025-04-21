@@ -28,56 +28,73 @@ namespace SysInstaller {
 using namespace Hpackage;
 using namespace Updater;
 
-int32_t SysInstallerManagerHelper::SysInstallerInit()
+int32_t SysInstallerManagerHelper::SysInstallerInit(const std::string &taskId)
 {
-    LOG(INFO) << "SysInstallerInit";
-    if (ActionProcesser::GetInstance().IsRunning()) {
-        LOG(WARNING) << "ActionProcesser IsRunning";
-        return 0;
+    LOG(INFO) << "SysInstallerInit taskId : " << taskId;
+    std::shared_ptr<StatusManager> statusManager = nullptr;
+    {
+        std::lock_guard<std::recursive_mutex> lock(statusLock_);
+        if (statusManagerMap_.count(taskId) > 0) {
+            LOG(INFO) << "is has been init";
+            return 0;
+        }
+
+        statusManager = std::make_shared<StatusManager>();
+        statusManagerMap_.emplace(taskId, statusManager);
+        statusManager->Init();
     }
-    if (statusManager_ == nullptr) {
-        statusManager_ = std::make_shared<StatusManager>();
-    }
-    statusManager_->Init();
-    ActionProcesser::GetInstance().SetStatusManager(statusManager_);
+
+    std::lock_guard<std::recursive_mutex> lock(processerLock_);
+    std::shared_ptr<ActionProcesser> actionProcesser = std::make_shared<ActionProcesser>(statusManager);
+    actionProcesserMap_.emplace(taskId, actionProcesser);
     return 0;
 }
 
-int32_t SysInstallerManagerHelper::StartUpdatePackageZip(const std::string &pkgPath)
+int32_t SysInstallerManagerHelper::StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath)
 {
-    LOG(INFO) << "StartUpdatePackageZip start";
-    if (statusManager_ == nullptr) {
-        LOG(ERROR) << "statusManager_ nullptr";
+    LOG(INFO) << "StartUpdatePackageZip start taskId : " << taskId;
+    std::shared_ptr<StatusManager> statusManager = GetStatusManager(taskId);
+    if (statusManager == nullptr) {
+        LOG(ERROR) << "statusManager nullptr";
         return -1;
     }
-    if (ActionProcesser::GetInstance().IsRunning()) {
+
+    std::shared_ptr<ActionProcesser> actionProcesser = GetActionProcesser(taskId);
+    if (actionProcesser == nullptr) {
+        LOG(ERROR) << "actionProcesser nullptr";
+        return -1;
+    }
+
+    if (actionProcesser->IsRunning()) {
         LOG(ERROR) << "ActionProcesser IsRunning";
         return -1;
     }
     std::vector<std::string> filePath = {};
     filePath.push_back(pkgPath);
-    ActionProcesser::GetInstance().AddAction(std::make_unique<PkgVerify>(statusManager_, filePath));
-    ActionProcesser::GetInstance().AddAction(std::make_unique<ABUpdate>(statusManager_, pkgPath));
-    ActionProcesser::GetInstance().Start();
+    actionProcesser->AddAction(std::make_unique<PkgVerify>(statusManager_, filePath));
+    actionProcesser->AddAction(std::make_unique<ABUpdate>(statusManager_, pkgPath));
+    actionProcesser->Start();
     return 0;
 }
 
 int32_t SysInstallerManagerHelper::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback)
 {
-    if (statusManager_ == nullptr) {
-        LOG(ERROR) << "statusManager_ nullptr";
+    std::shared_ptr<StatusManager> statusManager = GetStatusManager(taskId);
+    if (statusManager == nullptr) {
+        LOG(ERROR) << "statusManager nullptr";
         return -1;
     }
-    return statusManager_->SetUpdateCallback(updateCallback);
+    return statusManager->SetUpdateCallback(updateCallback);
 }
 
 int32_t SysInstallerManagerHelper::GetUpdateStatus()
 {
-    if (statusManager_ == nullptr) {
-        LOG(ERROR) << "statusManager_ nullptr";
+    std::shared_ptr<StatusManager> statusManager = GetStatusManager(taskId);
+    if (statusManager == nullptr) {
+        LOG(ERROR) << "statusManager nullptr";
         return -1;
     }
-    return statusManager_->GetUpdateStatus();
+    return statusManager->GetUpdateStatus();
 }
 
 int32_t SysInstallerManagerHelper::StartUpdateParaZip(const std::string &pkgPath,
@@ -141,6 +158,59 @@ int32_t SysInstallerManagerHelper::ClearVabMetadataAndCow()
 int32_t SysInstallerManagerHelper::MergeRollbackReasonFile()
 {
     return -1;
+}
+
+std::string SysInstallerManagerHelper::GetUpdateResult(const std::string &taskId, cosnt std::string &taskType,
+    const std::string &resultType)
+{
+    LOG(INFO) << "GetUpdateResult start taskId : " << taskId;
+    std::shared_ptr<ActionProcesser> actionProcesser = GetActionProcesser(taskId);
+    if (actionProcesser == nullptr) {
+        LOG(ERROR) << "actionProcesser nullptr";
+        return "has not task";
+    }
+
+    if (actionProcesser->IsRunning()) {
+        LOG(ERROR) << "ActionProcesser IsRunning";
+        return "task is running";
+    }
+
+    {
+        std::lock_guard<std::recursive_mutex> lock(statusLock_);
+        auto inter = statusManagerMap_.find(taskId);
+        if (inter != statusManagerMap_.end()) {
+            statusManagerMap_.erase(inter);
+        }
+    }
+
+    {
+        std::lock_guard<std::recursive_mutex> lock(processerLock_);
+        auto inter = actionProcesserMap_.find(taskId);
+        if (inter != actionProcesserMap_.end()) {
+            actionProcesserMap_.erase(inter);
+        }
+    }
+    return "success";
+}
+
+std::shared_ptr<StatusManager> SysInstallerManagerHelper::GetStatusManager(const std::string &taskId)
+{
+    std::lock_guard<std::recursive_mutex> lock(statusLock_);
+    auto inter = statusManagerMap_.find(taskId);
+    if (inter != statusManagerMap_.end()) {
+        return inter->second;
+    }
+    return nullptr;
+}
+
+std::shared_ptr<StatusManager> SysInstallerManagerHelper::GetActionProcesser(const std::string &taskId)
+{
+    std::lock_guard<std::recursive_mutex> lock(processerLock_);
+    auto inter = actionProcesserMap_.find(taskId);
+    if (inter != actionProcesserMap_.end()) {
+        return inter->second;
+    }
+    return nullptr;
 }
 
 int32_t SysInstallerManagerHelper::GetMetadataUpdateStatus(int32_t &metadataStatus)

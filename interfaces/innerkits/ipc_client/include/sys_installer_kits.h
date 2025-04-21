@@ -36,27 +36,30 @@ public:
     static SysInstallerKits &GetInstance();
 
     virtual int32_t Init() = 0;
-    virtual int32_t SysInstallerInit(bool bStreamUpgrade = false) = 0;
-    virtual int32_t StartUpdatePackageZip(const std::string &pkgPath) = 0;
+    virtual int32_t SysInstallerInit(const std::string &taskId = "", bool bStreamUpgrade = false) = 0;
+    virtual int32_t StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath) = 0;
     virtual int32_t StartStreamUpdate() = 0;
     virtual int32_t StopStreamUpdate() = 0;
     virtual int32_t ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size) = 0;
-    virtual int32_t SetUpdateCallback(const sptr<ISysInstallerCallback> &cb) = 0;
-    virtual int32_t GetUpdateStatus() = 0;
-    virtual int32_t StartUpdateParaZip(const std::string &pkgPath,
+    virtual int32_t SetUpdateCallback(const std::string &taskId = "", const sptr<ISysInstallerCallback> &cb) = 0;
+    virtual int32_t GetUpdateStatus(const std::string &taskId) = 0;
+    virtual int32_t StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir) = 0;
-    virtual int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir) = 0;
-    virtual int32_t AccDecompressAndVerifyPkg(const std::string &srcPath,
+    virtual int32_t StartDeleteParaZip(const std::string &taskId, const std::string &location,
+        const std::string &cfgDir) = 0;
+    virtual int32_t AccDecompressAndVerifyPkg(const std::string &taskId, const std::string &srcPath,
         const std::string &dstPath, const uint32_t type) = 0;
-    virtual int32_t AccDeleteDir(const std::string &dstPath) = 0;
+    virtual int32_t AccDeleteDir(const std::string &taskId, const std::string &dstPath) = 0;
     virtual int32_t CancelUpdateVabPackageZip(void) = 0;
-    virtual int32_t StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath) = 0;
+    virtual int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath) = 0;
     virtual int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo) = 0;
-    virtual int32_t StartVabMerge() = 0;
+    virtual int32_t StartVabMerge(const std::string &taskId) = 0;
     virtual int32_t EnableVabCheckpoint() = 0;
     virtual int32_t AbortVabActiveSnapshot() = 0;
     virtual int32_t ClearVabMetadataAndCow() = 0;
     virtual int32_t MergeRollbackReasonFile() = 0;
+    virtual std::string GetUpdateResult(const std::string &taskId, const std::string &taskType,
+        const std::string &resultType) = 0;
     virtual int32_t GetMetadataUpdateStatus(int32_t &metadataStatus) = 0;
 };
 } // namespace SysInstaller

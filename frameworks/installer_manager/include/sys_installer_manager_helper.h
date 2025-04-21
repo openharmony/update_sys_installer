@@ -16,6 +16,10 @@
 #ifndef SYS_INSTALLER_MANAGER_HELPER_H
 #define SYS_INSTALLER_MANAGER_HELPER_H
 
+#include <map>
+#include <mutex>
+
+#include "action_processer.h"
 #include "status_manager.h"
 
 namespace OHOS {
@@ -25,28 +29,38 @@ public:
     SysInstallerManagerHelper() = default;
     virtual ~SysInstallerManagerHelper() = default;
 
-    virtual int32_t SysInstallerInit();
-    virtual int32_t StartUpdatePackageZip(const std::string &pkgPath);
-    virtual int32_t SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback);
-    virtual int32_t GetUpdateStatus();
-    virtual int32_t StartUpdateParaZip(const std::string &pkgPath,
+    virtual int32_t SysInstallerInit(const std::string &taskId);
+    virtual int32_t StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath);
+    virtual int32_t SetUpdateCallback(const std::string &taskId, const sptr<ISysInstallerCallback> &updateCallback);
+    virtual int32_t GetUpdateStatus(const std::string &taskId);
+    virtual int32_t StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir);
-    virtual int32_t StartDeleteParaZip(const std::string &location, const std::string &cfgDir);
-    virtual int32_t AccDecompressAndVerifyPkg(const std::string &srcPath,
+    virtual int32_t StartDeleteParaZip(const std::string &taskId, const std::string &location,
+        const std::string &cfgDir);
+    virtual int32_t AccDecompressAndVerifyPkg(const std::string &taskId, const std::string &srcPath,
         const std::string &dstPath, const uint32_t type);
-    virtual int32_t AccDeleteDir(const std::string &dstPath);
+    virtual int32_t AccDeleteDir(const std::string &taskId, const std::string &dstPath);
     virtual int32_t CancelUpdateVabPackageZip(void);
-    virtual int32_t StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath);
+    virtual int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath);
     virtual int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo);
-    virtual int32_t StartVabMerge();
+    virtual int32_t StartVabMerge(const std::string &taskId);
     virtual int32_t EnableVabCheckpoint();
     virtual int32_t AbortVabActiveSnapshot();
     virtual int32_t ClearVabMetadataAndCow();
     virtual int32_t MergeRollbackReasonFile();
+    virtual std::string GetUpdateResult(const std::string &taskId, cosnt std::string &taskType,
+        const std::string &resultType);
     virtual int32_t GetMetadataUpdateStatus(int32_t &metadataStatus);
 
 protected:
-    std::shared_ptr<StatusManager> statusManager_ {};
+    std::map<std::string, std::shared_ptr<StatusManager>> statusManagerMap_;
+    std::map<std::string, std::shared_ptr<ActionProcesser>> actionProcesserMap_;
+    std::recursive_mutex statusLock_;
+    std::recursive_mutex processerLock_;
+
+protected:
+    std::shared_ptr<StatusManager> GetStatusManager(const std::string &taskId);
+    std::shared_ptr<StatusManager> GetActionProcesser(const std::string &taskId);
 };
 } // SysInstaller
 } // namespace OHOS
