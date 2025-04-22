@@ -181,7 +181,7 @@ int32_t SysInstallerServer::MergeRollbackReasonFile()
     return SysInstallerManager::GetInstance().MergeRollbackReasonFile();
 }
 
-int32_t GetUpdateResult(const std::string &taskId, const std::string &taskType,
+int32_t SysInstallerServer::GetUpdateResult(const std::string &taskId, const std::string &taskType,
     const std::string &resultType, std::string &updateResult)
 {
     updateResult = SysInstallerManager::GetInstance().GetUpdateResult(taskId, taskType, resultType);
