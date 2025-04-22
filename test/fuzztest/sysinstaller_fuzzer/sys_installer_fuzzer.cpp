@@ -45,6 +45,7 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     SysInstallerKitsImpl::GetInstance().MergeRollbackReasonFile();
     int32_t metadataStatus = 0;
     SysInstallerKitsImpl::GetInstance().GetMetadataUpdateStatus(metadataStatus);
+    SysInstallerKitsImpl::GetInstance().VabUpdateActive();
     SysInstallerKitsImpl::GetInstance().StartVabMerge();
     SysInstallerKitsImpl::GetInstance().EnableVabCheckpoint();
     SysInstallerKitsImpl::GetInstance().AbortVabActiveSnapshot();
