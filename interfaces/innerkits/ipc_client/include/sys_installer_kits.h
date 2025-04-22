@@ -58,6 +58,7 @@ public:
     virtual int32_t ClearVabMetadataAndCow() = 0;
     virtual int32_t MergeRollbackReasonFile() = 0;
     virtual int32_t GetMetadataUpdateStatus(int32_t &metadataStatus) = 0;
+    virtual int32_t VabUpdateActive() = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS
