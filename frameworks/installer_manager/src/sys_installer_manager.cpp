@@ -193,5 +193,14 @@ int32_t SysInstallerManager::GetMetadataUpdateStatus(int32_t &metadataStatus)
     }
     return helper_->GetMetadataUpdateStatus(metadataStatus);
 }
+
+int32_t SysInstallerManager::VabUpdateActive()
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->VabUpdateActive();
+}
 } // namespace SysInstaller
 } // namespace OHOS
