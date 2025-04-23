@@ -149,7 +149,7 @@ HWTEST_F(SysInstallerIpcUnitTest, StartUpdateParaZipTest, TestSize.Level1)
     sysInstallerLoadCallback.OnLoadSystemAbilityFail(4101); // 4041 : SYS_INSTALLER_DISTRIBUTED_SERVICE_ID
     sptr<IRemoteObject> callback {};
     SysInstallerProxy env(callback);
-    auto ret = env.StartUpdateParaZip("ipc_ut_test", "", "");
+    auto ret = env.StartUpdateParaZip("ipc_ut_test", "", "", "");
     ASSERT_EQ(ret, 5); // 5 : ERR_INVALID_DATA
 }
 
