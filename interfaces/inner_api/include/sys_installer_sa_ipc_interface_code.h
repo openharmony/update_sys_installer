@@ -34,21 +34,6 @@ enum SysInstallerCallbackInterfaceCode {
     UPDATE_RESULT = 1,
     STREAM_UPDATE_RESULT = 2,
 };
-
-enum SysInstallerInterfaceCode {
-    SYS_INSTALLER_INIT = 1,
-    UPDATE_PACKAGE,
-    START_STREAM_UPDATE,
-    STOP_STREAM_UPDATE,
-    PROCESS_STREAM_DATA,
-    SET_UPDATE_CALLBACK,
-    GET_UPDATE_STATUS,
-    UPDATE_PARA_PACKAGE,
-    DELETE_PARA_PACKAGE,
-    DECOMPRESS_ACC_PACKAGE,
-    DELETE_ACC_PACKAGE,
-    DELETE_UPDATE_RESULT
-};
 } // namespace SysInstaller
 } // namespace OHOS
 #endif // SYS_INSTALLER_IMODULE_UPDATE_H

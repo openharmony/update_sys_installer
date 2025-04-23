@@ -15,12 +15,26 @@
 
 #include "sys_installer_callback.h"
 #include "sys_installer_kits_impl.h"
-#include "sys_installer_sa_ipc_interface_code.h"
 #include "isys_installer_callback_func.h"
 
 using namespace OHOS;
 using namespace std;
 using namespace OHOS::SysInstaller;
+
+enum SysInstallerInterfaceCode {
+    SYS_INSTALLER_INIT = 1,
+    UPDATE_PACKAGE,
+    START_STREAM_UPDATE,
+    STOP_STREAM_UPDATE,
+    PROCESS_STREAM_DATA,
+    SET_UPDATE_CALLBACK,
+    GET_UPDATE_STATUS,
+    UPDATE_PARA_PACKAGE,
+    DELETE_PARA_PACKAGE,
+    DECOMPRESS_ACC_PACKAGE,
+    DELETE_ACC_PACKAGE,
+    DELETE_UPDATE_RESULT
+};
 
 class ProcessCallback : public ISysInstallerCallbackFunc {
 public:
