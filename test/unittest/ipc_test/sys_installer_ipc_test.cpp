@@ -149,8 +149,8 @@ HWTEST_F(SysInstallerIpcUnitTest, StartUpdateParaZipTest, TestSize.Level1)
     sysInstallerLoadCallback.OnLoadSystemAbilityFail(4101); // 4041 : SYS_INSTALLER_DISTRIBUTED_SERVICE_ID
     sptr<IRemoteObject> callback {};
     SysInstallerProxy env(callback);
-    auto ret = env.StartUpdateParaZip("ipc_ut_test", "", "", "");
-    ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
+    auto ret = env.StartUpdateParaZip("ipc_ut_test", "", "");
+    ASSERT_EQ(ret, 5); // 5 : ERR_INVALID_DATA
 }
 
 // StartDeleteParaZip test
@@ -160,7 +160,7 @@ HWTEST_F(SysInstallerIpcUnitTest, StartDeleteParaZipTest, TestSize.Level1)
     sptr<IRemoteObject> callback {};
     SysInstallerProxy env(callback);
     auto ret = env.StartDeleteParaZip("ipc_ut_test", "", "");
-    ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
+    ASSERT_EQ(ret, 5); // 5 : ERR_INVALID_DATA
 }
 
 // AccDecompressAndVerifyPkg test
@@ -170,7 +170,7 @@ HWTEST_F(SysInstallerIpcUnitTest, AccDecompressAndVerifyPkgTest, TestSize.Level1
     sptr<IRemoteObject> callback {};
     SysInstallerProxy env(callback);
     auto ret = env.AccDecompressAndVerifyPkg("ipc_ut_test", "", "", 0);
-    ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
+    ASSERT_EQ(ret, 5); // 5 : ERR_INVALID_DATA
 }
 
 // AccDeleteDir test
@@ -180,7 +180,7 @@ HWTEST_F(SysInstallerIpcUnitTest, AccDeleteDirTest, TestSize.Level1)
     sptr<IRemoteObject> callback {};
     SysInstallerProxy env(callback);
     auto ret = env.AccDeleteDir("ipc_ut_test", "");
-    ASSERT_EQ(ret, 3); // 3 : ERR_FLATTEN_OBJECT
+    ASSERT_EQ(ret, 5); // 5 : ERR_INVALID_DATA
 }
 
 // SysInstallerKitsImpl test
