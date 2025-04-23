@@ -18,12 +18,12 @@
   
 namespace OHOS {
 namespace SysInstaller {
-class TaskTypeConst {
-    constexpr const char *TASK_TYPE_AB_UPDATE = "ab_update";
+struct TaskTypeConst {
+    static constexpr const char *TASK_TYPE_AB_UPDATE = "ab_update";
 };
 
-class ResultTypeConst {
-    constexpr const char *RESULT_TYPE_INSTALL = "install";
+struct ResultTypeConst {
+    static constexpr const char *RESULT_TYPE_INSTALL = "install";
 };
 
 } // namespace SysInstaller
