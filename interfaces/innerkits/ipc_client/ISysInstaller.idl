@@ -15,20 +15,20 @@
 
 import ISysInstallerCallback;
 interface OHOS.SysInstaller.ISysInstaller {
-    void SysInstallerInit([in] boolean bStreamUpgrade);
-    [oneway] void StartUpdatePackageZip([in] String pkgPath);
+    void SysInstallerInit([in] String taskId, [in] boolean bStreamUpgrade);
+    [oneway] void StartUpdatePackageZip([in] String taskId, [in] String pkgPath);
     void StartStreamUpdate();
     void StopStreamUpdate();
     void ProcessStreamData([in] List<unsigned char> buffer, [in] unsigned int size);
-    [oneway] void SetUpdateCallback([in] ISysInstallerCallback updateCallback);
-    [oneway] void GetUpdateStatus();
-    void StartUpdateParaZip([in] String pkgPath, [in] String location, [in] String cfgDir);
-    void StartDeleteParaZip([in] String location, [in] String cfgDir);
-    void AccDecompressAndVerifyPkg([in] String srcPath, [in] String dstPath, [in] unsigned int type);
-    void AccDeleteDir([in] String dstPath);
+    [oneway] void SetUpdateCallback([in] String taskId, [in] ISysInstallerCallback updateCallback);
+    [oneway] void GetUpdateStatus([in] String taskId);
+    void StartUpdateParaZip([in] String taskId, [in] String pkgPath, [in] String location, [in] String cfgDir);
+    void StartDeleteParaZip([in] String taskId, [in] String location, [in] String cfgDir);
+    void AccDecompressAndVerifyPkg([in] String taskId, [in] String srcPath, [in] String dstPath, [in] unsigned int type);
+    void AccDeleteDir([in] String taskId, [in] String dstPath);
     void CancelUpdateVabPackageZip();
-    [oneway] void StartUpdateVabPackageZip([in] List<String> pkgPath);
-    [oneway] void StartVabMerge();
+    [oneway] void StartUpdateVabPackageZip([in] String taskId, [in] List<String> pkgPath);
+    [oneway] void StartVabMerge([in] String taskId);
     [oneway] void EnableVabCheckpoint();
     [oneway] void AbortVabActiveSnapshot();
     [oneway] void ClearVabMetadataAndCow();
@@ -36,4 +36,5 @@ interface OHOS.SysInstaller.ISysInstaller {
     void GetMetadataUpdateStatus([out] int metadataStatus);
     void VabUpdateActive();
     void CreateVabSnapshotCowImg([in] Map<String, unsigned long> partitionInfo);
+    void GetUpdateResult([in] String taskId, [in] String taskType, [in] String resultType, [out] String updateResult);
 }

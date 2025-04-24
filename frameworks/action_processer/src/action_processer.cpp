@@ -21,13 +21,6 @@
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
-
-ActionProcesser &ActionProcesser::GetInstance()
-{
-    static ActionProcesser instance;
-    return instance;
-}
-
 bool ActionProcesser::IsRunning()
 {
     return isRunning_ || isSuspend_;

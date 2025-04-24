@@ -28,6 +28,11 @@
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
+SysInstallerCallback::SysInstallerCallback(sptr<ISysInstallerCallbackFunc> callback)
+{
+    callback_ = callback;
+}
+
 ErrCode SysInstallerCallback::OnUpgradeProgress(UpdateStatus updateStatus, int percent,
     const std::string &resultMsg)
 {
@@ -46,11 +51,6 @@ ErrCode SysInstallerCallback::OnUpgradeDealLen(UpdateStatus updateStatus, int de
         callback_->OnUpgradeDealLen(updateStatus, dealLen, resultMsg);
     }
     return 0;
-}
-
-void SysInstallerCallback::RegisterCallback(sptr<ISysInstallerCallbackFunc> callback)
-{
-    callback_ = callback;
 }
 }
 } // namespace OHOS

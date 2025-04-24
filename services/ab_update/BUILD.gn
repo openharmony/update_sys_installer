@@ -23,6 +23,7 @@ ohos_static_library("libabupdate") {
     "${sys_installer_path}/interfaces/innerkits",
     "${sys_installer_path}/interfaces/inner_api/include",
     "${sys_installer_path}/frameworks/actions/include",
+    "${sys_installer_path}/frameworks/action_processer/include",
     "${sys_installer_path}/frameworks/installer_manager/include",
     "${sys_installer_path}/frameworks/status_manager/include",
     "${sys_installer_path}/include",

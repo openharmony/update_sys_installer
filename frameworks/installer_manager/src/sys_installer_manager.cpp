@@ -35,7 +35,7 @@ SysInstallerManager &SysInstallerManager::GetInstance()
     return instance;
 }
 
-int32_t SysInstallerManager::SysInstallerInit()
+int32_t SysInstallerManager::SysInstallerInit(const std::string &taskId)
 {
     if (helper_ == nullptr) {
         SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_PRE_INIT_EVENT);
@@ -45,81 +45,84 @@ int32_t SysInstallerManager::SysInstallerInit()
             RegisterDump(std::make_unique<SysInstallerManagerHelper>());
         }
     }
-    return helper_->SysInstallerInit();
+    return helper_->SysInstallerInit(taskId);
 }
 
-int32_t SysInstallerManager::StartUpdatePackageZip(const std::string &pkgPath)
+int32_t SysInstallerManager::StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->StartUpdatePackageZip(pkgPath);
+    return helper_->StartUpdatePackageZip(taskId, pkgPath);
 }
 
-int32_t SysInstallerManager::SetUpdateCallback(const sptr<ISysInstallerCallback> &updateCallback)
+int32_t SysInstallerManager::SetUpdateCallback(const std::string &taskId,
+    const sptr<ISysInstallerCallback> &updateCallback)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->SetUpdateCallback(updateCallback);
+    return helper_->SetUpdateCallback(taskId, updateCallback);
 }
 
-int32_t SysInstallerManager::GetUpdateStatus()
+int32_t SysInstallerManager::GetUpdateStatus(const std::string &taskId)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->GetUpdateStatus();
+    return helper_->GetUpdateStatus(taskId);
 }
 
-int32_t SysInstallerManager::StartUpdateParaZip(const std::string &pkgPath,
+int32_t SysInstallerManager::StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
     const std::string &location, const std::string &cfgDir)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->StartUpdateParaZip(pkgPath, location, cfgDir);
+    return helper_->StartUpdateParaZip(taskId, pkgPath, location, cfgDir);
 }
 
-int32_t SysInstallerManager::StartDeleteParaZip(const std::string &location, const std::string &cfgDir)
+int32_t SysInstallerManager::StartDeleteParaZip(const std::string &taskId, const std::string &location,
+    const std::string &cfgDir)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->StartDeleteParaZip(location, cfgDir);
+    return helper_->StartDeleteParaZip(taskId, location, cfgDir);
 }
 
-int32_t SysInstallerManager::AccDecompressAndVerifyPkg(const std::string &srcPath,
+int32_t SysInstallerManager::AccDecompressAndVerifyPkg(const std::string &taskId, const std::string &srcPath,
     const std::string &dstPath, const uint32_t type)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->AccDecompressAndVerifyPkg(srcPath, dstPath, type);
+    return helper_->AccDecompressAndVerifyPkg(taskId, srcPath, dstPath, type);
 }
 
-int32_t SysInstallerManager::AccDeleteDir(const std::string &dstPath)
+int32_t SysInstallerManager::AccDeleteDir(const std::string &taskId, const std::string &dstPath)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->AccDeleteDir(dstPath);
+    return helper_->AccDeleteDir(taskId, dstPath);
 }
 
-int32_t SysInstallerManager::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
+int32_t SysInstallerManager::StartUpdateVabPackageZip(const std::string &taskId,
+    const std::vector<std::string> &pkgPath)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->StartUpdateVabPackageZip(pkgPath);
+    return helper_->StartUpdateVabPackageZip(taskId, pkgPath);
 }
 
 int32_t SysInstallerManager::CancelUpdateVabPackageZip(void)
@@ -131,13 +134,13 @@ int32_t SysInstallerManager::CancelUpdateVabPackageZip(void)
     return helper_->CancelUpdateVabPackageZip();
 }
 
-int32_t SysInstallerManager::StartVabMerge()
+int32_t SysInstallerManager::StartVabMerge(const std::string &taskId)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->StartVabMerge();
+    return helper_->StartVabMerge(taskId);
 }
 
 int32_t SysInstallerManager::CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo)
@@ -183,6 +186,16 @@ int32_t SysInstallerManager::MergeRollbackReasonFile()
         return -1;
     }
     return helper_->MergeRollbackReasonFile();
+}
+
+std::string  SysInstallerManager::GetUpdateResult(const std::string &taskId, const std::string &taskType,
+    const std::string &resultType)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return std::string("");
+    }
+    return helper_->GetUpdateResult(taskId, taskType, resultType);
 }
 
 int32_t SysInstallerManager::GetMetadataUpdateStatus(int32_t &metadataStatus)
