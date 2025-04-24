@@ -24,7 +24,7 @@ config("module_update_exported_header") {
 check_module_update_gen("check_module_update") {
   include_dirs = [ "./include" ]
 
-  deps = [ "${sys_installer_path}/services/module_update/src:check_module_update_staic" ]
+  deps = [ "${sys_installer_path}/services/module_update/src:check_module_update_static" ]
   output_name = "check_module_update_init"
   external_deps = [
     "bounds_checking_function:libsec_shared",
@@ -35,7 +35,7 @@ check_module_update_gen("check_module_update") {
   subsystem_name = "updater"
 }
 
-ohos_static_library("check_module_update_staic") {
+ohos_static_library("check_module_update_static") {
   sources = [ "${sys_installer_path}/services/module_update/src/main.cpp" ]
 
   include_dirs = [ "./include" ]
@@ -48,6 +48,7 @@ ohos_static_library("check_module_update_staic") {
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
+    "ipc:ipc_single",
     "updater:libupdaterlog_shared",
   ]
 
@@ -71,6 +72,7 @@ ohos_static_library("module_update_static") {
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
+    "ipc:ipc_single",
     "updater:libupdaterlog_shared",
   ]
 

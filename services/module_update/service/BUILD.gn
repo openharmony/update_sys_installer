@@ -70,7 +70,7 @@ ohos_static_library("libmodule_update_service_static") {
     "hilog:libhilog",
     "hisysevent:libhisyseventmanager",
     "init:libbeget_proxy",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "updater:libpackage_shared",
