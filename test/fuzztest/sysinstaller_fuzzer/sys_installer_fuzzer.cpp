@@ -30,22 +30,24 @@ using namespace SysInstaller;
 
 void FuzzSysInstaller(const uint8_t* data, size_t size)
 {
-    SysInstallerKitsImpl::GetInstance().SysInstallerInit();
-    SysInstallerKitsImpl::GetInstance().SetUpdateCallback(nullptr);
-    SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(std::string(reinterpret_cast<const char*>(data), size));
+    std::string taskId = "fuzz_test";
+    SysInstallerKitsImpl::GetInstance().SysInstallerInit(taskId);
+    SysInstallerKitsImpl::GetInstance().SetUpdateCallback(taskId, nullptr);
+    SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(taskId,
+        std::string(reinterpret_cast<const char*>(data), size));
     const std::string pkgPath = "/data/updater/fuzz/updater.zip";
     const std::string location = "location";
-    SysInstallerKitsImpl::GetInstance().GetUpdateStatus();
-    SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(pkgPath,
+    SysInstallerKitsImpl::GetInstance().GetUpdateStatus(taskId);
+    SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(taskId, pkgPath,
         location, std::string(reinterpret_cast<const char*>(data), size));
-    SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
+    SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(taskId,
         pkgPath, std::string(reinterpret_cast<const char*>(data), size), 1);
-    SysInstallerKitsImpl::GetInstance().AccDeleteDir(std::string(reinterpret_cast<const char*>(data), size));
+    SysInstallerKitsImpl::GetInstance().AccDeleteDir(taskId, std::string(reinterpret_cast<const char*>(data), size));
     SysInstallerKitsImpl::GetInstance().ClearVabMetadataAndCow();
     SysInstallerKitsImpl::GetInstance().MergeRollbackReasonFile();
     int32_t metadataStatus = 0;
     SysInstallerKitsImpl::GetInstance().GetMetadataUpdateStatus(metadataStatus);
-    SysInstallerKitsImpl::GetInstance().StartVabMerge();
+    SysInstallerKitsImpl::GetInstance().StartVabMerge(taskId);
     SysInstallerKitsImpl::GetInstance().EnableVabCheckpoint();
     SysInstallerKitsImpl::GetInstance().AbortVabActiveSnapshot();
 }

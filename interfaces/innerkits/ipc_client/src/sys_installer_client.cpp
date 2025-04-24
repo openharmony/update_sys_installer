@@ -15,12 +15,26 @@
 
 #include "sys_installer_callback.h"
 #include "sys_installer_kits_impl.h"
-#include "sys_installer_sa_ipc_interface_code.h"
 #include "isys_installer_callback_func.h"
 
 using namespace OHOS;
 using namespace std;
 using namespace OHOS::SysInstaller;
+
+enum SysInstallerInterfaceCode {
+    SYS_INSTALLER_INIT = 1,
+    UPDATE_PACKAGE,
+    START_STREAM_UPDATE,
+    STOP_STREAM_UPDATE,
+    PROCESS_STREAM_DATA,
+    SET_UPDATE_CALLBACK,
+    GET_UPDATE_STATUS,
+    UPDATE_PARA_PACKAGE,
+    DELETE_PARA_PACKAGE,
+    DECOMPRESS_ACC_PACKAGE,
+    DELETE_ACC_PACKAGE,
+    DELETE_UPDATE_RESULT
+};
 
 class ProcessCallback : public ISysInstallerCallbackFunc {
 public:
@@ -40,12 +54,15 @@ public:
 
 int main(int argc, char **argv)
 {
-    if (argc != 2) { // 2: max para
+    if (argc != 3) { // 3: max para
         printf("argc para error\n");
         return -1;
     }
 
-    int32_t ret = SysInstallerKitsImpl::GetInstance().SysInstallerInit();
+    std::string taskId = argv[2];
+    printf("taskId %s\n", taskId.c_str());
+
+    int32_t ret = SysInstallerKitsImpl::GetInstance().SysInstallerInit(taskId);
     printf("SysInstallerInit ret:%d\n", ret);
 
     sptr<ISysInstallerCallbackFunc> callback = new ProcessCallback;
@@ -53,34 +70,38 @@ int main(int argc, char **argv)
         printf("callback new failed\n");
         return -1;
     }
-    SysInstallerKitsImpl::GetInstance().SetUpdateCallback(callback);
-
+    SysInstallerKitsImpl::GetInstance().SetUpdateCallback(taskId, callback);
+    std::string updateResult;
     printf("argv[1]:%d\n", atoi(argv[1]));
     switch (atoi(argv[1])) {
         case SysInstallerInterfaceCode::UPDATE_PACKAGE:
-            ret = SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip("/data/ota_package/update.zip");
+            ret = SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(taskId, "/data/ota_package/update.zip");
             break;
         case SysInstallerInterfaceCode::GET_UPDATE_STATUS:
-            ret = SysInstallerKitsImpl::GetInstance().GetUpdateStatus();
+            ret = SysInstallerKitsImpl::GetInstance().GetUpdateStatus(taskId);
             break;
         case SysInstallerInterfaceCode::UPDATE_PARA_PACKAGE:
-            ret = SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(
+            ret = SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(taskId,
                 "/data/ota_package/update_para.zip", "System", "/taboo");
             break;
         case SysInstallerInterfaceCode::DELETE_PARA_PACKAGE:
-            ret = SysInstallerKitsImpl::GetInstance().StartDeleteParaZip("System", "/taboo");
+            ret = SysInstallerKitsImpl::GetInstance().StartDeleteParaZip(taskId, "System", "/taboo");
             break;
         case SysInstallerInterfaceCode::DECOMPRESS_ACC_PACKAGE:
-            ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(
+            ret = SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(taskId,
                 "/data/ota_package/update.zip",
                 "/data/ota_package/", 1);
             break;
         case SysInstallerInterfaceCode::DELETE_ACC_PACKAGE:
-            ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("/data/ota_package/");
+            ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir(taskId, "/data/ota_package/");
+            break;
+        case SysInstallerInterfaceCode::DELETE_UPDATE_RESULT:
+            updateResult = SysInstallerKitsImpl::GetInstance().GetUpdateResult(taskId, "taskType", "resultType");
             break;
         default:
             break;
     }
 
+    printf("updateResult %s\n", updateResult.c_str());
     return ret;
 }

@@ -26,11 +26,11 @@ namespace SysInstaller {
 class SysInstallerCallback : public SysInstallerCallbackStub {
 public:
     SysInstallerCallback() = default;
+    explicit SysInstallerCallback(sptr<ISysInstallerCallbackFunc> callback);
     ~SysInstallerCallback() = default;
 
     ErrCode OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) override;
     ErrCode OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen, const std::string &resultMsg) override;
-    void RegisterCallback(sptr<ISysInstallerCallbackFunc> callback);
 
 private:
     sptr<ISysInstallerCallbackFunc> callback_;

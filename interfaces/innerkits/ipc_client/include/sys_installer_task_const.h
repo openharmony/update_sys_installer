@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,27 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef SYS_INSTALLER_SA_IPC_INTERFACE_CODE_H
-#define SYS_INSTALLER_SA_IPC_INTERFACE_CODE_H
-
-/* SAID: 4101 */
+#ifndef SYS_INSTALLER_TASK_CONST_H
+#define SYS_INSTALLER_TASK_CONST_H
+  
 namespace OHOS {
 namespace SysInstaller {
-enum ModuleUpdateInterfaceCode {
-    INSTALL_MODULE_PACKAGE = 1,
-    UNINSTALL_MODULE_PACKAGE,
-    GET_MODULE_PACKAGE_INFO,
-    REPORT_MODULE_UPDATE_STATUS,
-    EXIT_MODULE_UPDATE,
-    GET_HMP_VERSION_INFO,
-    START_UPDATE_HMP_PACKAGE,
-    GET_HMP_UPDATE_RESULT
+struct TaskTypeConst {
+    static constexpr const char *TASK_TYPE_AB_UPDATE = "ab_update";
 };
 
-enum SysInstallerCallbackInterfaceCode {
-    UPDATE_RESULT = 1,
-    STREAM_UPDATE_RESULT = 2,
+struct ResultTypeConst {
+    static constexpr const char *RESULT_TYPE_INSTALL = "install";
 };
+
 } // namespace SysInstaller
 } // namespace OHOS
-#endif // SYS_INSTALLER_IMODULE_UPDATE_H
+#endif // SYS_INSTALLER_TASK_CONST_H
+ 

@@ -223,9 +223,8 @@ int32_t ModuleUpdateKitsImpl::StartUpdateHmpPackage(const std::string &path,
     }
 
     if (updateCallBack_ == nullptr) {
-        updateCallBack_ = new SysInstallerCallback;
+        updateCallBack_ = new SysInstallerCallback(callback);
     }
-    static_cast<SysInstallerCallback *>(updateCallBack_.GetRefPtr())->RegisterCallback(callback);
 
     return moduleUpdate->StartUpdateHmpPackage(path, updateCallBack_);
 }

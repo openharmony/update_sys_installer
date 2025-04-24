@@ -129,7 +129,7 @@ int32_t SysInstallerKitsImpl::Init()
     return 0;
 }
 
-int32_t SysInstallerKitsImpl::SysInstallerInit(bool bStreamUpgrade)
+int32_t SysInstallerKitsImpl::SysInstallerInit(const std::string &taskId, bool bStreamUpgrade)
 {
     LOG(INFO) << "SysInstallerInit";
     int ret = Init();
@@ -143,11 +143,11 @@ int32_t SysInstallerKitsImpl::SysInstallerInit(bool bStreamUpgrade)
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    updateService->SysInstallerInit(bStreamUpgrade);
+    updateService->SysInstallerInit(taskId, bStreamUpgrade);
     return 0;
 }
 
-int32_t SysInstallerKitsImpl::StartUpdatePackageZip(const std::string &pkgPath)
+int32_t SysInstallerKitsImpl::StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath)
 {
     LOG(INFO) << "StartUpdatePackageZip";
     auto updateService = GetService();
@@ -155,7 +155,7 @@ int32_t SysInstallerKitsImpl::StartUpdatePackageZip(const std::string &pkgPath)
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->StartUpdatePackageZip(pkgPath);
+    int32_t ret = updateService->StartUpdatePackageZip(taskId, pkgPath);
     LOG(INFO) << "StartUpdatePackageZip ret:" << ret;
     return ret;
 }
@@ -200,7 +200,7 @@ int32_t SysInstallerKitsImpl::ProcessStreamData(uint8_t *buffer, uint32_t size)
     return ret;
 }
 
-int32_t SysInstallerKitsImpl::SetUpdateCallback(sptr<ISysInstallerCallbackFunc> callback)
+int32_t SysInstallerKitsImpl::SetUpdateCallback(const std::string &taskId, sptr<ISysInstallerCallbackFunc> callback)
 {
     LOG(INFO) << "SetUpdateCallback";
     if (callback == nullptr) {
@@ -214,14 +214,16 @@ int32_t SysInstallerKitsImpl::SetUpdateCallback(sptr<ISysInstallerCallbackFunc> 
         return -1;
     }
 
-    if (updateCallBack_ == nullptr) {
-        updateCallBack_ = new SysInstallerCallback;
+    sptr<ISysInstallerCallback> updateCallBack = sptr<SysInstallerCallback>::MakeSptr(callback);
+    if (updateCallBack == nullptr) {
+        LOG(ERROR) << "updateCallBack nullptr";
+        return -1;
     }
-    static_cast<SysInstallerCallback *>(updateCallBack_.GetRefPtr())->RegisterCallback(callback);
-    return updateService->SetUpdateCallback(updateCallBack_);
+
+    return updateService->SetUpdateCallback(taskId, updateCallBack);
 }
 
-int32_t SysInstallerKitsImpl::GetUpdateStatus()
+int32_t SysInstallerKitsImpl::GetUpdateStatus(const std::string &taskId)
 {
     LOG(INFO) << "GetUpdateStatus";
     auto updateService = GetService();
@@ -229,10 +231,10 @@ int32_t SysInstallerKitsImpl::GetUpdateStatus()
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    return updateService->GetUpdateStatus();
+    return updateService->GetUpdateStatus(taskId);
 }
 
-int32_t SysInstallerKitsImpl::StartUpdateParaZip(const std::string &pkgPath,
+int32_t SysInstallerKitsImpl::StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
     const std::string &location, const std::string &cfgDir)
 {
     LOG(INFO) << "StartUpdateParaZip";
@@ -241,7 +243,7 @@ int32_t SysInstallerKitsImpl::StartUpdateParaZip(const std::string &pkgPath,
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->StartUpdateParaZip(pkgPath, location, cfgDir);
+    int32_t ret = updateService->StartUpdateParaZip(taskId, pkgPath, location, cfgDir);
     LOG(INFO) << "StartUpdateParaZip ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
@@ -249,7 +251,8 @@ int32_t SysInstallerKitsImpl::StartUpdateParaZip(const std::string &pkgPath,
     return ret;
 }
 
-int32_t SysInstallerKitsImpl::StartDeleteParaZip(const std::string &location, const std::string &cfgDir)
+int32_t SysInstallerKitsImpl::StartDeleteParaZip(const std::string &taskId, const std::string &location,
+    const std::string &cfgDir)
 {
     LOG(INFO) << "StartDeleteParaZip";
     auto updateService = GetService();
@@ -257,7 +260,7 @@ int32_t SysInstallerKitsImpl::StartDeleteParaZip(const std::string &location, co
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->StartDeleteParaZip(location, cfgDir);
+    int32_t ret = updateService->StartDeleteParaZip(taskId, location, cfgDir);
     LOG(INFO) << "StartDeleteParaZip ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
@@ -265,7 +268,7 @@ int32_t SysInstallerKitsImpl::StartDeleteParaZip(const std::string &location, co
     return ret;
 }
 
-int32_t SysInstallerKitsImpl::AccDecompressAndVerifyPkg(const std::string &srcPath,
+int32_t SysInstallerKitsImpl::AccDecompressAndVerifyPkg(const std::string &taskId, const std::string &srcPath,
     const std::string &dstPath, const uint32_t type)
 {
     LOG(INFO) << "AccDecompressAndVerifyPkg";
@@ -274,7 +277,7 @@ int32_t SysInstallerKitsImpl::AccDecompressAndVerifyPkg(const std::string &srcPa
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->AccDecompressAndVerifyPkg(srcPath, dstPath, type);
+    int32_t ret = updateService->AccDecompressAndVerifyPkg(taskId, srcPath, dstPath, type);
     LOG(INFO) << "AccDecompressAndVerifyPkg ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
@@ -282,7 +285,7 @@ int32_t SysInstallerKitsImpl::AccDecompressAndVerifyPkg(const std::string &srcPa
     return ret;
 }
 
-int32_t SysInstallerKitsImpl::AccDeleteDir(const std::string &dstPath)
+int32_t SysInstallerKitsImpl::AccDeleteDir(const std::string &taskId, const std::string &dstPath)
 {
     LOG(INFO) << "AccDeleteDir";
     auto updateService = GetService();
@@ -290,7 +293,7 @@ int32_t SysInstallerKitsImpl::AccDeleteDir(const std::string &dstPath)
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->AccDeleteDir(dstPath);
+    int32_t ret = updateService->AccDeleteDir(taskId, dstPath);
     LOG(INFO) << "AccDeleteDir ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
@@ -311,7 +314,8 @@ int32_t SysInstallerKitsImpl::CancelUpdateVabPackageZip(void)
     return ret;
 }
 
-int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::vector<std::string> &pkgPath)
+int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::string &taskId,
+    const std::vector<std::string> &pkgPath)
 {
     LOG(INFO) << "StartUpdateVabPackageZip";
     auto updateService = GetService();
@@ -319,7 +323,7 @@ int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::vector<std::st
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->StartUpdateVabPackageZip(pkgPath);
+    int32_t ret = updateService->StartUpdateVabPackageZip(taskId, pkgPath);
     LOG(INFO) << "StartUpdateVabPackageZip ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
@@ -343,7 +347,7 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::unordered_map<s
     return ret;
 }
 
-int32_t SysInstallerKitsImpl::StartVabMerge()
+int32_t SysInstallerKitsImpl::StartVabMerge(const std::string &taskId)
 {
     LOG(INFO) << "StartVabMerge";
     auto updateService = GetService();
@@ -351,7 +355,7 @@ int32_t SysInstallerKitsImpl::StartVabMerge()
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->StartVabMerge();
+    int32_t ret = updateService->StartVabMerge(taskId);
     LOG(INFO) << "StartVabMerge ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
@@ -438,6 +442,23 @@ int32_t SysInstallerKitsImpl::GetMetadataUpdateStatus(int32_t &metadataStatus)
     return -1;
 #endif
     return ret;
+}
+
+std::string SysInstallerKitsImpl::GetUpdateResult(const std::string &taskId, const std::string &taskType,
+    const std::string &resultType)
+{
+    LOG(INFO) << "GetUpdateResult";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return std::string("");
+    }
+    std::string updateResult;
+    int32_t ret = updateService->GetUpdateResult(taskId, taskType, resultType, updateResult);
+    if (ret != 0) {
+        return std::string("");
+    }
+    return updateResult;
 }
 
 void SysInstallerKitsImpl::LoadServiceSuccess()
