@@ -34,6 +34,7 @@ interface OHOS.SysInstaller.ISysInstaller {
     [oneway] void ClearVabMetadataAndCow();
     void MergeRollbackReasonFile();
     void GetMetadataUpdateStatus([out] int metadataStatus);
+    void VabUpdateActive();
     void CreateVabSnapshotCowImg([in] Map<String, unsigned long> partitionInfo);
     void GetUpdateResult([in] String taskId, [in] String taskType, [in] String resultType, [out] String updateResult);
 }

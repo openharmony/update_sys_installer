@@ -63,6 +63,7 @@ public:
     int32_t GetUpdateResult(const std::string &taskId, const std::string &taskType,
         const std::string &resultType, std::string &updateResult) override;
     int32_t GetMetadataUpdateStatus(int32_t &metadataStatus) override;
+    int32_t VabUpdateActive() override;
 
 #ifndef UPDATER_UT
 private:

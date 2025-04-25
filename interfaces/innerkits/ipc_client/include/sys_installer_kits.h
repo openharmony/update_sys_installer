@@ -61,6 +61,7 @@ public:
     virtual std::string GetUpdateResult(const std::string &taskId, const std::string &taskType,
         const std::string &resultType) = 0;
     virtual int32_t GetMetadataUpdateStatus(int32_t &metadataStatus) = 0;
+    virtual int32_t VabUpdateActive() = 0;
 };
 } // namespace SysInstaller
 } // namespace OHOS

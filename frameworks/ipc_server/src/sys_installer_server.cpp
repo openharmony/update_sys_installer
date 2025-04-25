@@ -194,6 +194,12 @@ int32_t SysInstallerServer::GetMetadataUpdateStatus(int32_t &metadataStatus)
     return SysInstallerManager::GetInstance().GetMetadataUpdateStatus(metadataStatus);
 }
 
+int32_t SysInstallerServer::VabUpdateActive()
+{
+    LOG(INFO) << "VabUpdateActive";
+    return SysInstallerManager::GetInstance().VabUpdateActive();
+}
+
 void SysInstallerServer::OnStart()
 {
     LOG(INFO) << "OnStart";

@@ -444,6 +444,22 @@ int32_t SysInstallerKitsImpl::GetMetadataUpdateStatus(int32_t &metadataStatus)
     return ret;
 }
 
+int32_t SysInstallerKitsImpl::VabUpdateActive()
+{
+    LOG(INFO) << "VabUpdateActive";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->VabUpdateActive();
+    LOG(INFO) << "VabUpdateActive ret:" << ret;
+#ifdef UPDATER_UT
+    return -1;
+#endif
+    return ret;
+}
+
 std::string SysInstallerKitsImpl::GetUpdateResult(const std::string &taskId, const std::string &taskType,
     const std::string &resultType)
 {

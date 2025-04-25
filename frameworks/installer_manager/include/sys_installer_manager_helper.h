@@ -51,6 +51,7 @@ public:
     virtual std::string GetUpdateResult(const std::string &taskId, const std::string &taskType,
         const std::string &resultType);
     virtual int32_t GetMetadataUpdateStatus(int32_t &metadataStatus);
+    virtual int32_t VabUpdateActive();
 
 protected:
     std::map<std::string, std::shared_ptr<StatusManager>> statusManagerMap_;
