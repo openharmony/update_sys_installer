@@ -35,6 +35,7 @@ ohos_static_library("libactionprocesser") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "updater:libupdaterlog",
