@@ -48,6 +48,7 @@ ohos_static_library("check_module_update_static") {
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
+    "c_utils:utils",
     "ipc:ipc_single",
     "updater:libupdaterlog_shared",
   ]
@@ -72,6 +73,7 @@ ohos_static_library("module_update_static") {
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
+    "c_utils:utils",
     "ipc:ipc_single",
     "updater:libupdaterlog_shared",
   ]
