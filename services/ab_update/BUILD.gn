@@ -37,6 +37,7 @@ ohos_static_library("libabupdate") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "updater:libringbuffer",
