@@ -47,6 +47,7 @@ ohos_static_library("libverifyaction") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "openssl:libcrypto_shared",
