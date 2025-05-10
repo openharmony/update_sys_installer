@@ -50,7 +50,7 @@ public:
     virtual int32_t AccDecompressAndVerifyPkg(const std::string &taskId, const std::string &srcPath,
         const std::string &dstPath, const uint32_t type) = 0;
     virtual int32_t AccDeleteDir(const std::string &taskId, const std::string &dstPath) = 0;
-    virtual int32_t CancelUpdateVabPackageZip(void) = 0;
+    virtual int32_t CancelUpdateVabPackageZip(const std::string &taskId) = 0;
     virtual int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath) = 0;
     virtual int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo) = 0;
     virtual int32_t StartVabMerge(const std::string &taskId) = 0;

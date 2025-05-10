@@ -139,10 +139,10 @@ int32_t SysInstallerServer::StartUpdateVabPackageZip(const std::string &taskId,
     return SysInstallerManager::GetInstance().StartUpdateVabPackageZip(taskId, pkgPath);
 }
 
-int32_t SysInstallerServer::CancelUpdateVabPackageZip(void)
+int32_t SysInstallerServer::CancelUpdateVabPackageZip(const std::string &taskId)
 {
     LOG(INFO) << "CancelUpdateVabPackageZip";
-    return SysInstallerManager::GetInstance().CancelUpdateVabPackageZip();
+    return SysInstallerManager::GetInstance().CancelUpdateVabPackageZip(taskId);
 }
 
 int32_t SysInstallerServer::StartVabMerge(const std::string &taskId)

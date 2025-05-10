@@ -127,7 +127,7 @@ int32_t SysInstallerManagerHelper::StartUpdateVabPackageZip(const std::string &t
     return -1;
 }
 
-int32_t SysInstallerManagerHelper::CancelUpdateVabPackageZip(void)
+int32_t SysInstallerManagerHelper::CancelUpdateVabPackageZip(const std::string &taskId)
 {
     return -1;
 }
