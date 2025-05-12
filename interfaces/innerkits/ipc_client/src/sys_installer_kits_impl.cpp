@@ -16,6 +16,7 @@
 #include "sys_installer_kits_impl.h"
 
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
@@ -34,6 +35,8 @@
 namespace OHOS {
 namespace SysInstaller {
 using namespace Updater;
+using namespace Updater::Utils;
+using namespace Utils;
 constexpr int GROUP_UPDATE_AUTHORITY = 6666;
 constexpr int LOAD_SA_TIMEOUT_MS = 3;
 
@@ -105,9 +108,13 @@ int32_t SysInstallerKitsImpl::Init()
     }
     (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0777); // 0777 : rwxrwxrwx
     InitUpdaterLogger("SysInstallerClient", SYS_LOG_FILE, SYS_STAGE_FILE, SYS_ERROR_FILE);
-    (void)chown(SYS_LOG_FILE, GROUP_UPDATE_AUTHORITY, GROUP_UPDATE_AUTHORITY);
-    (void)chown(SYS_STAGE_FILE, GROUP_UPDATE_AUTHORITY, GROUP_UPDATE_AUTHORITY);
-    (void)chown(SYS_ERROR_FILE, GROUP_UPDATE_AUTHORITY, GROUP_UPDATE_AUTHORITY);
+    mode_t mode = 0664; // 0777 : -rw-rw-r--
+    (void)chown(SYS_LOG_FILE, USER_ROOT_AUTHORITY, GROUP_ROOT_AUTHORITY);
+    (void)chown(SYS_STAGE_FILE, USER_ROOT_AUTHORITY, GROUP_ROOT_AUTHORITY);
+    (void)chown(SYS_ERROR_FILE, USER_ROOT_AUTHORITY, GROUP_ROOT_AUTHORITY);
+    (void)chmod(SYS_LOG_FILE, mode);
+    (void)chmod(SYS_STAGE_FILE, mode);
+    (void)chmod(SYS_ERROR_FILE, mode);
 
     // 构造步骤1的SystemAbilityLoadCallbackStub子类的实例
     sptr<SysInstallerLoadCallback> loadCallback_ = new SysInstallerLoadCallback();
