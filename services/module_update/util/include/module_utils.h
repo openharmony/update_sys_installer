@@ -54,7 +54,6 @@ extern "C" {
 #endif
 bool RevertImageCert(const std::string &hmpName, bool revertMore);
 bool VerityInfoWrite(const ModuleFile &file);
-void MountModuleUpdateDir(void);
 bool PrepareFileToDestDir(const std::string &pkgPath, const std::string &outPath);
 void SetModuleVersion(const ModuleFile &file);
 #ifdef __cplusplus
