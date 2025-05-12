@@ -108,7 +108,7 @@ int32_t SysInstallerKitsImpl::Init()
     }
     (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0777); // 0777 : rwxrwxrwx
     InitUpdaterLogger("SysInstallerClient", SYS_LOG_FILE, SYS_STAGE_FILE, SYS_ERROR_FILE);
-    mode_t mode = 0664; // 0777 : -rw-rw-r--
+    mode_t mode = 0664; // 0664 : -rw-rw-r--
     (void)chown(SYS_LOG_FILE, USER_ROOT_AUTHORITY, GROUP_ROOT_AUTHORITY);
     (void)chown(SYS_STAGE_FILE, USER_ROOT_AUTHORITY, GROUP_ROOT_AUTHORITY);
     (void)chown(SYS_ERROR_FILE, USER_ROOT_AUTHORITY, GROUP_ROOT_AUTHORITY);
