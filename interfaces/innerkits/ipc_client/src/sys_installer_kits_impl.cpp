@@ -37,7 +37,6 @@ namespace SysInstaller {
 using namespace Updater;
 using namespace Updater::Utils;
 using namespace Utils;
-constexpr int GROUP_UPDATE_AUTHORITY = 6666;
 constexpr int LOAD_SA_TIMEOUT_MS = 3;
 
 SysInstallerKitsImpl &SysInstallerKitsImpl::GetInstance()
