@@ -51,6 +51,9 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     SysInstallerKitsImpl::GetInstance().StartVabMerge(taskId);
     SysInstallerKitsImpl::GetInstance().EnableVabCheckpoint();
     SysInstallerKitsImpl::GetInstance().AbortVabActiveSnapshot();
+    const std::string action = "needMerge";
+    bool result = false;
+    SysInstallerKitsImpl::GetInstance().GetMetadataResult(action, result);
 }
 }
 

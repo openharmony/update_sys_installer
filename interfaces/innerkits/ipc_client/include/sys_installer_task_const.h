@@ -26,6 +26,10 @@ struct ResultTypeConst {
     static constexpr const char *RESULT_TYPE_INSTALL = "install";
 };
 
+struct MetadataActionConst {
+    static constexpr const char *NEED_MERGE = "needMerge";
+    static constexpr const char *ACTIVE_ROLL_BACK = "activeRollBack";
+};
 } // namespace SysInstaller
 } // namespace OHOS
 #endif // SYS_INSTALLER_TASK_CONST_H

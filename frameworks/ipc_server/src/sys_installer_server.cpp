@@ -200,6 +200,12 @@ int32_t SysInstallerServer::VabUpdateActive()
     return SysInstallerManager::GetInstance().VabUpdateActive();
 }
 
+int32_t SysInstallerServer::GetMetadataResult(const std::string &action, bool &result)
+{
+    LOG(INFO) << "GetMetadataResult";
+    return SysInstallerManager::GetInstance().GetMetadataResult(action, result);
+}
+
 void SysInstallerServer::OnStart()
 {
     LOG(INFO) << "OnStart";
