@@ -215,5 +215,14 @@ int32_t SysInstallerManager::VabUpdateActive()
     }
     return helper_->VabUpdateActive();
 }
+
+int32_t SysInstallerManager::GetMetadataResult(const std::string &action, bool &result)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->GetMetadataResult(action, result);
+}
 } // namespace SysInstaller
 } // namespace OHOS

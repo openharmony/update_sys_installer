@@ -64,6 +64,7 @@ public:
         const std::string &resultType, std::string &updateResult) override;
     int32_t GetMetadataUpdateStatus(int32_t &metadataStatus) override;
     int32_t VabUpdateActive() override;
+    int32_t GetMetadataResult(const std::string &action, bool &result) override;
 
 #ifndef UPDATER_UT
 private:
