@@ -242,22 +242,6 @@ std::vector<HmpUpdateInfo> ModuleUpdateKitsImpl::GetHmpUpdateResult()
     return updateInfo;
 }
 
-int32_t SysInstallerKitsImpl::ExitSysInstaller()
-{
-    LOG(INFO) << "ExitSysInstaller";
-    auto updateService = GetService();
-    if (updateService == nullptr) {
-        LOG(ERROR) << "Get updateService failed";
-        return -1;
-    }
-    int32_t ret = updateService->ExitSysInstaller();
-    LOG(INFO) << "ExitSysInstaller ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#endif
-    return ret;
-}
-
 void ModuleUpdateKitsImpl::LoadServiceSuccess()
 {
     serviceCv_.notify_all();
