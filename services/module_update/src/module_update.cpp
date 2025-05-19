@@ -251,9 +251,6 @@ void ModuleUpdate::CheckModuleUpdate()
             LOG(ERROR) << "Failed to remove " << UPDATE_INSTALL_DIR << " err=" << errno;
         }
     };
-    if (!hmpNameSet.empty()) {
-        MountModuleUpdateDir();
-    }
     for (auto &hmpName : hmpNameSet) {
         instance.AddTask(hmpName);
     }

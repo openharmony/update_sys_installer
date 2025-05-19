@@ -223,17 +223,6 @@ std::string GetRealPath(const std::string &filePath)
     return realPath;
 }
 
-__attribute__((weak)) void MountModuleUpdateDir(void)
-{
-    LOG(INFO) << "mount /module_update.";
-    if (mount("tmpfs", "/module_update", "tmpfs", MS_NOEXEC | MS_NODEV | MS_NOSUID, "mode=0755") != 0) {
-        LOG(ERROR) << "mount module_Update tmpfs fail, " << strerror(errno);
-    }
-    if (mount(nullptr, "/module_update", nullptr, MS_SHARED, nullptr) != 0) {
-        LOG(ERROR) << "mount module_Update shared fail, " << strerror(errno);
-    }
-}
-
 __attribute__((weak)) bool RevertImageCert(const std::string &hmpName, bool revertMore)
 {
     LOG(INFO) << "Revert image cert, default is true";
