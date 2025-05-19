@@ -20,8 +20,8 @@ interface OHOS.SysInstaller.ISysInstaller {
     void StartStreamUpdate();
     void StopStreamUpdate();
     void ProcessStreamData([in] List<unsigned char> buffer, [in] unsigned int size);
-    [oneway] void SetUpdateCallback([in] String taskId, [in] ISysInstallerCallback updateCallback);
-    [oneway] void GetUpdateStatus([in] String taskId);
+    void SetUpdateCallback([in] String taskId, [in] ISysInstallerCallback updateCallback);
+    void GetUpdateStatus([in] String taskId);
     void StartUpdateParaZip([in] String taskId, [in] String pkgPath, [in] String location, [in] String cfgDir);
     void StartDeleteParaZip([in] String taskId, [in] String location, [in] String cfgDir);
     void AccDecompressAndVerifyPkg([in] String taskId, [in] String srcPath, [in] String dstPath, [in] unsigned int type);
@@ -30,8 +30,8 @@ interface OHOS.SysInstaller.ISysInstaller {
     [oneway] void StartUpdateVabPackageZip([in] String taskId, [in] List<String> pkgPath);
     [oneway] void StartVabMerge([in] String taskId);
     [oneway] void EnableVabCheckpoint();
-    [oneway] void AbortVabActiveSnapshot();
-    [oneway] void ClearVabMetadataAndCow();
+    void AbortVabActiveSnapshot();
+    void ClearVabMetadataAndCow();
     void MergeRollbackReasonFile();
     void GetMetadataUpdateStatus([out] int metadataStatus);
     void VabUpdateActive();
