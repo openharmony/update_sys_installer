@@ -39,7 +39,6 @@ public:
     int32_t StartUpdateHmpPackage(const std::string &path,
         sptr<ISysInstallerCallbackFunc> callback) final;
     std::vector<HmpUpdateInfo> GetHmpUpdateResult() final;
-    virtual int32_t ExitSysInstaller() final;
 
     void LoadServiceSuccess() final;
     void LoadServiceFail() final;
