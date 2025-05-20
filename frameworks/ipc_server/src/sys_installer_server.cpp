@@ -206,6 +206,20 @@ int32_t SysInstallerServer::GetMetadataResult(const std::string &action, bool &r
     return SysInstallerManager::GetInstance().GetMetadataResult(action, result);
 }
 
+int32_t SysInstallerServer::ExitSysInstaller()
+{
+    LOG(INFO) << "ExitSysInstaller";
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sm == nullptr) {
+        LOG(ERROR) << "GetSystemAbilityManager samgr object null!";
+        return 0;
+    }
+    if (sm->UnloadSystemAbility(SYS_INSTALLER_DISTRIBUTED_SERVICE_ID) != 0) {
+        LOG(ERROR) << "UnloadSystemAbility error!";
+    }
+    return 0;
+}
+
 void SysInstallerServer::OnStart()
 {
     LOG(INFO) << "OnStart";

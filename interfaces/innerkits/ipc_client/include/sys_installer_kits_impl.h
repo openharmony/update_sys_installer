@@ -56,6 +56,7 @@ public:
     virtual int32_t GetMetadataResult(const std::string &action, bool &result);
     virtual void ResetService(const wptr<IRemoteObject> &remote);
     sptr<ISysInstaller> GetService();
+    virtual int32_t ExitSysInstaller();
 
     void LoadServiceSuccess();
     void LoadServiceFail();

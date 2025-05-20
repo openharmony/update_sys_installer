@@ -33,7 +33,8 @@ enum SysInstallerInterfaceCode {
     DELETE_PARA_PACKAGE,
     DECOMPRESS_ACC_PACKAGE,
     DELETE_ACC_PACKAGE,
-    DELETE_UPDATE_RESULT
+    DELETE_UPDATE_RESULT,
+    EXIT_SYS_INSTALLER
 };
 
 class ProcessCallback : public ISysInstallerCallbackFunc {
@@ -97,6 +98,9 @@ int main(int argc, char **argv)
             break;
         case SysInstallerInterfaceCode::DELETE_UPDATE_RESULT:
             updateResult = SysInstallerKitsImpl::GetInstance().GetUpdateResult(taskId, "taskType", "resultType");
+            break;
+        case SysInstallerInterfaceCode::EXIT_SYS_INSTALLER:
+            updateResult = SysInstallerKitsImpl::GetInstance().ExitSysInstaller();
             break;
         default:
             break;
