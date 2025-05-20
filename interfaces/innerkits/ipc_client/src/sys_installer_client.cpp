@@ -61,10 +61,9 @@ int main(int argc, char **argv)
     }
 
     std::string taskId = argv[2];
-    printf("taskId %s\n", taskId.c_str());
 
     int32_t ret = SysInstallerKitsImpl::GetInstance().SysInstallerInit(taskId);
-    printf("SysInstallerInit ret:%d\n", ret);
+    printf("SysInstallerInit ret:%d taskId %s\n", ret, taskId.c_str());
 
     sptr<ISysInstallerCallbackFunc> callback = new ProcessCallback;
     if (callback == nullptr) {
