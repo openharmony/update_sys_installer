@@ -502,6 +502,18 @@ std::string SysInstallerKitsImpl::GetUpdateResult(const std::string &taskId, con
 int32_t SysInstallerKitsImpl::ExitSysInstaller()
 {
     LOG(INFO) << "ExitSysInstaller";
+    sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOG(ERROR) << "Get samgr failed";
+        return -1;
+    }
+    bool isExist = false;
+    sptr<IRemoteObject> object = samgr->CheckSystemAbility(SYS_INSTALLER_DISTRIBUTED_SERVICE_ID, isExist);
+    if (!isExist) {
+        LOG(ERROR) << "sys_installer not exist";
+        return 0;
+    }
+
     auto updateService = GetService();
     if (updateService == nullptr) {
         LOG(ERROR) << "Get updateService failed";
