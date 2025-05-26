@@ -53,6 +53,7 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
     if ((pkgPath.find(PATCH_PACKAGE_NAME) != std::string::npos) &&
         (SetUpdateSlotParam(upParams, true) != UPDATE_SUCCESS)) {
         LOG(ERROR) << "set slot param failed";
+        Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
         return UPDATE_ERROR;
     }
     UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, upParams, HOTA_UPDATE);
