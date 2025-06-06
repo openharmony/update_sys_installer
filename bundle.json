@@ -37,7 +37,8 @@
         "curl",
         "lz4",
         "openssl",
-        "zlib"
+        "zlib",
+        "bzip2"
       ],
       "third_party": []
     },

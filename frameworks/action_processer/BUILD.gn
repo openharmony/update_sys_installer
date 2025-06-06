@@ -40,5 +40,6 @@ ohos_static_library("libactionprocesser") {
     "ipc:ipc_core",
     "updater:libupdaterlog",
   ]
+  subsystem_name = "updater"
   part_name = "sys_installer"
 }
