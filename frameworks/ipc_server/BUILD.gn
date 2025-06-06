@@ -62,6 +62,7 @@ sys_installer_gen("sys_installer") {
     "updater:libutils",
     "updater:libapplypatch",
     "updater:libpatch",
+    "updater:libwritestate",
     "openssl:libcrypto_static",
     "updater:libupdaterpackage_shared",
     "selinux_adapter:librestorecon",
