@@ -61,7 +61,7 @@ ohos_shared_library("module_update_utils") {
     "updater:libupdaterpackage_shared",
     "updater:libutils",
     "updater:libfsmanager",
-    "init:libfsmanager_static",
+    "init:libfsmanager_static_real",
     "selinux_adapter:librestorecon"
   ]
 
