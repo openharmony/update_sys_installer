@@ -73,7 +73,7 @@ bool ActionProcesser::Stop()
         ret = curAction_->TerminateAction();
     }
     if (!ret) {
-        LOG(INFO) << "Stop " << curAction_->GetActionName() << " failed, directly returned";
+        LOG(INFO) << "Stop action failed, directly returned";
         return false;
     }
     isRunning_ = false;
