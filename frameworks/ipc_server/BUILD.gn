@@ -48,7 +48,6 @@ sys_installer_gen("sys_installer") {
     "c_utils:utils",
     "hilog:libhilog",
     "init:libbegetutil",
-    "init:libfsmanager",
     "ipc:ipc_core",
     "ipc:ipc_single",
     "lz4:liblz4_static",
