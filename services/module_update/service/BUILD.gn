@@ -17,6 +17,8 @@ import("//build/ohos.gni")
 sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
 module_update_service_gen("module_update_service") {
   deps = [ "${sys_installer_path}/services/module_update/service:libmodule_update_service_static" ]
+  
+  external_deps = [ "init:libbegetutil" ]
 
   part_name = "sys_installer"
   subsystem_name = "updater"

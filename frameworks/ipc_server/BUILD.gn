@@ -55,10 +55,22 @@ sys_installer_gen("sys_installer") {
     "samgr:samgr_proxy",
     "updater:libfsmanager",
     "updater:libmiscinfo",
+    "updater:libslotinfo",
     "updater:libupdaterlog",
     "updater:libupdaterpackage",
     "updater:libutils",
+    "updater:libapplypatch",
+    "updater:libpatch",
+    "updater:libwritestate",
+    "openssl:libcrypto_static",
+    "updater:libupdaterpackage_shared",
+    "selinux_adapter:librestorecon",
+    "bzip2:libbz2",
+    "zlib:libz"
   ]
+  if (!is_linux && !is_mingw && !is_mac) {
+    external_deps += [ "hilog:libhilog_base" ]
+  }
 
   if (defined(sys_installer_custom_external_deps)) {
     external_deps += sys_installer_custom_external_deps
