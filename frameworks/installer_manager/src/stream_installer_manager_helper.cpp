@@ -70,7 +70,7 @@ int32_t StreamInstallerManagerHelper::StopStreamUpdate()
     return 0;
 }
 
-int32_t StreamInstallerManagerHelper::ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size)
+int32_t StreamInstallerManagerHelper::ProcessStreamData(const uint8_t *buffer, uint32_t size)
 {
     return StreamInstallProcesser::GetInstance().ProcessStreamData(buffer, size);
 }

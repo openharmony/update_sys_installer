@@ -23,6 +23,8 @@
 #include "updater/updater_const.h"
 #include "utils.h"
 #include <thread>
+#include "updater/updater.h"
+#include "slot_info/slot_info.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -139,7 +141,13 @@ void StreamInstallProcesser::ThreadExecuteFunc()
 
 bool StreamInstallProcesser::ProcessHeader()
 {
+    LOG(INFO) << "enter StreamInstallProcesser::ProcessHeader";
     if (headerProcessed_) {
+        // 设置参数，用于ab流式升级
+        if(SetUpdateSuffixParam() != UPDATE_SUCCESS) {
+            LOG(ERROR) << "SetUpdateSuffixParam failed";
+            return false;
+        }
         return true;
     }
 
@@ -148,6 +156,7 @@ bool StreamInstallProcesser::ProcessHeader()
     }
     
     const uint16_t type = ReadLE16(partialData_.data(), partialData_.size());
+    LOG(INFO) << "type = " << type;
     if (type != ZIP_HEADER_TLV_TYPE) {
         headerProcessed_ = true;
         LOG(ERROR) << "No match type: " << type;
@@ -200,6 +209,8 @@ bool StreamInstallProcesser::ProcessValidData()
     } else if (retUpdate == STREAM_UPDATE_COMPLETE) {
         LOG(INFO) << "StreamInstallProcesser ThreadExecuteFunc STREAM_UPDATE_COMPLETE";
         UpdateResult(UpdateStatus::UPDATE_STATE_SUCCESSFUL, dealLen, "");
+        // 流式OTA成功后，切换分区
+        SetActiveSlot();
         isExitThread_ = true;
     }
     return isExitThread_;
@@ -225,7 +236,6 @@ void StreamInstallProcesser::ProcessPartialData()
     }
 }
 
-
 void StreamInstallProcesser::ThreadExitProc()
 {
     LOG(INFO) << "StreamInstallProcesser ThreadExitProc enter";
@@ -235,10 +245,10 @@ void StreamInstallProcesser::ThreadExitProc()
     ringBuffer_.Reset();
 }
 
-int32_t StreamInstallProcesser::ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size)
+int32_t StreamInstallProcesser::ProcessStreamData(const uint8_t *buffer, uint32_t size)
 {
     uint8_t tmpBuff[BUFFER_SIZE]{0};
-    errno_t ret = memcpy_s(tmpBuff, BUFFER_SIZE, buffer.data(), buffer.size());
+    errno_t ret = memcpy_s(tmpBuff, BUFFER_SIZE, buffer, size);
     if (ret != 0) {
         LOG(ERROR) << "ProcessStreamData memcpy_s failed: " << ret;
         return -1;

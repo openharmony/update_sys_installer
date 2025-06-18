@@ -31,6 +31,7 @@
 #include "sys_installer_common.h"
 #include "sys_installer_load_callback.h"
 #include "sys_installer_proxy.h"
+#include "buffer_info_parcel.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -192,16 +193,18 @@ int32_t SysInstallerKitsImpl::StopStreamUpdate()
     return ret;
 }
 
-int32_t SysInstallerKitsImpl::ProcessStreamData(uint8_t *buffer, uint32_t size)
+int32_t SysInstallerKitsImpl::ProcessStreamData(const uint8_t *buffer, uint32_t size)
 {
     LOG(INFO) << "ProcessStreamData";
     auto updateService = GetService();
+    BufferInfoParcel bufferParcel;
     if (updateService == nullptr) {
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    std::vector<uint8_t> vecBuffer(buffer, buffer + size);
-    int32_t ret = updateService->ProcessStreamData(vecBuffer, size);
+    bufferParcel.bufferInfo.buffer = buffer;
+    bufferParcel.bufferInfo.size = size;
+    int32_t ret = updateService->ProcessStreamData(bufferParcel);
     LOG(INFO) << "ProcessStreamData ret:" << ret;
     return ret;
 }

@@ -12,14 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+package OHOS.SysInstaller;
+sequenceable OHOS.SysInstaller.BufferInfoParcel;
 import ISysInstallerCallback;
 interface OHOS.SysInstaller.ISysInstaller {
     void SysInstallerInit([in] String taskId, [in] boolean bStreamUpgrade);
     [oneway] void StartUpdatePackageZip([in] String taskId, [in] String pkgPath);
     void StartStreamUpdate();
     void StopStreamUpdate();
-    void ProcessStreamData([in] List<unsigned char> buffer, [in] unsigned int size);
+    void ProcessStreamData([in] BufferInfoParcel bufferParcel);
     void SetUpdateCallback([in] String taskId, [in] ISysInstallerCallback updateCallback);
     void GetUpdateStatus([in] String taskId);
     void StartUpdateParaZip([in] String taskId, [in] String pkgPath, [in] String location, [in] String cfgDir);

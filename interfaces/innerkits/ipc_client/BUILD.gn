@@ -30,7 +30,10 @@ config("libsysinstallerkits_exported_headers") {
 }
 
 config("idl_file_headers") {
-  include_dirs = [ "${target_gen_dir}" ]
+  include_dirs = [
+    "${target_gen_dir}",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/include", 
+  ]
 }
 
 idl_gen_interface("sysinstaller_interface") {
@@ -50,7 +53,10 @@ ohos_source_set("sys_installer_stub") {
     "${target_gen_dir}/sys_installer_stub.cpp",
   ]
 
-  include_dirs = [ "${target_gen_dir}" ]
+  include_dirs = [
+      "${target_gen_dir}",
+      "${sys_installer_path}/interfaces/innerkits/ipc_client/include", 
+  ]
 
   deps = [ ":sysinstaller_interface" ]
 
@@ -67,7 +73,10 @@ ohos_source_set("sys_installer_stub") {
 ohos_source_set("module_update_stub") {
   sources = [ "${target_gen_dir}/sys_installer_callback_proxy.cpp" ]
 
-  include_dirs = [ "${target_gen_dir}" ]
+  include_dirs = [
+    "${target_gen_dir}",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/include", 
+  ]
 
   deps = [ ":sysinstaller_interface" ]
 
@@ -89,6 +98,7 @@ ohos_shared_library("libsysinstaller_shared") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_load_callback.cpp",
     "${target_gen_dir}/sys_installer_callback_stub.cpp",
     "${target_gen_dir}/sys_installer_proxy.cpp",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/buffer_info_parcel.cpp",
   ]
 
   include_dirs = [
@@ -139,6 +149,7 @@ ohos_static_library("libsysinstallerkits") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_load_callback.cpp",
     "${target_gen_dir}/sys_installer_callback_stub.cpp",
     "${target_gen_dir}/sys_installer_proxy.cpp",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/buffer_info_parcel.cpp",
   ]
 
   include_dirs = [
@@ -280,6 +291,7 @@ ohos_shared_library("libmodule_update_shared") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_callback.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
     "${target_gen_dir}/sys_installer_callback_stub.cpp",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client/src/buffer_info_parcel.cpp",
   ]
 
   include_dirs = [ "${sys_installer_path}/common/include" ]

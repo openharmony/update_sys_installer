@@ -63,7 +63,7 @@ int32_t StreamInstallerManager::StopStreamUpdate()
     return helper_->StopStreamUpdate();
 }
 
-int32_t StreamInstallerManager::ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size)
+int32_t StreamInstallerManager::ProcessStreamData(const uint8_t *buffer, uint32_t size)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
