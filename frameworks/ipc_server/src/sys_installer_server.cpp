@@ -82,7 +82,7 @@ int32_t SysInstallerServer::StopStreamUpdate()
 int32_t SysInstallerServer::ProcessStreamData(const BufferInfoParcel &bufferParcel)
 {
     LOG(INFO) << "ProcessStreamData";
-    return StreamInstallerManager::GetInstance().ProcessStreamData(bufferParcel.bufferInfo.buffer, 
+    return StreamInstallerManager::GetInstance().ProcessStreamData(bufferParcel.bufferInfo.buffer,
         bufferParcel.bufferInfo.size);
 }
 
