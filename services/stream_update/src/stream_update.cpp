@@ -144,7 +144,7 @@ bool StreamInstallProcesser::ProcessHeader()
     LOG(INFO) << "enter StreamInstallProcesser::ProcessHeader";
     if (headerProcessed_) {
         // 设置参数，用于ab流式升级
-        if(SetUpdateSuffixParam() != UPDATE_SUCCESS) {
+        if (SetUpdateSuffixParam() != UPDATE_SUCCESS) {
             LOG(ERROR) << "SetUpdateSuffixParam failed";
             return false;
         }

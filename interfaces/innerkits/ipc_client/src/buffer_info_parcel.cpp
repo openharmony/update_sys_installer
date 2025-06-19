@@ -19,8 +19,12 @@ namespace OHOS {
 namespace SysInstaller {
 bool BufferInfoParcel::Marshalling(Parcel &out) const
 {
-    RETURN_IF_FALSE(out.WriteUint32(bufferInfo.size));
-    RETURN_IF_FALSE(out.WriteBuffer(bufferInfo.buffer, bufferInfo.size));
+    if (!(out.WriteUint32(bufferInfo.size))) {
+        return false;
+    }
+    if (!(out.WriteBuffer(bufferInfo.buffer, bufferInfo.size))) {
+        return false;
+    }
     return true;
 }
 

@@ -19,18 +19,6 @@
 
 namespace OHOS {
 namespace SysInstaller {
-#define RETURN_IF_FALSE(expr) \
-    if (!(expr)) { \
-        return false; \
-    }
-
-#define RELEASE_IF_FALSE(expr, obj) \
-    if (!(expr)) { \
-        delete (obj); \
-        (obj) = nullptr; \
-        return (obj); \
-    }
-
 struct BufferInfo final {
 public:
     const uint8_t *buffer;
