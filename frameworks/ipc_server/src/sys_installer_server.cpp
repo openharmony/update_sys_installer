@@ -20,6 +20,7 @@
 #include "securec.h"
 #include "system_ability_definition.h"
 #include "utils.h"
+#include "buffer_info_parcel.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -78,10 +79,11 @@ int32_t SysInstallerServer::StopStreamUpdate()
     return StreamInstallerManager::GetInstance().StopStreamUpdate();
 }
 
-int32_t SysInstallerServer::ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size)
+int32_t SysInstallerServer::ProcessStreamData(const BufferInfoParcel &bufferParcel)
 {
     LOG(INFO) << "ProcessStreamData";
-    return StreamInstallerManager::GetInstance().ProcessStreamData(buffer, size);
+    return StreamInstallerManager::GetInstance().ProcessStreamData(bufferParcel.bufferInfo.buffer,
+        bufferParcel.bufferInfo.size);
 }
 
 int32_t SysInstallerServer::SetUpdateCallback(const std::string &taskId,

@@ -55,6 +55,7 @@ ohos_static_library("libinstallermanager") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client:sysinstaller_interface",
     "${sys_installer_path}/services/ab_update:libabupdate",
     "${sys_installer_path}/services/stream_update:libstreamupdate",
+    "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstaller_shared",
   ]
 
   public_configs = [

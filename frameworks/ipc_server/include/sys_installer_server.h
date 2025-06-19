@@ -42,7 +42,7 @@ public:
     int32_t StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath) override;
     int32_t StartStreamUpdate() override;
     int32_t StopStreamUpdate() override;
-    int32_t ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size) override;
+    int32_t ProcessStreamData(const BufferInfoParcel &bufferParcel) override;
     int32_t SetUpdateCallback(const std::string &taskId, const sptr<ISysInstallerCallback> &updateCallback) override;
     int32_t GetUpdateStatus(const std::string &taskId) override;
     int32_t StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,

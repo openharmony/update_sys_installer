@@ -45,8 +45,8 @@ HWTEST_F(StreamInstallProcesserTest, ProcessStreamDataSuccess, TestSize.Level1)
 {
     EXPECT_EQ(StreamInstallProcesser::GetInstance().Start(), 0);
 
-    std::vector<uint8_t> data(1024, 0);
-    std::fill_n(data.begin(), data.size(), 0x55);
+    uint8_t data[1024] = {0};
+    std::fill_n(data, sizeof(data), 0x55);
 
     EXPECT_EQ(StreamInstallProcesser::GetInstance().ProcessStreamData(data, sizeof(data)), 0);
     StreamInstallProcesser::GetInstance().Stop();

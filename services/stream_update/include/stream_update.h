@@ -37,7 +37,7 @@ public:
     bool IsRunning();
     int32_t Start();
     void Stop();
-    int32_t ProcessStreamData(const std::vector<uint8_t>& buffer, uint32_t size);
+    int32_t ProcessStreamData(const uint8_t *buffer, uint32_t size);
     void UpdateResult(UpdateStatus updateStatus, int dealLen, const std::string &resultMsg);
 
 private:
