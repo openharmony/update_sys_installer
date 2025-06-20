@@ -144,6 +144,9 @@
                "//base/update/sys_installer/services/module_update/utils/include"
             ]
           }
+        },
+        {
+          "name": "//base/update/sys_installer/tools/zipalign:zipalign_build"
         }
       ],
       "test": [
