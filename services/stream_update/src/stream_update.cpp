@@ -211,6 +211,8 @@ bool StreamInstallProcesser::ProcessValidData()
         UpdateResult(UpdateStatus::UPDATE_STATE_SUCCESSFUL, dealLen, "");
         // 流式OTA成功后，切换分区
         SetActiveSlot();
+        // 流式OTA成功后，设置异常回滚检查
+        SetOTACheckpoint(1);
         isExitThread_ = true;
     }
     return isExitThread_;
