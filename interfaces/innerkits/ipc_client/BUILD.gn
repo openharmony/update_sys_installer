@@ -128,7 +128,7 @@ ohos_shared_library("libsysinstaller_shared") {
     "zlib:shared_libz",
   ]
 
-  if (ohos_indep_compiler_enable) {
+  if (!is_linux && !is_mingw && !is_mac && ohos_indep_compiler_enable) {
     external_deps += [ "hilog:libhilog_base", ]
   }
 
@@ -313,7 +313,7 @@ ohos_shared_library("libmodule_update_shared") {
     "zlib:shared_libz",
   ]
 
-  if (ohos_indep_compiler_enable) {
+  if (!is_linux && !is_mingw && !is_mac && ohos_indep_compiler_enable) {
     external_deps += [ "hilog:libhilog_base", ]
   }
 
