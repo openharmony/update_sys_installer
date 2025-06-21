@@ -29,8 +29,10 @@ check_module_update_gen("check_module_update") {
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "updater:libupdaterlog_shared",
-    "init:libbegetutil"
   ]
+  if (ohos_indep_compiler_enable) {
+    external_deps += [ "init:libbegetutil", ]
+  }
 
   part_name = "sys_installer"
   subsystem_name = "updater"
