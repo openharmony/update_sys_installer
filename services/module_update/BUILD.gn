@@ -61,8 +61,13 @@ ohos_shared_library("module_update_utils") {
     "updater:libupdaterpackage_shared",
     "updater:libutils",
     "updater:libfsmanager",
-    "selinux_adapter:librestorecon"
+    "selinux_adapter:librestorecon",
   ]
+  if (ohos_indep_compiler_enable) {
+    external_deps += [
+      "init:libfsmanager_static",
+    ]
+  }
 
   if (defined(global_parts_info.startup_hvb)) {
     sources += [
