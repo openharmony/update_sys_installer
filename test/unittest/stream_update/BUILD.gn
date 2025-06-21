@@ -63,7 +63,22 @@ ohos_unittest("stream_update_unittest") {
     "updater:libupdater",
     "updater:libutils",
   ]
-
+  if (ohos_indep_compiler_enable) {
+    external_deps += [
+      "init:libbegetutil",
+      "selinux_adapter:librestorecon",
+      "init:libfsmanager_static",
+      "updater:libfsmanager",
+      "updater:libapplypatch",
+      "updater:libpatch",
+      "updater:libwritestate",
+      "updater:libupdaterpackage_shared",
+      "bzip2:libbz2",
+      "zlib:libz",
+      "updater:libslotinfo",
+      "drivers_peripheral_partitionslot:libpartition_slot_manager",
+    ]
+  }
   cflags_cc = [ "-fexceptions" ]
 
   defines = [

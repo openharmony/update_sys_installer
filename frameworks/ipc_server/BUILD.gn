@@ -67,8 +67,14 @@ sys_installer_gen("sys_installer") {
     "updater:libupdaterpackage_shared",
     "selinux_adapter:librestorecon",
     "bzip2:libbz2",
-    "zlib:libz"
+    "zlib:libz",
   ]
+  if (ohos_indep_compiler_enable) {
+    external_deps += [
+      "init:libfsmanager_static",
+      "drivers_peripheral_partitionslot:libpartition_slot_manager",
+    ]
+  }
   if (!is_linux && !is_mingw && !is_mac) {
     external_deps += [ "hilog:libhilog_base" ]
   }
