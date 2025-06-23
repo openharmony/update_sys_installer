@@ -143,11 +143,6 @@ bool StreamInstallProcesser::ProcessHeader()
 {
     LOG(INFO) << "enter StreamInstallProcesser::ProcessHeader";
     if (headerProcessed_) {
-        // 设置参数，用于ab流式升级
-        if (SetUpdateSuffixParam() != UPDATE_SUCCESS) {
-            LOG(ERROR) << "SetUpdateSuffixParam failed";
-            return false;
-        }
         return true;
     }
 
@@ -167,7 +162,11 @@ bool StreamInstallProcesser::ProcessHeader()
     skipRemaining_ = length;
     partialData_.erase(partialData_.begin(), partialData_.begin() + TOTAL_TL_BYTES);
     headerProcessed_ = true;
-
+    // 处理头部数据的时候设置参数，用于ab流式升级
+    if (SetUpdateSuffixParam() != UPDATE_SUCCESS) {
+        LOG(ERROR) << "SetUpdateSuffixParam failed";
+        return false;
+    }
     return true;
 }
 
