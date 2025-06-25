@@ -48,18 +48,12 @@ private:
 
 private:
     Updater::RingBuffer ringBuffer_;
+    
     std::shared_ptr<StreamStatusManager> statusManager_ {};
     std::shared_ptr<Updater::BinChunkUpdate> binChunkUpdate_ {};
     std::atomic<bool> isExitThread_ = false;
     std::thread *pComsumeThread_ { nullptr };
     bool isRunning_ = false;
-    bool headerProcessed_ = false;
-    uint32_t skipRemaining_ = 0;
-    std::vector<uint8_t> partialData_;
-    void ProcessPartialData();
-    bool ProcessHeader();
-    bool SkipTargetData();
-    bool ProcessValidData();
 };
 } // SysInstaller
 } // namespace OHOS
