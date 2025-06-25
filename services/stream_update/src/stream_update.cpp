@@ -113,6 +113,8 @@ void StreamInstallProcesser::ThreadExecuteFunc()
         } else if (STREAM_UPDATE_COMPLETE == ret) {
             LOG(INFO) << "StreamInstallProcesser ThreadExecuteFunc STREM_UPDATE_COMPLETE";
             UpdateResult(UpdateStatus::UPDATE_STATE_SUCCESSFUL, dealLen, "");
+            // 升级完成，切换分区
+            SetActiveSlot();
             break;
         }
     }
