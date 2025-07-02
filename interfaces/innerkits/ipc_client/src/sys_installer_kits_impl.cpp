@@ -256,8 +256,9 @@ int32_t SysInstallerKitsImpl::StartUpdateParaZip(const std::string &taskId, cons
     LOG(INFO) << "StartUpdateParaZip ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::StartDeleteParaZip(const std::string &taskId, const std::string &location,
@@ -273,8 +274,9 @@ int32_t SysInstallerKitsImpl::StartDeleteParaZip(const std::string &taskId, cons
     LOG(INFO) << "StartDeleteParaZip ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::AccDecompressAndVerifyPkg(const std::string &taskId, const std::string &srcPath,
@@ -290,8 +292,9 @@ int32_t SysInstallerKitsImpl::AccDecompressAndVerifyPkg(const std::string &taskI
     LOG(INFO) << "AccDecompressAndVerifyPkg ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::AccDeleteDir(const std::string &taskId, const std::string &dstPath)
@@ -306,8 +309,9 @@ int32_t SysInstallerKitsImpl::AccDeleteDir(const std::string &taskId, const std:
     LOG(INFO) << "AccDeleteDir ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::CancelUpdateVabPackageZip(const std::string &taskId)
@@ -336,8 +340,9 @@ int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::string &taskId
     LOG(INFO) << "StartUpdateVabPackageZip ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo)
@@ -352,8 +357,9 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::unordered_map<s
     LOG(INFO) << "CreateVabSnapshotCowImg ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::StartVabMerge(const std::string &taskId)
@@ -368,8 +374,9 @@ int32_t SysInstallerKitsImpl::StartVabMerge(const std::string &taskId)
     LOG(INFO) << "StartVabMerge ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::EnableVabCheckpoint()
@@ -384,8 +391,9 @@ int32_t SysInstallerKitsImpl::EnableVabCheckpoint()
     LOG(INFO) << "EnableVabCheckpoint ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::AbortVabActiveSnapshot()
@@ -400,8 +408,9 @@ int32_t SysInstallerKitsImpl::AbortVabActiveSnapshot()
     LOG(INFO) << "AbortVabActiveSnapshot ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::ClearVabMetadataAndCow()
@@ -416,8 +425,9 @@ int32_t SysInstallerKitsImpl::ClearVabMetadataAndCow()
     LOG(INFO) << "ClearVabMetadataAndCow ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::MergeRollbackReasonFile()
@@ -432,10 +442,10 @@ int32_t SysInstallerKitsImpl::MergeRollbackReasonFile()
     LOG(INFO) << "MergeRollbackReasonFile ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
-
 
 int32_t SysInstallerKitsImpl::GetMetadataUpdateStatus(int32_t &metadataStatus)
 {
@@ -449,8 +459,9 @@ int32_t SysInstallerKitsImpl::GetMetadataUpdateStatus(int32_t &metadataStatus)
     LOG(INFO) << "GetMetadataUpdateStatus ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::VabUpdateActive()
@@ -465,8 +476,9 @@ int32_t SysInstallerKitsImpl::VabUpdateActive()
     LOG(INFO) << "VabUpdateActive ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::GetMetadataResult(const std::string &action, bool &result)
@@ -481,8 +493,9 @@ int32_t SysInstallerKitsImpl::GetMetadataResult(const std::string &action, bool 
     LOG(INFO) << "GetMetadataResult ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 std::string SysInstallerKitsImpl::GetUpdateResult(const std::string &taskId, const std::string &taskType,
@@ -526,8 +539,9 @@ int32_t SysInstallerKitsImpl::ExitSysInstaller()
     LOG(INFO) << "ExitSysInstaller ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::StartAbSync()
@@ -542,8 +556,9 @@ int32_t SysInstallerKitsImpl::StartAbSync()
     LOG(INFO) << "StartAbSync ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
-#endif
+#else
     return ret;
+#endif
 }
 
 void SysInstallerKitsImpl::LoadServiceSuccess()

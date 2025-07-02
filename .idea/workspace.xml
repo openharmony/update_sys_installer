@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="3064f7ef-1a11-414f-b920-7abe0751eecb" name="默认的" comment="">
+      <change beforePath="$PROJECT_DIR$/interfaces/innerkits/ipc_client/src/sys_installer_kits_impl.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/interfaces/innerkits/ipc_client/src/sys_installer_kits_impl.cpp" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="2zK5C9SuP4auwrHwL4oGjTHrM3D" />
+  <component name="ProjectViewState">
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3064f7ef-1a11-414f-b920-7abe0751eecb" name="默认的" comment="" />
+      <created>1751466795341</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1751466795341</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state width="254" height="198" key="ShowFilterAction_Filter_Popup" timestamp="1751466892741">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="254" height="198" key="ShowFilterAction_Filter_Popup/0.0.1920.1040@0.0.1920.1040" timestamp="1751466892741" />
+    <state x="994" y="232" width="672" height="678" key="search.everywhere.popup" timestamp="1751467087310">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="994" y="232" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1751467087310" />
+  </component>
+</project>
