@@ -66,6 +66,7 @@ public:
     int32_t VabUpdateActive() override;
     int32_t GetMetadataResult(const std::string &action, bool &result) override;
     int32_t ExitSysInstaller() override;
+    int32_t StartAbSync() override;
 
 #ifndef UPDATER_UT
 private:
