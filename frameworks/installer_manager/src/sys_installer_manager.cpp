@@ -224,5 +224,14 @@ int32_t SysInstallerManager::GetMetadataResult(const std::string &action, bool &
     }
     return helper_->GetMetadataResult(action, result);
 }
+
+int32_t SysInstallerManager::StartAbSync()
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->StartAbSync();
+}
 } // namespace SysInstaller
 } // namespace OHOS

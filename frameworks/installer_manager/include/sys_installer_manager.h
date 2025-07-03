@@ -52,6 +52,7 @@ public:
     virtual int32_t GetMetadataUpdateStatus(int32_t &metadataStatus);
     virtual int32_t VabUpdateActive();
     virtual int32_t GetMetadataResult(const std::string &action, bool &result);
+    virtual int32_t StartAbSync();
 
 protected:
     std::unique_ptr<SysInstallerManagerHelper> helper_ {};

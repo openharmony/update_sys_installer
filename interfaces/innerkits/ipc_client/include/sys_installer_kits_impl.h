@@ -57,6 +57,7 @@ public:
     virtual void ResetService(const wptr<IRemoteObject> &remote);
     sptr<ISysInstaller> GetService();
     virtual int32_t ExitSysInstaller();
+    virtual int32_t StartAbSync();
 
     void LoadServiceSuccess();
     void LoadServiceFail();

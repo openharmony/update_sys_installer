@@ -222,6 +222,12 @@ int32_t SysInstallerServer::ExitSysInstaller()
     return 0;
 }
 
+int32_t SysInstallerServer::StartAbSync()
+{
+    LOG(INFO) << "StartAbSync";
+    return SysInstallerManager::GetInstance().StartAbSync();
+}
+
 void SysInstallerServer::OnStart()
 {
     LOG(INFO) << "OnStart";
