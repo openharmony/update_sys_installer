@@ -76,15 +76,15 @@ static enum hvb_io_errno HvbReadFromPartition(
         return HVB_IO_ERROR_IO;
     }
 
-    std::string path = std::string(partition);
-    std::string realPath = GetRealPath(path);
+    std::string fpInfo = std::string(partition);
+    std::string realPath = GetRealPath(fpInfo);
     if (realPath.empty()) {
-        LOG(ERROR) << "invalid path " << path;
+        LOG(ERROR) << "invalid path " << fpInfo;
         return HVB_IO_ERROR_IO;
     }
     off_t realOffset = 0;
     size_t count = 0;
-    if (!ParseReadParam(path, offset, numBytes, realOffset, count)) {
+    if (!ParseReadParam(fpInfo, offset, numBytes, realOffset, count)) {
         return HVB_IO_ERROR_IO;
     }
 

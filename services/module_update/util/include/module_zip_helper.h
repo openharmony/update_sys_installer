@@ -34,7 +34,7 @@ public:
         return handle_ != nullptr;
     }
     bool GetNumberOfEntry(uint32_t &number);
-    bool LocateFile(const std::string &filename);
+    bool LocateFile(const std::string &fpInfo);
     bool GetFileSize(uint32_t &size);
     bool GetFileOffset(uint32_t &offset);
     bool GetFileContent(std::string &buf);

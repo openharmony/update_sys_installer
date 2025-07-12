@@ -35,7 +35,7 @@ public:
     std::unique_ptr<ModuleFile> GetModuleFile(const std::string &pathPrefix, const std::string &hmpName) const;
     bool IsPreInstalledModule(const ModuleFile &moduleFile) const;
     void Clear();
-    void SaveInstallerResult(const std::string &path, const std::string &hmpName,
+    void SaveInstallerResult(const std::string &fpInfo, const std::string &hmpName,
         int result, const std::string &resultInfo, const Timer &timer) const;
     const std::unordered_map<std::string, std::unordered_map<std::string, ModuleFile>> &GetModuleMap(void);
 private:

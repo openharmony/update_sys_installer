@@ -25,12 +25,12 @@
 
 namespace OHOS {
 namespace SysInstaller {
-bool CreateDirIfNeeded(const std::string &path, mode_t mode);
+bool CreateDirIfNeeded(const std::string &fpInfo, mode_t mode);
 bool CheckPathExists(const std::string &path);
 bool CheckFileSuffix(const std::string &file, const std::string &suffix);
 std::string GetFileName(const std::string &file);
 std::string GetHmpName(const std::string &filePath);
-bool WaitForFile(const std::string &path, const std::chrono::nanoseconds &timeout);
+bool WaitForFile(const std::string &fpInfo, const std::chrono::nanoseconds &timeout);
 bool StartsWith(const std::string &str, const std::string &prefix);
 bool ReadFullyAtOffset(int fd, uint8_t *data, size_t count, off_t offset);
 bool WriteFullyAtOffset(int fd, const uint8_t *data, size_t count, off_t offset);
@@ -41,10 +41,10 @@ void Revert(const std::string &hmpName, bool reboot);
 bool IsHotSa(int32_t saId);
 bool IsRunning(int32_t saId);
 bool CheckBootComplete(void);
-bool RemoveSpecifiedDir(const std::string &path, bool keepDir);
+bool RemoveSpecifiedDir(const std::string &fpInfo, bool keepDir);
 std::string GetDeviceSaSdkVersion(void);
 int GetDeviceApiVersion(void);
-std::string GetContentFromZip(const std::string &zipPath, const std::string &fileName);
+std::string GetContentFromZip(const std::string &zipPath, const std::string &fpInfo);
 bool CheckAndUpdateRevertResult(const std::string &hmpPath, const std::string &resultInfo, const std::string &keyWord);
 std::string GetCurrentHmpName(void);
 int32_t NotifyBmsRevert(const std::string &hmpName, bool record);

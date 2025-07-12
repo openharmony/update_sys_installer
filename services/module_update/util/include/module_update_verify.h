@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace SysInstaller {
 bool CheckPackInfoVer(const std::string &pkgPackInfoPath);
-void CleanErrDir(const std::string &path);
+void CleanErrDir(const std::string &fpInfo);
 bool IsIncrementPackage(const std::string &pkgPackInfoPath);
 bool RestorePackage(const std::string &dstFile, const std::string &sourceFile);
 bool ReadHashFromPackInfo(const std::string &pkgPackInfoPath, std::string &hashValue);

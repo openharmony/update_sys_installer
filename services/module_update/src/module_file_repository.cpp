@@ -60,21 +60,23 @@ void ModuleFileRepository::InitRepository(const string &hmpName, const Timer &ti
     LOG(INFO) << "InitRepository all timer:" << timer;
 }
 
-void ModuleFileRepository::SaveInstallerResult(const std::string &path, const std::string &hmpName,
+void ModuleFileRepository::SaveInstallerResult(const std::string &fpInfo, const std::string &hmpName,
     int result, const std::string &resultInfo, const Timer &timer) const
 {
-    if (path.find(UPDATE_INSTALL_DIR) == std::string::npos && path.find(UPDATE_ACTIVE_DIR) == std::string::npos) {
+    if (fpInfo.find(UPDATE_INSTALL_DIR) == std::string::npos &&
+        fpInfo.find(UPDATE_ACTIVE_DIR) == std::string::npos) {
         return;
     }
-    if (!CheckFileSuffix(path, MODULE_PACKAGE_SUFFIX) && !CheckFileSuffix(path, MODULE_IMAGE_SUFFIX)) {
-        LOG(WARNING) << "SaveInstallerResult path:" << path << "; break;";
+    if (!CheckFileSuffix(fpInfo, MODULE_PACKAGE_SUFFIX) &&
+        !CheckFileSuffix(fpInfo, MODULE_IMAGE_SUFFIX)) {
+        LOG(WARNING) << "SaveInstallerResult path:" << fpInfo << "; break;";
         return;
     }
     if (!CheckPathExists(MODULE_RESULT_PATH)) {
         LOG(ERROR) << MODULE_RESULT_PATH << " not exist";
         return;
     }
-    LOG(INFO) << "path:" << path << "hmp:" << hmpName << "result:" << result << "Info:" << resultInfo << "\n";
+    LOG(INFO) << "path:" << fpInfo << "hmp:" << hmpName << "result:" << result << "Info:" << resultInfo << "\n";
 
     UniqueFd fd(open(MODULE_RESULT_PATH, O_APPEND | O_RDWR | O_CLOEXEC));
     if (fd.Get() == -1) {

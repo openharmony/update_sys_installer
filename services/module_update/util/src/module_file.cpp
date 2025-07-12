@@ -81,16 +81,16 @@ const char *RetrieveFsType(int fd, uint32_t imageOffset)
     return nullptr;
 }
 
-bool ParseImageStat(const string &path, ImageStat &imageStat)
+bool ParseImageStat(const string &fpInfo, ImageStat &imageStat)
 {
-    string realPath = GetRealPath(path);
+    string realPath = GetRealPath(fpInfo);
     if (realPath.empty() || !Utils::IsFileExist(realPath)) {
-        LOG(ERROR) << "Invalid path " << path;
+        LOG(ERROR) << "Invalid path " << fpInfo;
         return false;
     }
     struct stat buffer;
     if (stat(realPath.c_str(), &buffer) != 0) {
-        LOG(ERROR) << "stat file " << path << " failed.";
+        LOG(ERROR) << "stat file " << fpInfo << " failed.";
         return false;
     }
     imageStat.imageOffset = 0;
@@ -98,12 +98,12 @@ bool ParseImageStat(const string &path, ImageStat &imageStat)
 
     UniqueFd fd(open(realPath.c_str(), O_RDONLY | O_CLOEXEC));
     if (fd.Get() == -1) {
-        LOG(ERROR) << "Failed to open package " << path << ": I/O error";
+        LOG(ERROR) << "Failed to open package " << fpInfo << ": I/O error";
         return false;
     }
     const char *fsTypePtr = RetrieveFsType(fd.Get(), imageStat.imageOffset);
     if (fsTypePtr == nullptr) {
-        LOG(ERROR) << "Failed to get fs type " << path;
+        LOG(ERROR) << "Failed to get fs type " << fpInfo;
         return false;
     }
     errno_t ret = strcpy_s(imageStat.fsType, FS_TYPE_MAX_SIZE, fsTypePtr);
@@ -338,14 +338,14 @@ bool CompareBundleList(const std::list<BundleInfo> &smallList, const std::list<B
 }
 } // namespace
 
-bool ExtractZipFile(ModuleZipHelper &helper, const string &fileName, string &buf)
+bool ExtractZipFile(ModuleZipHelper &helper, const string &fpInfo, string &buf)
 {
-    if (!helper.LocateFile(fileName)) {
-        LOG(ERROR) << "Could not find " << fileName;
+    if (!helper.LocateFile(fpInfo)) {
+        LOG(ERROR) << "Could not find " << fpInfo;
         return false;
     }
     if (!helper.GetFileContent(buf)) {
-        LOG(ERROR) << "Failed to get content of " << fileName;
+        LOG(ERROR) << "Failed to get content of " << fpInfo;
         return false;
     }
     return true;
@@ -435,10 +435,10 @@ bool ParseVersion(const string &version, const string &split, std::vector<string
     return true;
 }
 
-__attribute__((weak)) int32_t VerifyModulePackageSign(const std::string &path)
+__attribute__((weak)) int32_t VerifyModulePackageSign(const std::string &fpInfo)
 {
-    LOG(INFO) << "VerifyModulePackageSign " << path;
-    return VerifyPackage(path.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0);
+    LOG(INFO) << "VerifyModulePackageSign " << fpInfo;
+    return VerifyPackage(fpInfo.c_str(), Utils::GetCertName().c_str(), "", nullptr, 0);
 }
 
 ModuleFile::~ModuleFile()
@@ -446,28 +446,28 @@ ModuleFile::~ModuleFile()
     ClearVerifiedData();
 }
 
-std::unique_ptr<ModuleFile> ModuleFile::Open(const string &path)
+std::unique_ptr<ModuleFile> ModuleFile::Open(const string &fpInfo)
 {
-    ModuleZipHelper helper(path);
+    ModuleZipHelper helper(fpInfo);
     if (!helper.IsValid()) {
-        LOG(ERROR) << "Failed to open file " << path;
+        LOG(ERROR) << "Failed to open file " << fpInfo;
         return nullptr;
     }
 
     string moduleInfo;
     if (!ExtractZipFile(helper, PACK_INFO_NAME, moduleInfo)) {
-        LOG(ERROR) << "Failed to extract " << PACK_INFO_NAME << " from package " << path;
+        LOG(ERROR) << "Failed to extract " << PACK_INFO_NAME << " from package " << fpInfo;
         return nullptr;
     }
     ModulePackageInfo versionInfo;
     if (!ParseModuleInfo(moduleInfo, versionInfo)) {
-        LOG(ERROR) << "Failed to parse version info of package " << path;
+        LOG(ERROR) << "Failed to parse version info of package " << fpInfo;
         return nullptr;
     }
 
     ImageStat tmpStat;
     std::optional<ImageStat> imageStat;
-    string imagePath = ExtractFilePath(path) + IMG_FILE_NAME;
+    string imagePath = ExtractFilePath(fpInfo) + IMG_FILE_NAME;
     if (ParseImageStat(imagePath, tmpStat)) {
         imageStat = std::move(tmpStat);
     } else if (!StartsWith(imagePath, MODULE_PREINSTALL_DIR)) {
@@ -475,7 +475,7 @@ std::unique_ptr<ModuleFile> ModuleFile::Open(const string &path)
         return nullptr;
     }
 
-    return std::make_unique<ModuleFile>(path, versionInfo, imageStat);
+    return std::make_unique<ModuleFile>(fpInfo, versionInfo, imageStat);
 }
 
 bool ModuleFile::CompareVersion(const ModuleFile &newFile, const ModuleFile &oldFile)

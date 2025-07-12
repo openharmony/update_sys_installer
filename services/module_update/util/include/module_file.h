@@ -41,14 +41,14 @@ constexpr const char *HMP_API_VERSION = "apiVersion";
 constexpr const char *HMP_SA_SDK_VERSION = "saSdkVersion";
 constexpr const char *HMP_MODULE_INFO = "moduleInfo";
 
-bool ExtractZipFile(ModuleZipHelper &helper, const std::string &fileName, std::string &buf);
+bool ExtractZipFile(ModuleZipHelper &helper, const std::string &fpInfo, std::string &buf);
 bool ParseVersion(const std::string &version, const std::string &split, std::vector<std::string> &versionVec);
 bool CompareHmpVersion(const std::vector<std::string> &smallVersion, const std::vector<std::string> &bigVersion);
 bool CompareSaSdkVersion(const std::vector<std::string> &smallVersion, const std::vector<std::string> &bigVersion);
 #ifdef __cplusplus
 extern "C" {
 #endif
-int32_t VerifyModulePackageSign(const std::string &path);
+int32_t VerifyModulePackageSign(const std::string &fpInfo);
 #ifdef __cplusplus
 }
 #endif
@@ -98,7 +98,7 @@ struct ImageStat {
 
 class ModuleFile {
 public:
-    static std::unique_ptr<ModuleFile> Open(const std::string &path);
+    static std::unique_ptr<ModuleFile> Open(const std::string &fpInfo);
     static bool CompareVersion(const ModuleFile &newFile, const ModuleFile &oldFile);
     ModuleFile(const std::string &modulePath,
                const ModulePackageInfo &versionInfo,

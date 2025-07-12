@@ -138,12 +138,12 @@ bool CheckPackInfoVer(const std::string &pkgPackInfoPath)
     return false;
 }
 
-void CleanErrDir(const std::string &path)
+void CleanErrDir(const std::string &fpInfo)
 {
-    if (path.find(UPDATE_ACTIVE_DIR) != std::string::npos ||
-        path.find(UPDATE_BACKUP_DIR) != std::string::npos) {
-        LOG(INFO) << "delete err dir :"<< path;
-        ForceRemoveDirectory(path.substr(0, path.rfind("/")));
+    if (fpInfo.find(UPDATE_ACTIVE_DIR) != std::string::npos ||
+        fpInfo.find(UPDATE_BACKUP_DIR) != std::string::npos) {
+        LOG(INFO) << "delete err dir :"<< fpInfo;
+        ForceRemoveDirectory(fpInfo.substr(0, fpInfo.rfind("/")));
     }
 }
 
