@@ -97,20 +97,20 @@ bool ModuleZipHelper::GetNumberOfEntry(uint32_t &number)
     return true;
 }
 
-bool ModuleZipHelper::LocateFile(const std::string &filename)
+bool ModuleZipHelper::LocateFile(const std::string &fpInfo)
 {
     if (!IsValid()) {
         LOG(ERROR) << "Cannot locate file with invalid handle. path=" << zipPath_;
         return false;
     }
-    int err = unzLocateFile2(handle_, filename.c_str(), 0);
+    int err = unzLocateFile2(handle_, fpInfo.c_str(), 0);
     if (err != UNZ_OK) {
-        LOG(ERROR) << filename << " is not found in " << zipPath_;
+        LOG(ERROR) << fpInfo << " is not found in " << zipPath_;
         hasLocated_ = false;
         return false;
     }
     hasLocated_ = true;
-    filename_ = filename;
+    filename_ = fpInfo;
     return true;
 }
 

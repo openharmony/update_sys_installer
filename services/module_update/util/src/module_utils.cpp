@@ -51,31 +51,31 @@ constexpr mode_t ALL_PERMISSIONS = 0777;
 constexpr const char *PREFIXES[] = {UPDATE_INSTALL_DIR, UPDATE_ACTIVE_DIR, UPDATE_BACKUP_DIR, MODULE_PREINSTALL_DIR};
 }
 
-bool CreateDirIfNeeded(const std::string &path, mode_t mode)
+bool CreateDirIfNeeded(const std::string &fpInfo, mode_t mode)
 {
     struct stat statData;
 
-    if (stat(path.c_str(), &statData) != 0) {
+    if (stat(fpInfo.c_str(), &statData) != 0) {
         if (errno == ENOENT) {
-            if (mkdir(path.c_str(), mode) != 0) {
-                LOG(ERROR) << "Could not mkdir " << path;
+            if (mkdir(fpInfo.c_str(), mode) != 0) {
+                LOG(ERROR) << "Could not mkdir " << fpInfo;
                 return false;
             }
         } else {
-            LOG(ERROR) << "Could not stat " << path;
+            LOG(ERROR) << "Could not stat " << fpInfo;
             return false;
         }
     } else {
         if (!S_ISDIR(statData.st_mode)) {
-            LOG(ERROR) << path << " exists and is not a directory";
+            LOG(ERROR) << fpInfo << " exists and is not a directory";
             return false;
         }
     }
 
     // Need to manually call chmod because mkdir will create a folder with
     // permissions mode & ~umask.
-    if (chmod(path.c_str(), mode) != 0) {
-        LOG(WARNING) << "Could not chmod " << path;
+    if (chmod(fpInfo.c_str(), mode) != 0) {
+        LOG(WARNING) << "Could not chmod " << fpInfo;
     }
     return true;
 }
@@ -127,22 +127,22 @@ std::string GetHmpName(const std::string &filePath)
     return filePath.substr(startPos, endPos - startPos);
 }
 
-bool WaitForFile(const std::string &path, const std::chrono::nanoseconds &timeout)
+bool WaitForFile(const std::string &fpInfo, const std::chrono::nanoseconds &timeout)
 {
     Timer timer;
     bool hasSlept = false;
     while (timer.duration() < timeout) {
         struct stat buffer;
-        if (stat(path.c_str(), &buffer) != -1) {
+        if (stat(fpInfo.c_str(), &buffer) != -1) {
             if (hasSlept) {
-                LOG(INFO) << "wait for '" << path << "' took " << timer;
+                LOG(INFO) << "wait for '" << fpInfo << "' took " << timer;
             }
             return true;
         }
         std::this_thread::sleep_for(WAIT_FOR_FILE_TIME);
         hasSlept = true;
     }
-    LOG(ERROR) << "wait for '" << path << "' timed out and took " << timer;
+    LOG(ERROR) << "wait for '" << fpInfo << "' timed out and took " << timer;
     return false;
 }
 
@@ -210,16 +210,16 @@ std::ostream &operator<<(std::ostream &os, const Timer &timer)
 
 std::string GetRealPath(const std::string &filePath)
 {
-    char path[PATH_MAX] = {'\0'};
-    if (realpath(filePath.c_str(), path) == nullptr) {
+    char fpInfo[PATH_MAX] = {'\0'};
+    if (realpath(filePath.c_str(), fpInfo) == nullptr) {
         LOG(ERROR) << "get real path fail " << filePath;
         return "";
     }
-    if (!CheckPathExists(path)) {
-        LOG(ERROR) << "path " << path << " doesn't exist";
+    if (!CheckPathExists(fpInfo)) {
+        LOG(ERROR) << "path " << fpInfo << " doesn't exist";
         return "";
     }
-    std::string realPath(path);
+    std::string realPath(fpInfo);
     return realPath;
 }
 
@@ -355,7 +355,7 @@ int GetDeviceApiVersion(void)
     return Utils::String2Int<int>(apiVersion, Utils::N_DEC);
 }
 
-std::string GetContentFromZip(const std::string &zipPath, const std::string &fileName)
+std::string GetContentFromZip(const std::string &zipPath, const std::string &fpInfo)
 {
     ModuleZipHelper helper(zipPath);
     if (!helper.IsValid()) {
@@ -363,32 +363,32 @@ std::string GetContentFromZip(const std::string &zipPath, const std::string &fil
         return "";
     }
     std::string content;
-    if (!ExtractZipFile(helper, fileName, content)) {
-        LOG(ERROR) << "Failed to extract: " << fileName << " from package: " << zipPath;
+    if (!ExtractZipFile(helper, fpInfo, content)) {
+        LOG(ERROR) << "Failed to extract: " << fpInfo << " from package: " << zipPath;
         return "";
     }
     return content;
 }
 
-bool RemoveSpecifiedDir(const std::string &path, bool keepDir)
+bool RemoveSpecifiedDir(const std::string &fpInfo, bool keepDir)
 {
-    if (!CheckPathExists(path)) {
+    if (!CheckPathExists(fpInfo)) {
         return false;
     }
-    LOG(INFO) << "Clear specified dir: " << path << "; keepdir: " << keepDir;
+    LOG(INFO) << "Clear specified dir: " << fpInfo << "; keepdir: " << keepDir;
     if (!keepDir) {
-        if (!ForceRemoveDirectory(path)) {
-            LOG(WARNING) << "Failed to remove: " << path << ", err: " << errno;
+        if (!ForceRemoveDirectory(fpInfo)) {
+            LOG(WARNING) << "Failed to remove: " << fpInfo << ", err: " << errno;
             return false;
         }
         return true;
     }
-    if (!std::filesystem::is_directory(path)) {
-        LOG(WARNING) << "The file is not a directory: " << path.c_str();
+    if (!std::filesystem::is_directory(fpInfo)) {
+        LOG(WARNING) << "The file is not a directory: " << fpInfo.c_str();
         return false;
     }
     bool ret = true;
-    for (const auto &entry : std::filesystem::directory_iterator(path)) {
+    for (const auto &entry : std::filesystem::directory_iterator(fpInfo)) {
         std::error_code errorCode;
         LOG(INFO) << "deleted " << entry.path().c_str() << ";";
         if (!std::filesystem::remove_all(entry.path(), errorCode)) {

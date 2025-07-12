@@ -74,7 +74,7 @@ bool StageUpdateModulePackage(const string &updatePath, const string &stagePath)
     string path = ExtractFilePath(stagePath);
     // active dir should create by module_update_sa
     if (!CheckPathExists(path)) {
-        LOG(ERROR) << path << " doesn't exist.";
+        LOG(ERROR) << "active module path doesn't exist.";
         return false;
     }
     ret = link(updatePath.c_str(), stagePath.c_str());
@@ -378,11 +378,11 @@ bool ModuleUpdate::MountModulePackage(ModuleFile &moduleFile, const bool mountOn
     if (!CheckModulePackage(mountPoint, moduleFile)) {
         return false;
     }
-    const string &fullPath = ExtractFilePath(moduleFile.GetPath()) + IMG_FILE_NAME;
+    const string &fpInfo = ExtractFilePath(moduleFile.GetPath()) + IMG_FILE_NAME;
     const ImageStat &imageStat = moduleFile.GetImageStat().value();
     Loop::LoopbackDeviceUniqueFd loopbackDevice;
-    if (!CreateLoopDevice(fullPath, imageStat, loopbackDevice)) {
-        LOG(ERROR) << "Could not create loop device for " << fullPath;
+    if (!CreateLoopDevice(fpInfo, imageStat, loopbackDevice)) {
+        LOG(ERROR) << "Could not create loop device for " << fpInfo;
         return false;
     }
     LOG(INFO) << "Loopback device created: " << loopbackDevice.name << " fsType=" << imageStat.fsType;
@@ -394,11 +394,11 @@ bool ModuleUpdate::MountModulePackage(ModuleFile &moduleFile, const bool mountOn
     uint32_t mountFlags = MS_NOATIME | MS_NODEV | MS_DIRSYNC | MS_RDONLY;
     ret = mount(blockDevice.c_str(), mountPoint.c_str(), imageStat.fsType, mountFlags, nullptr);
     if (ret != 0) {
-        LOG(ERROR) << "Mounting failed for module package " << fullPath << " errno:" << errno;
+        LOG(ERROR) << "Mounting failed for module package " << fpInfo << " errno:" << errno;
         Loop::ClearDmLoopDevice(blockDevice, true);
         return false;
     }
-    LOG(INFO) << "Successfully mounted module package " << fullPath << " on " << mountPoint << " duration=" << timer;
+    LOG(INFO) << "Successfully mounted module package " << fpInfo << " on " << mountPoint << " duration=" << timer;
     SetModuleVersion(moduleFile);
     loopbackDevice.CloseGood();
     CANCEL_SCOPE_EXIT_GUARD(rmDir);
@@ -470,6 +470,10 @@ void ModuleUpdate::SetParameterFromFile(void) const
 void ModuleUpdate::HandleExtraArgs(int argc, char **argv) const
 {
     InitUpdaterLogger("CheckModuleUpdate", MODULE_UPDATE_LOG_FILE, "", "");
+    if (argc == 0 || argv == nullptr) {
+        LOG(ERROR) << "argc is 0 or argv is nullptr.";
+        return;
+    }
     const std::unordered_map<std::string, std::function<void(void)>> handleFuncMap = {
         {"setParam", [] () { return ModuleUpdate::GetInstance().SetParameterFromFile(); }},
     };
