@@ -54,6 +54,7 @@ public:
     virtual int32_t VabUpdateActive();
     virtual int32_t GetMetadataResult(const std::string &action, bool &result);
     virtual int32_t StartAbSync();
+    virtual int32_t SetCpuAffinity(const std::string &taskId, unsigned int reservedCores);
 
 protected:
     std::map<std::string, std::shared_ptr<StatusManager>> statusManagerMap_;
