@@ -45,7 +45,7 @@ public:
     {
         return "";
     }
-    virtual bool SetCpuAffinity(unsigned int reservedCores)
+    virtual bool SetCpuAffinityAction(unsigned int reservedCores)
     {
         return false;
     }
