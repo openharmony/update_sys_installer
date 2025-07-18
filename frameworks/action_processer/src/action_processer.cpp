@@ -161,7 +161,7 @@ bool ActionProcesser::SetCpuAffinity(unsigned int reservedCores)
         return false;
     }
     LOG(INFO) << "SetCpuAffinity " << curAction_->GetActionName();
-    bool ret = curAction_->SetCpuAffinity(reservedCores);
+    bool ret = curAction_->SetCpuAffinityAction(reservedCores);
     if (!ret) {
         LOG(WARNING) << "SetCpuAffinity action filed";
         return false;
