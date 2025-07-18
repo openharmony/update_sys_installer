@@ -561,6 +561,20 @@ int32_t SysInstallerKitsImpl::StartAbSync()
 #endif
 }
 
+int32_t SysInstallerKitsImpl::SetCpuAffinity(const std::string &taskId, unsigned int reservedCores)
+{
+    LOG(INFO) << "SetCpuAffinity taskId:" << taskId << ", reservedCores:" << reservedCores;
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    uint32_t reservedCpus = reservedCores;
+    int32_t ret = updateService->SetCpuAffinity(taskId, reservedCpus);
+    LOG(INFO) << "SetCpuAffinity ret:" << ret;
+    return ret;
+}
+
 void SysInstallerKitsImpl::LoadServiceSuccess()
 {
     serviceCv_.notify_all();
