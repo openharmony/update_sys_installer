@@ -45,6 +45,10 @@ public:
     {
         return "";
     }
+    virtual bool SetCpuAffinity(unsigned int reservedCores)
+    {
+        return false;
+    }
 
 protected:
     ActionCallbackFun actionCallBack_;
