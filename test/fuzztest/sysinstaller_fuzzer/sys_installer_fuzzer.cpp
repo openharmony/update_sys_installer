@@ -55,7 +55,7 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     bool result = false;
     SysInstallerKitsImpl::GetInstance().GetMetadataResult(action, result);
     uint32_t reservedCores;
-    std::memcpy(&reservedCores, data, std::min(sizeof(uint32_t), data.size()));
+    std::memcpy(&reservedCores, data, std::min(sizeof(uint32_t), size));
     SysInstallerKitsImpl::GetInstance().SetCpuAffinity(taskId, reservedCores);
 }
 }
