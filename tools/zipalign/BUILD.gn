@@ -41,6 +41,7 @@ action("zipalign") {
 ohos_shared_library("zipalign_build") {
   output_values = get_target_outputs(":zipalign")
   include_dirs = output_values
+  deps = [ ":zipalign" ]
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
