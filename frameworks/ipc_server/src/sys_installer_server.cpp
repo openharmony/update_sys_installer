@@ -45,6 +45,7 @@ SysInstallerServer::~SysInstallerServer()
 int32_t SysInstallerServer::SysInstallerInit(const std::string &taskId, bool bStreamUpgrade)
 {
     std::lock_guard<std::mutex> lock(sysInstallerServerLock_);
+    DEFINE_EXIT_GUARD();
     LOG(INFO) << "SysInstallerInit";
     if (!logInit_) {
         (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0777); // 0777 : rwxrwxrwx
@@ -64,24 +65,28 @@ int32_t SysInstallerServer::SysInstallerInit(const std::string &taskId, bool bSt
 int32_t SysInstallerServer::StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath)
 {
     LOG(INFO) << "StartUpdatePackageZip";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().StartUpdatePackageZip(taskId, pkgPath);
 }
 
 int32_t SysInstallerServer::StartStreamUpdate()
 {
     LOG(INFO) << "StartStreamUpdate";
+    DEFINE_EXIT_GUARD();
     return StreamInstallerManager::GetInstance().StartStreamUpdate();
 }
 
 int32_t SysInstallerServer::StopStreamUpdate()
 {
     LOG(INFO) << "StopStreamUpdate";
+    DEFINE_EXIT_GUARD();
     return StreamInstallerManager::GetInstance().StopStreamUpdate();
 }
 
 int32_t SysInstallerServer::ProcessStreamData(const BufferInfoParcel &bufferParcel)
 {
     LOG(INFO) << "ProcessStreamData";
+    DEFINE_EXIT_GUARD();
     return StreamInstallerManager::GetInstance().ProcessStreamData(bufferParcel.bufferInfo.buffer,
         bufferParcel.bufferInfo.size);
 }
@@ -90,6 +95,7 @@ int32_t SysInstallerServer::SetUpdateCallback(const std::string &taskId,
     const sptr<ISysInstallerCallback> &updateCallback)
 {
     LOG(INFO) << "SetUpdateCallback";
+    DEFINE_EXIT_GUARD();
     if (bStreamUpgrade_) {
         return StreamInstallerManager::GetInstance().SetUpdateCallback(updateCallback);
     } else {
@@ -100,6 +106,7 @@ int32_t SysInstallerServer::SetUpdateCallback(const std::string &taskId,
 int32_t SysInstallerServer::GetUpdateStatus(const std::string &taskId)
 {
     LOG(INFO) << "GetUpdateStatus";
+    DEFINE_EXIT_GUARD();
     if (bStreamUpgrade_) {
         return StreamInstallerManager::GetInstance().GetUpdateStatus();
     } else {
@@ -111,6 +118,7 @@ int32_t SysInstallerServer::StartUpdateParaZip(const std::string &taskId, const 
     const std::string &location, const std::string &cfgDir)
 {
     LOG(INFO) << "StartUpdateParaZip";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().StartUpdateParaZip(taskId, pkgPath, location, cfgDir);
 }
 
@@ -118,6 +126,7 @@ int32_t SysInstallerServer::StartDeleteParaZip(const std::string &taskId, const 
     const std::string &cfgDir)
 {
     LOG(INFO) << "StartDeleteParaZip";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().StartDeleteParaZip(taskId, location, cfgDir);
 }
 
@@ -125,12 +134,14 @@ int32_t SysInstallerServer::AccDecompressAndVerifyPkg(const std::string &taskId,
     const std::string &dstPath, const uint32_t type)
 {
     LOG(INFO) << "AccDecompressAndVerifyPkg";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().AccDecompressAndVerifyPkg(taskId, srcPath, dstPath, type);
 }
 
 int32_t SysInstallerServer::AccDeleteDir(const std::string &taskId, const std::string &dstPath)
 {
     LOG(INFO) << "AccDeleteDir";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().AccDeleteDir(taskId, dstPath);
 }
 
@@ -138,54 +149,63 @@ int32_t SysInstallerServer::StartUpdateVabPackageZip(const std::string &taskId,
     const std::vector<std::string> &pkgPath)
 {
     LOG(INFO) << "StartUpdateVabPackageZip";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().StartUpdateVabPackageZip(taskId, pkgPath);
 }
 
 int32_t SysInstallerServer::CancelUpdateVabPackageZip(const std::string &taskId)
 {
     LOG(INFO) << "CancelUpdateVabPackageZip";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().CancelUpdateVabPackageZip(taskId);
 }
 
 int32_t SysInstallerServer::StartVabMerge(const std::string &taskId)
 {
     LOG(INFO) << "StartVabMerge";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().StartVabMerge(taskId);
 }
 
 int32_t SysInstallerServer::CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo)
 {
     LOG(INFO) << "CreateVabSnapshotCowImg";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().CreateVabSnapshotCowImg(partitionInfo);
 }
 
 int32_t SysInstallerServer::EnableVabCheckpoint()
 {
     LOG(INFO) << "EnableVabCheckpoint";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().EnableVabCheckpoint();
 }
 
 int32_t SysInstallerServer::AbortVabActiveSnapshot()
 {
     LOG(INFO) << "AbortVabActiveSnapshot";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().AbortVabActiveSnapshot();
 }
 
 int32_t SysInstallerServer::ClearVabMetadataAndCow()
 {
     LOG(INFO) << "ClearVabMetadataAndCow";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().ClearVabMetadataAndCow();
 }
 
 int32_t SysInstallerServer::MergeRollbackReasonFile()
 {
     LOG(INFO) << "MergeRollbackReasonFile";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().MergeRollbackReasonFile();
 }
 
 int32_t SysInstallerServer::GetUpdateResult(const std::string &taskId, const std::string &taskType,
     const std::string &resultType, std::string &updateResult)
 {
+    DEFINE_EXIT_GUARD();
     updateResult = SysInstallerManager::GetInstance().GetUpdateResult(taskId, taskType, resultType);
     return 0;
 }
@@ -193,24 +213,50 @@ int32_t SysInstallerServer::GetUpdateResult(const std::string &taskId, const std
 int32_t SysInstallerServer::GetMetadataUpdateStatus(int32_t &metadataStatus)
 {
     LOG(INFO) << "GetMetadataUpdateStatus";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().GetMetadataUpdateStatus(metadataStatus);
 }
 
 int32_t SysInstallerServer::VabUpdateActive()
 {
     LOG(INFO) << "VabUpdateActive";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().VabUpdateActive();
 }
 
 int32_t SysInstallerServer::GetMetadataResult(const std::string &action, bool &result)
 {
     LOG(INFO) << "GetMetadataResult";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().GetMetadataResult(action, result);
+}
+
+bool SysInstallerServer::IsTaskRunning(void)
+{
+    return !SysInstallerExitGuard::GetRunningSet().empty();
+}
+
+std::string SysInstallerServer::GetRunningTask(void)
+{
+    const auto &runningSet = SysInstallerExitGuard::GetRunningSet();
+    if (runningSet.size() > SysInstallerExitGuard::MAX_RUNNING_SET_SIZE) {
+        LOG(ERROR) << "size too big, size is " << runningSet.size();
+        return "error: size too big";
+    }
+    std::ostringstream ss;
+    for (const auto &tag : runningSet) {
+        ss << tag;
+    }
+    return ss.str();
 }
 
 int32_t SysInstallerServer::ExitSysInstaller()
 {
     LOG(INFO) << "ExitSysInstaller";
+    if (IsTaskRunning()) {
+        LOG(ERROR) << "SysInstaller running, can't exit, running info " << GetRunningTask();
+        return -1;
+    }
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
         LOG(ERROR) << "GetSystemAbilityManager samgr object null!";
@@ -225,12 +271,14 @@ int32_t SysInstallerServer::ExitSysInstaller()
 int32_t SysInstallerServer::StartAbSync()
 {
     LOG(INFO) << "StartAbSync";
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().StartAbSync();
 }
 
 int32_t SysInstallerServer::SetCpuAffinity(const std::string &taskId, uint32_t reservedCores)
 {
     LOG(INFO) << "SetCpuAffinity reservedCores:" << reservedCores;
+    DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().SetCpuAffinity(taskId, reservedCores);
 }
 

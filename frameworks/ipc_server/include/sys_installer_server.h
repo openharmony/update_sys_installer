@@ -16,7 +16,9 @@
 #define SYS_INSTALLER_SERVER_H
 
 #include <iostream>
+#include <shared_mutex>
 #include <thread>
+#include <unordered_set>
 #include "if_system_ability_manager.h"
 #include "sys_installer_manager.h"
 #include "stream_installer_manager.h"
@@ -32,6 +34,36 @@
 namespace OHOS {
 namespace SysInstaller {
 class SysInstallerServer : public SystemAbility, public SysInstallerStub {
+    class SysInstallerExitGuard {
+    public:
+        constexpr static int MAX_RUNNING_SET_SIZE = 256;
+        SysInstallerExitGuard(const std::string &tag) : tag_(tag)
+        {
+            std::lock_guard<std::shared_mutex> guard(setLock_);
+            if (runningSet_.size() < MAX_RUNNING_SET_SIZE) {
+                runningSet_.insert(tag_);
+                isTagInserted_ = true;
+            }
+        }
+        ~SysInstallerExitGuard()
+        {
+            std::lock_guard<std::shared_mutex> guard(setLock_);
+            if (isTagInserted_) {
+                runningSet_.erase(tag_);
+            }
+        }
+        static const auto &GetRunningSet(void)
+        {
+            std::shared_lock<std::shared_mutex> guard(setLock_);
+            return runningSet_;
+        }
+    private:
+        bool isTagInserted_ {false};
+        std::string tag_ {};
+        static inline std::unordered_multiset<std::string> runningSet_ {};
+        static inline std::shared_mutex setLock_ {};
+    };
+    #define DEFINE_EXIT_GUARD() SysInstallerExitGuard exitGuard(__FUNCTION__)
 public:
     DECLARE_SYSTEM_ABILITY(SysInstallerServer);
     DISALLOW_COPY_AND_MOVE(SysInstallerServer);
@@ -78,6 +110,8 @@ public:
     void OnStop() override;
 
 private:
+    bool IsTaskRunning(void);
+    std::string GetRunningTask(void);
     bool logInit_ = false;
     bool bStreamUpgrade_ = false;
     std::mutex sysInstallerServerLock_;
