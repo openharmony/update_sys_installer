@@ -233,5 +233,14 @@ int32_t SysInstallerManager::StartAbSync()
     }
     return helper_->StartAbSync();
 }
+
+int32_t SysInstallerManager::SetCpuAffinity(const std::string &taskId, unsigned int reservedCores)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->SetCpuAffinity(taskId, reservedCores);
+}
 } // namespace SysInstaller
 } // namespace OHOS

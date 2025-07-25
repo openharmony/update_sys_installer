@@ -58,6 +58,7 @@ public:
     sptr<ISysInstaller> GetService();
     virtual int32_t ExitSysInstaller();
     virtual int32_t StartAbSync();
+    virtual int32_t SetCpuAffinity(const std::string &taskId, unsigned int reservedCores);
 
     void LoadServiceSuccess();
     void LoadServiceFail();

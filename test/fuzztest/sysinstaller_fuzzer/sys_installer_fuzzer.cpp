@@ -54,6 +54,9 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     const std::string action = "needMerge";
     bool result = false;
     SysInstallerKitsImpl::GetInstance().GetMetadataResult(action, result);
+    uint32_t reservedCores;
+    std::copy(data, data + std::min(sizeof(uint32_t), size), reinterpret_cast<uint8_t*>(&reservedCores));
+    SysInstallerKitsImpl::GetInstance().SetCpuAffinity(taskId, reservedCores);
 }
 }
 

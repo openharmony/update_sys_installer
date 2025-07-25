@@ -197,6 +197,8 @@ HWTEST_F(SysInstallerIpcUnitTest, SysInstallerKitsImplTest, TestSize.Level1)
     ASSERT_EQ(ret, -1);
     ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("ipc_ut_test", "");
     ASSERT_EQ(ret, -1);
+    ret = SysInstallerKitsImpl::GetInstance().SetCpuAffinity("ipc_ut_test", 0);
+    ASSERT_EQ(ret, -1);
 }
 } // SysInstaller
 } // OHOS

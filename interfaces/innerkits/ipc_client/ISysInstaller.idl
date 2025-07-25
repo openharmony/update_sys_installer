@@ -41,4 +41,5 @@ interface OHOS.SysInstaller.ISysInstaller {
     void GetUpdateResult([in] String taskId, [in] String taskType, [in] String resultType, [out] String updateResult);
     void ExitSysInstaller();
     void StartAbSync();
+    void SetCpuAffinity([in] String taskId, [in] unsigned int reservedCores);
 }

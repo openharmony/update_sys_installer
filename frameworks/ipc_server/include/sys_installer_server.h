@@ -67,6 +67,7 @@ public:
     int32_t GetMetadataResult(const std::string &action, bool &result) override;
     int32_t ExitSysInstaller() override;
     int32_t StartAbSync() override;
+    int32_t SetCpuAffinity(const std::string &taskId, uint32_t reservedCores) override;
 
 #ifndef UPDATER_UT
 private:

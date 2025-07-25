@@ -153,5 +153,20 @@ void ActionProcesser::StartNextAction()
     actionQue_.pop_front();
     curAction_->PerformAction();
 }
+
+bool ActionProcesser::SetCpuAffinity(unsigned int reservedCores)
+{
+    if (!isRunning_ || curAction_ == nullptr) {
+        LOG(WARNING) << "ActionProcesser not running or action empty";
+        return false;
+    }
+    LOG(INFO) << "SetCpuAffinity " << curAction_->GetActionName();
+    bool ret = curAction_->SetCpuAffinityAction(reservedCores);
+    if (!ret) {
+        LOG(WARNING) << "SetCpuAffinity action filed";
+        return false;
+    }
+    return ret;
+}
 } // namespace SysInstaller
 } // namespace OHOS

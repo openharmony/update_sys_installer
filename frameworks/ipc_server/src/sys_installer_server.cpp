@@ -228,6 +228,12 @@ int32_t SysInstallerServer::StartAbSync()
     return SysInstallerManager::GetInstance().StartAbSync();
 }
 
+int32_t SysInstallerServer::SetCpuAffinity(const std::string &taskId, uint32_t reservedCores)
+{
+    LOG(INFO) << "SetCpuAffinity reservedCores:" << reservedCores;
+    return SysInstallerManager::GetInstance().SetCpuAffinity(taskId, reservedCores);
+}
+
 void SysInstallerServer::OnStart()
 {
     LOG(INFO) << "OnStart";
