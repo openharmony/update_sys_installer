@@ -311,14 +311,14 @@ int32_t SysInstallerServer::CallbackEnter([[maybe_unused]] uint32_t code)
     LOG(INFO) << "Received stub message:" << code << ", callingUid:" << IPCSkeleton::GetCallingUid();
     if (!CheckCallingPerm()) {
         LOG(ERROR) << "SysInstallerServer CheckCallingPerm fail";
-        return -1;
+        return ERR_INVALID_VALUE;
     }
-    return 0;
+    return ERR_NONE;
 }
 
 int32_t SysInstallerServer::CallbackExit([[maybe_unused]] uint32_t code, [[maybe_unused]] int32_t result)
 {
-    return 0;
+    return ERR_NONE;
 }
 
 void SysInstallerServer::OnStart()
