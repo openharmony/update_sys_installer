@@ -15,6 +15,7 @@
 
 #include "sys_installer_server.h"
 
+#include "accesstoken_kit.h"
 #include "iservice_registry.h"
 #include "log/log.h"
 #include "securec.h"
