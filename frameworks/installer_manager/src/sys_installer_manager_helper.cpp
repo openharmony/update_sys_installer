@@ -201,11 +201,6 @@ std::shared_ptr<ActionProcesser> SysInstallerManagerHelper::GetActionProcesser(c
     return nullptr;
 }
 
-int32_t SysInstallerManagerHelper::GetMetadataUpdateStatus(int32_t &metadataStatus)
-{
-    return -1;
-}
-
 int32_t SysInstallerManagerHelper::VabUpdateActive()
 {
     return -1;
