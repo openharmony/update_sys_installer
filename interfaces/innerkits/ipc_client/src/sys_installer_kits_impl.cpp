@@ -379,40 +379,6 @@ int32_t SysInstallerKitsImpl::StartVabMerge(const std::string &taskId)
 #endif
 }
 
-int32_t SysInstallerKitsImpl::EnableVabCheckpoint()
-{
-    LOG(INFO) << "EnableVabCheckpoint";
-    auto updateService = GetService();
-    if (updateService == nullptr) {
-        LOG(ERROR) << "Get updateService failed";
-        return -1;
-    }
-    int32_t ret = updateService->EnableVabCheckpoint();
-    LOG(INFO) << "EnableVabCheckpoint ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
-    return ret;
-#endif
-}
-
-int32_t SysInstallerKitsImpl::AbortVabActiveSnapshot()
-{
-    LOG(INFO) << "AbortVabActiveSnapshot";
-    auto updateService = GetService();
-    if (updateService == nullptr) {
-        LOG(ERROR) << "Get updateService failed";
-        return -1;
-    }
-    int32_t ret = updateService->AbortVabActiveSnapshot();
-    LOG(INFO) << "AbortVabActiveSnapshot ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
-    return ret;
-#endif
-}
-
 int32_t SysInstallerKitsImpl::ClearVabMetadataAndCow()
 {
     LOG(INFO) << "ClearVabMetadataAndCow";
@@ -423,23 +389,6 @@ int32_t SysInstallerKitsImpl::ClearVabMetadataAndCow()
     }
     int32_t ret = updateService->ClearVabMetadataAndCow();
     LOG(INFO) << "ClearVabMetadataAndCow ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
-    return ret;
-#endif
-}
-
-int32_t SysInstallerKitsImpl::MergeRollbackReasonFile()
-{
-    LOG(INFO) << "MergeRollbackReasonFile";
-    auto updateService = GetService();
-    if (updateService == nullptr) {
-        LOG(ERROR) << "Get updateService failed";
-        return -1;
-    }
-    int32_t ret = updateService->MergeRollbackReasonFile();
-    LOG(INFO) << "MergeRollbackReasonFile ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
 #else

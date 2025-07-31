@@ -152,24 +152,6 @@ int32_t SysInstallerManager::CreateVabSnapshotCowImg(const std::unordered_map<st
     return helper_->CreateVabSnapshotCowImg(partitionInfo);
 }
 
-int32_t SysInstallerManager::EnableVabCheckpoint()
-{
-    if (helper_ == nullptr) {
-        LOG(ERROR) << "helper_ null";
-        return -1;
-    }
-    return helper_->EnableVabCheckpoint();
-}
-
-int32_t SysInstallerManager::AbortVabActiveSnapshot()
-{
-    if (helper_ == nullptr) {
-        LOG(ERROR) << "helper_ null";
-        return -1;
-    }
-    return helper_->AbortVabActiveSnapshot();
-}
-
 int32_t SysInstallerManager::ClearVabMetadataAndCow()
 {
     if (helper_ == nullptr) {
@@ -177,15 +159,6 @@ int32_t SysInstallerManager::ClearVabMetadataAndCow()
         return -1;
     }
     return helper_->ClearVabMetadataAndCow();
-}
-
-int32_t SysInstallerManager::MergeRollbackReasonFile()
-{
-    if (helper_ == nullptr) {
-        LOG(ERROR) << "helper_ null";
-        return -1;
-    }
-    return helper_->MergeRollbackReasonFile();
 }
 
 std::string  SysInstallerManager::GetUpdateResult(const std::string &taskId, const std::string &taskType,

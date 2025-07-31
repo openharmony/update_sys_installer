@@ -175,32 +175,11 @@ int32_t SysInstallerServer::CreateVabSnapshotCowImg(const std::unordered_map<std
     return SysInstallerManager::GetInstance().CreateVabSnapshotCowImg(partitionInfo);
 }
 
-int32_t SysInstallerServer::EnableVabCheckpoint()
-{
-    LOG(INFO) << "EnableVabCheckpoint";
-    DEFINE_EXIT_GUARD();
-    return SysInstallerManager::GetInstance().EnableVabCheckpoint();
-}
-
-int32_t SysInstallerServer::AbortVabActiveSnapshot()
-{
-    LOG(INFO) << "AbortVabActiveSnapshot";
-    DEFINE_EXIT_GUARD();
-    return SysInstallerManager::GetInstance().AbortVabActiveSnapshot();
-}
-
 int32_t SysInstallerServer::ClearVabMetadataAndCow()
 {
     LOG(INFO) << "ClearVabMetadataAndCow";
     DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().ClearVabMetadataAndCow();
-}
-
-int32_t SysInstallerServer::MergeRollbackReasonFile()
-{
-    LOG(INFO) << "MergeRollbackReasonFile";
-    DEFINE_EXIT_GUARD();
-    return SysInstallerManager::GetInstance().MergeRollbackReasonFile();
 }
 
 int32_t SysInstallerServer::GetUpdateResult(const std::string &taskId, const std::string &taskType,

@@ -88,10 +88,7 @@ public:
     int32_t CancelUpdateVabPackageZip(const std::string &taskId) override;
     int32_t StartVabMerge(const std::string &taskId) override;
     int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo) override;
-    int32_t EnableVabCheckpoint() override;
-    int32_t AbortVabActiveSnapshot() override;
     int32_t ClearVabMetadataAndCow() override;
-    int32_t MergeRollbackReasonFile() override;
     int32_t GetUpdateResult(const std::string &taskId, const std::string &taskType,
         const std::string &resultType, std::string &updateResult) override;
     int32_t GetMetadataUpdateStatus(int32_t &metadataStatus) override;
