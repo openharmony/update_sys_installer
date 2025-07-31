@@ -45,10 +45,7 @@ public:
     virtual int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath);
     virtual int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo);
     virtual int32_t StartVabMerge(const std::string &taskId);
-    virtual int32_t EnableVabCheckpoint();
-    virtual int32_t AbortVabActiveSnapshot();
     virtual int32_t ClearVabMetadataAndCow();
-    virtual int32_t MergeRollbackReasonFile();
     virtual std::string GetUpdateResult(const std::string &taskId, const std::string &taskType,
         const std::string &resultType);
     virtual int32_t GetMetadataUpdateStatus(int32_t &metadataStatus);

@@ -143,22 +143,7 @@ int32_t SysInstallerManagerHelper::CreateVabSnapshotCowImg(const std::unordered_
     return -1;
 }
 
-int32_t SysInstallerManagerHelper::EnableVabCheckpoint()
-{
-    return -1;
-}
-
-int32_t SysInstallerManagerHelper::AbortVabActiveSnapshot()
-{
-    return -1;
-}
-
 int32_t SysInstallerManagerHelper::ClearVabMetadataAndCow()
-{
-    return -1;
-}
-
-int32_t SysInstallerManagerHelper::MergeRollbackReasonFile()
 {
     return -1;
 }
