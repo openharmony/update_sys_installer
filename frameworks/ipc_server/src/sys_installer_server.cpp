@@ -291,7 +291,7 @@ bool SysInstallerServer::IsPermissionGranted(void)
     int verifyResult = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permission);
     bool isPermissionGranted = (verifyResult == Security::AccessToken::PERMISSION_GRANTED);
     if (!isPermissionGranted) {
-        LOG(ERROR) << "not granted " << permission.c_str();
+        LOG(ERROR) << "not granted " << permission;
     }
     return isPermissionGranted;
 }
