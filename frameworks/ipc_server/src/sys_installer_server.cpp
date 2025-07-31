@@ -15,6 +15,7 @@
 
 #include "sys_installer_server.h"
 
+#include "accesstoken_kit.h"
 #include "iservice_registry.h"
 #include "log/log.h"
 #include "securec.h"
@@ -280,6 +281,44 @@ int32_t SysInstallerServer::SetCpuAffinity(const std::string &taskId, uint32_t r
     LOG(INFO) << "SetCpuAffinity reservedCores:" << reservedCores;
     DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().SetCpuAffinity(taskId, reservedCores);
+}
+
+bool SysInstallerServer::IsPermissionGranted(void)
+{
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    std::string permission = "ohos.permission.UPDATE_SYSTEM";
+
+    int verifyResult = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permission);
+    bool isPermissionGranted = (verifyResult == Security::AccessToken::PERMISSION_GRANTED);
+    if (!isPermissionGranted) {
+        LOG(ERROR) << "not granted " << permission;
+    }
+    return isPermissionGranted;
+}
+
+bool SysInstallerServer::CheckCallingPerm(void)
+{
+    int32_t callingUid = OHOS::IPCSkeleton::GetCallingUid();
+    LOG(INFO) << "CheckCallingPerm callingUid:" << callingUid;
+    if (callingUid == 0) {
+        return true;
+    }
+    return callingUid == Updater::Utils::USER_UPDATE_AUTHORITY && IsPermissionGranted();
+}
+
+int32_t SysInstallerServer::CallbackEnter([[maybe_unused]] uint32_t code)
+{
+    LOG(INFO) << "Received stub message:" << code << ", callingUid:" << IPCSkeleton::GetCallingUid();
+    if (!CheckCallingPerm()) {
+        LOG(ERROR) << "SysInstallerServer CheckCallingPerm fail";
+        return ERR_INVALID_VALUE;
+    }
+    return ERR_NONE;
+}
+
+int32_t SysInstallerServer::CallbackExit([[maybe_unused]] uint32_t code, [[maybe_unused]] int32_t result)
+{
+    return ERR_NONE;
 }
 
 void SysInstallerServer::OnStart()

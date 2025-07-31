@@ -101,6 +101,11 @@ public:
     int32_t StartAbSync() override;
     int32_t SetCpuAffinity(const std::string &taskId, uint32_t reservedCores) override;
 
+    bool CheckCallingPerm(void);
+    bool IsPermissionGranted(void);
+    int32_t CallbackEnter([[maybe_unused]] uint32_t code) override;
+    int32_t CallbackExit([[maybe_unused]] uint32_t code, [[maybe_unused]] int32_t result) override;
+
 #ifndef UPDATER_UT
 private:
 #else
