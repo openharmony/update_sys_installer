@@ -44,8 +44,6 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
         pkgPath, std::string(reinterpret_cast<const char*>(data), size), 1);
     SysInstallerKitsImpl::GetInstance().AccDeleteDir(taskId, std::string(reinterpret_cast<const char*>(data), size));
     SysInstallerKitsImpl::GetInstance().ClearVabMetadataAndCow();
-    int32_t metadataStatus = 0;
-    SysInstallerKitsImpl::GetInstance().GetMetadataUpdateStatus(metadataStatus);
     SysInstallerKitsImpl::GetInstance().VabUpdateActive();
     SysInstallerKitsImpl::GetInstance().StartVabMerge(taskId);
     const std::string action = "needMerge";

@@ -190,13 +190,6 @@ int32_t SysInstallerServer::GetUpdateResult(const std::string &taskId, const std
     return 0;
 }
 
-int32_t SysInstallerServer::GetMetadataUpdateStatus(int32_t &metadataStatus)
-{
-    LOG(INFO) << "GetMetadataUpdateStatus";
-    DEFINE_EXIT_GUARD();
-    return SysInstallerManager::GetInstance().GetMetadataUpdateStatus(metadataStatus);
-}
-
 int32_t SysInstallerServer::VabUpdateActive()
 {
     LOG(INFO) << "VabUpdateActive";
