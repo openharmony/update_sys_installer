@@ -29,6 +29,8 @@ struct ResultTypeConst {
 struct MetadataActionConst {
     static constexpr const char *NEED_MERGE = "needMerge";
     static constexpr const char *ACTIVE_ROLL_BACK = "activeRollBack";
+    static constexpr const char *ACTIVE_SUCCESS = "activeSuccess";
+    static constexpr const char *NORMAL_BOOT = "normalBoot";
 };
 } // namespace SysInstaller
 } // namespace OHOS
