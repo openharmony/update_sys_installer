@@ -86,9 +86,11 @@ bool CreateDmDevice(const OHOS::SysInstaller::ModuleFile &moduleFile, std::strin
     }
     deviceName = std::string(devPath);
     LOG(INFO) << "Create dm device success. path=" << deviceName;
-    free(devPath);
 
 exit:
+    if (devPath != nullptr) {
+        free(devPath);
+    }
     FsHvbDestoryVerityTarget(&target);
     return ret == 0;
 #else
