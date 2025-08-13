@@ -14,7 +14,8 @@
  */
 
 #include "action_processer.h"
-
+#include <chrono>
+#include <thread>
 #include "sys_installer_manager.h"
 #include "log/log.h"
 
@@ -24,6 +25,23 @@ using namespace Updater;
 bool ActionProcesser::IsRunning()
 {
     return isRunning_ || isSuspend_;
+}
+
+bool ActionProcesser::WaitActionExit()
+{
+    using namespace std::chrono_literals;
+    const unsigned int WAIT_MAX_SECOND = 4;
+    unsigned int count = 0;
+    while (IsRunning() && (count < WAIT_MAX_SECOND)) {
+        std::this_thread::sleep_for(1s);
+        count++;
+    }
+    if (count == WAIT_MAX_SECOND) {
+        LOG(ERROR) << "wait action exit failed for " << WAIT_MAX_SECOND << "s";
+        return false;
+    }
+    LOG(INFO) << "action exit after " << count << "s";
+    return true;
 }
 
 void ActionProcesser::AddAction(std::unique_ptr<IAction> action)
@@ -72,7 +90,7 @@ bool ActionProcesser::Stop()
         LOG(INFO) << "Stop " << curAction_->GetActionName();
         ret = curAction_->TerminateAction();
     }
-    if (!ret) {
+    if (!ret || !WaitActionExit()) {
         LOG(INFO) << "Stop action failed, directly returned";
         return false;
     }
