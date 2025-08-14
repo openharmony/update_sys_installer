@@ -31,6 +31,7 @@ public:
 
     ErrCode OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) override;
     ErrCode OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen, const std::string &resultMsg) override;
+    ErrCode OnUpgradeFeatureStatus(const FeatureStatus &statusInfo) override;
 
 private:
     sptr<ISysInstallerCallbackFunc> callback_;

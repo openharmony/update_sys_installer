@@ -103,5 +103,16 @@ float StatusManager::GetUpdateProgress()
 {
     return percent_ / 100.0; // 100.0 : max percent
 }
+
+void StatusManager::UpdateFeatureStatus(const FeatureStatus &statusInfo)
+{
+    std::lock_guard<std::mutex> lock(updateCbMutex_);
+    if (updateCallback_ == nullptr) {
+        LOG(ERROR) << "updateCallback_ null";
+        return;
+    }
+
+    updateCallback_->OnUpgradeFeatureStatus(statusInfo);
+}
 } // namespace SysInstaller
 } // namespace OHOS

@@ -22,3 +22,55 @@ enum UpdateStatus {
     UPDATE_STATE_SUCCESSFUL,
     UPDATE_STATE_MAX,
 };
+
+enum InstallMode {
+    FEATURE_INSTALL = 0,
+    REGULAR_OTA,
+    STREAM_OTA,
+    AB_REGULAR_OTA,
+    AB_STREAM_OTA,
+    VAB_REGULAR_OTA,
+    VAB_STREAM_OTA,
+};
+
+enum RebootStatus {
+    NOT_REBOOT = 0,
+    REBOOTED,
+};
+
+enum CloudRomInstallStatus {
+    ERROR = -1,
+    INIT = 0,
+    INSTALLING = 10,
+    UNZIP_PKG_SUCCESS,
+    RESTORE_PKG_SUCCESS,
+    WAIT_REBOOT_THEN_INSTALL,
+    WAIT_UPGRADE_THEN_INSTALL,
+    INSTALL_FAIL,
+    INSTALL_SUCCESS,
+    UNINSTALLING = 30,
+    WAIT_REBOOT_THEN_UNINSTALL,
+    UNINSTALL_FAIL,
+    UNINSTALL_SUCCESS,
+};
+
+struct FeatureInfo {
+    boolean isNeedReboot;
+    String featureName;
+    String version;
+    String path;
+};
+
+struct ErrorInfo {
+    int errorCode;
+    String errorMsg;
+};
+
+struct FeatureStatus {
+    String featureName;
+    String version;
+    String installPath;
+    CloudRomInstallStatus status;
+    ErrorInfo errorInfo;
+    unsigned int featureType;
+};

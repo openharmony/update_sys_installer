@@ -52,5 +52,15 @@ ErrCode SysInstallerCallback::OnUpgradeDealLen(UpdateStatus updateStatus, int de
     }
     return 0;
 }
+
+ErrCode SysInstallerCallback::OnUpgradeFeatureStatus(const FeatureStatus &statusInfo)
+{
+    LOG(INFO) << "updateFeatureStatus:" << statusInfo.featureName << " status:" << static_cast<int>(statusInfo.status)
+        << " errCode:" << statusInfo.errorInfo.errorCode << " errMsg:" << statusInfo.errorInfo.errorMsg;
+    if (callback_ != nullptr) {
+        callback_->OnUpgradeFeatureStatus(statusInfo);
+    }
+    return 0;
+}
 }
 } // namespace OHOS

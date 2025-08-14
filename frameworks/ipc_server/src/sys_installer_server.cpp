@@ -223,6 +223,46 @@ std::string SysInstallerServer::GetRunningTask(void)
     return ss.str();
 }
 
+int32_t SysInstallerServer::InstallCloudRom(const std::string &taskId,
+    InstallMode installMode, const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus)
+{
+    LOG(INFO) << "InstallCloudRom";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().InstallCloudRom(taskId, installMode, featureInfos, rebootStatus);
+}
+
+int32_t SysInstallerServer::UninstallCloudRom(const std::string &taskId,
+    const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus)
+{
+    LOG(INFO) << "UninstallCloudRom";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().UninstallCloudRom(taskId, featureInfos, rebootStatus);
+}
+
+int32_t SysInstallerServer::GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos,
+    std::vector<FeatureStatus> &statusInfos)
+{
+    LOG(INFO) << "GetFeatureStatus";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().GetFeatureStatus(featureInfos, statusInfos);
+}
+
+int32_t SysInstallerServer::GetAllFeatureStatus(const std::string &baseVersion,
+    std::vector<FeatureStatus> &statusInfos)
+{
+    LOG(INFO) << "GetAllFeatureStatus";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().GetAllFeatureStatus(baseVersion, statusInfos);
+}
+
+int32_t SysInstallerServer::ClearCloudRom(const std::string &baseVersion,
+    const std::string &featureName)
+{
+    LOG(INFO) << "ClearCloudRom";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().ClearCloudRom(baseVersion, featureName);
+}
+
 int32_t SysInstallerServer::ExitSysInstaller()
 {
     LOG(INFO) << "ExitSysInstaller";

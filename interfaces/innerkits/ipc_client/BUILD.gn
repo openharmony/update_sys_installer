@@ -39,6 +39,7 @@ config("idl_file_headers") {
 idl_gen_interface("sysinstaller_interface") {
   sources = [ "ISysInstaller.idl" ]
   sources_callback = [ "ISysInstallerCallback.idl" ]
+  sources_common = ["Types.idl"]
 
   log_domainid = "0xD002E01"
   log_tag = "SysInstaller"
@@ -64,6 +65,7 @@ ohos_source_set("sys_installer_stub") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "bounds_checking_function:libsec_shared",
   ]
 
   part_name = "sys_installer"
@@ -71,7 +73,10 @@ ohos_source_set("sys_installer_stub") {
 }
 
 ohos_source_set("module_update_stub") {
-  sources = [ "${target_gen_dir}/sys_installer_callback_proxy.cpp" ]
+  sources = [
+    "${target_gen_dir}/sys_installer_callback_proxy.cpp",
+    "${target_gen_dir}/types.cpp",
+  ]
 
   include_dirs = [
     "${target_gen_dir}",
@@ -84,6 +89,7 @@ ohos_source_set("module_update_stub") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
+    "bounds_checking_function:libsec_shared",
   ]
 
   part_name = "sys_installer"
@@ -99,6 +105,7 @@ ohos_shared_library("libsysinstaller_shared") {
     "${target_gen_dir}/sys_installer_callback_stub.cpp",
     "${target_gen_dir}/sys_installer_proxy.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/buffer_info_parcel.cpp",
+    "${target_gen_dir}/types.cpp",
   ]
 
   include_dirs = [
@@ -150,6 +157,7 @@ ohos_static_library("libsysinstallerkits") {
     "${target_gen_dir}/sys_installer_callback_stub.cpp",
     "${target_gen_dir}/sys_installer_proxy.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/buffer_info_parcel.cpp",
+    "${target_gen_dir}/types.cpp",
   ]
 
   include_dirs = [
@@ -258,6 +266,7 @@ ohos_static_library("module_update_client_static") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/sys_installer_callback.cpp",
     "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
     "${target_gen_dir}/sys_installer_callback_stub.cpp",
+    "${target_gen_dir}/types.cpp",
   ]
 
   include_dirs = [ "${sys_installer_path}/common/include" ]
@@ -292,6 +301,7 @@ ohos_shared_library("libmodule_update_shared") {
     "${sys_installer_path}/services/module_update/util/src/module_ipc_helper.cpp",
     "${target_gen_dir}/sys_installer_callback_stub.cpp",
     "${sys_installer_path}/interfaces/innerkits/ipc_client/src/buffer_info_parcel.cpp",
+    "${target_gen_dir}/types.cpp",
   ]
 
   include_dirs = [ "${sys_installer_path}/common/include" ]

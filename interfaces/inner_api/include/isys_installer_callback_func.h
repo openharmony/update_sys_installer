@@ -27,6 +27,7 @@ public:
 
     virtual void OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen,
         const std::string &resultMsg) = 0;
+    virtual void OnUpgradeFeatureStatus(const FeatureStatus &statusInfo) {};
 };
 } // namespace SysInstaller
 } // namespace OHOS
