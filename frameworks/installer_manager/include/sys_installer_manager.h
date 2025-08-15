@@ -51,6 +51,15 @@ public:
     virtual int32_t StartAbSync();
     virtual int32_t SetCpuAffinity(const std::string &taskId, unsigned int reservedCores);
 
+    virtual int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,
+        const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);
+    virtual int32_t UninstallCloudRom(const std::string &taskId,
+        const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);
+    virtual int32_t GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos,
+        std::vector<FeatureStatus> &statusInfos);
+    virtual int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos);
+    virtual int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName);
+
 protected:
     std::unique_ptr<SysInstallerManagerHelper> helper_ {};
 

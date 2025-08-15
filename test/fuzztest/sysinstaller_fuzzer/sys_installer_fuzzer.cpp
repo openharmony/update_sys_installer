@@ -28,6 +28,85 @@
 namespace OHOS {
 using namespace SysInstaller;
 
+constexpr int DATA_IDX_NEED_REBOOT = 0;
+constexpr int DATA_IDX_INSTALL_MODE = 1;
+constexpr int DATA_IDX_REBOOT = 2;
+constexpr int DATA_FEATURE_MIN_LEN = 3;
+constexpr int DATA_FEATURE_CLEAR_LEN = 2;
+
+FeatureInfo ParseFeatureInfo(const uint8_t* data, size_t size)
+{
+    FeatureInfo featureInfo {};
+
+    size_t len = size / DATA_FEATURE_MIN_LEN;
+    size_t offset = 0;
+    std::string featureName = std::string(reinterpret_cast<const char*>(data + offset), len);
+    offset += len;
+    std::string version = std::string(reinterpret_cast<const char*>(data + offset), len);
+    offset += len;
+    std::string path = std::string(reinterpret_cast<const char*>(data + offset), size - offset);
+    return {(data[DATA_IDX_NEED_REBOOT] & 1) == 0, featureName, version, path};
+}
+
+void InstallCloudRomFuzzTest(const std::string &taskId, const uint8_t* data, size_t size)
+{
+    if (size < DATA_FEATURE_MIN_LEN) {
+        return;
+    }
+    FeatureInfo featureInfo = ParseFeatureInfo(data, size);
+    std::vector<FeatureInfo> featureInfos = {featureInfo};
+    InstallMode installMode = (data[DATA_IDX_INSTALL_MODE] & 1) == 0 ?
+        InstallMode::FEATURE_INSTALL : InstallMode::REGULAR_OTA;
+    RebootStatus rebootStatus = (data[DATA_IDX_REBOOT] & 1) == 0 ? RebootStatus::NOT_REBOOT : RebootStatus::REBOOTED;
+    SysInstallerKitsImpl::GetInstance().InstallCloudRom(taskId, installMode, featureInfos, rebootStatus);
+}
+
+void UninstallCloudRomFuzzTest(const std::string &taskId, const uint8_t* data, size_t size)
+{
+    if (size < DATA_FEATURE_MIN_LEN) {
+        return;
+    }
+    FeatureInfo featureInfo = ParseFeatureInfo(data, size);
+    std::vector<FeatureInfo> featureInfos = {featureInfo};
+    RebootStatus rebootStatus = (data[DATA_IDX_REBOOT] & 1) == 0 ? RebootStatus::NOT_REBOOT : RebootStatus::REBOOTED;
+    SysInstallerKitsImpl::GetInstance().UninstallCloudRom(taskId, featureInfos, rebootStatus);
+}
+
+void GetFeatureStatusFuzzTest(const uint8_t* data, size_t size)
+{
+    if (size < DATA_FEATURE_MIN_LEN) {
+        return;
+    }
+    FeatureInfo featureInfo = ParseFeatureInfo(data, size);
+    std::vector<FeatureInfo> featureInfos = {featureInfo};
+    std::vector<FeatureStatus> statusInfos = {};
+    SysInstallerKitsImpl::GetInstance().GetFeatureStatus(featureInfos, statusInfos);
+}
+
+void GetAllFeatureStatusFuzzTest(const uint8_t* data, size_t size)
+{
+    std::vector<FeatureStatus> statusInfos = {};
+    SysInstallerKitsImpl::GetInstance().GetAllFeatureStatus(
+        std::string(reinterpret_cast<const char*>(data), size), statusInfos);
+}
+
+void ClearCloudRomFuzzTest(const uint8_t* data, size_t size)
+{
+    if (size < 0) {
+        return;
+    }
+    std::string baseVersion = "";
+    std::string featureName = "";
+    if ((data[0] & 1) == 0) {
+        baseVersion = std::string(reinterpret_cast<const char*>(data), size);
+    } else {
+        size_t len = size / DATA_FEATURE_CLEAR_LEN;
+        baseVersion = std::string(reinterpret_cast<const char*>(data), len);
+        featureName = std::string(reinterpret_cast<const char*>(data + len), size - len);
+    }
+    SysInstallerKitsImpl::GetInstance().ClearCloudRom(baseVersion, featureName);
+}
+
 void FuzzSysInstaller(const uint8_t* data, size_t size)
 {
     std::string taskId = "fuzz_test";
@@ -53,6 +132,16 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     std::copy(data, data + std::min(sizeof(uint32_t), size), reinterpret_cast<uint8_t*>(&reservedCores));
     SysInstallerKitsImpl::GetInstance().SetCpuAffinity(taskId, reservedCores);
 }
+
+void FuzzSysInstallerCloudRom(const uint8_t* data, size_t size)
+{
+    std::string taskId = "fuzz_test";
+    InstallCloudRomFuzzTest(taskId, data, size);
+    UninstallCloudRomFuzzTest(taskId, data, size);
+    GetFeatureStatusFuzzTest(data, size);
+    GetAllFeatureStatusFuzzTest(data, size);
+    ClearCloudRomFuzzTest(data, size);
+}
 }
 
 /* Fuzzer entry point */
@@ -60,6 +149,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::FuzzSysInstaller(data, size);
+    OHOS::FuzzSysInstallerCloudRom(data, size);
     return 0;
 }
 

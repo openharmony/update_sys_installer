@@ -220,5 +220,35 @@ int32_t SysInstallerManagerHelper::SetCpuAffinity(const std::string &taskId, uns
 {
     return -1;
 }
+
+int32_t SysInstallerManagerHelper::InstallCloudRom(const std::string &taskId,
+    InstallMode installMode, const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus)
+{
+    return -1;
+}
+
+int32_t SysInstallerManagerHelper::UninstallCloudRom(const std::string &taskId,
+    const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus)
+{
+    return -1;
+}
+
+int32_t SysInstallerManagerHelper::GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos,
+    std::vector<FeatureStatus> &statusInfos)
+{
+    return -1;
+}
+
+int32_t SysInstallerManagerHelper::GetAllFeatureStatus(const std::string &baseVersion,
+    std::vector<FeatureStatus> &statusInfos)
+{
+    return -1;
+}
+
+int32_t SysInstallerManagerHelper::ClearCloudRom(const std::string &baseVersion,
+    const std::string &featureName)
+{
+    return -1;
+}
 } // namespace SysInstaller
 } // namespace OHOS

@@ -447,6 +447,66 @@ std::string SysInstallerKitsImpl::GetUpdateResult(const std::string &taskId, con
     return updateResult;
 }
 
+int32_t SysInstallerKitsImpl::InstallCloudRom(const std::string &taskId,
+    InstallMode installMode, const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus)
+{
+    LOG(INFO) << "InstallCloudRom";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    return updateService->InstallCloudRom(taskId, installMode, featureInfos, rebootStatus);
+}
+
+int32_t SysInstallerKitsImpl::UninstallCloudRom(const std::string &taskId,
+    const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus)
+{
+    LOG(INFO) << "UninstallCloudRom";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    return updateService->UninstallCloudRom(taskId, featureInfos, rebootStatus);
+}
+
+int32_t SysInstallerKitsImpl::GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos,
+    std::vector<FeatureStatus> &statusInfos)
+{
+    LOG(INFO) << "GetFeatureStatus";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    return updateService->GetFeatureStatus(featureInfos, statusInfos);
+}
+
+int32_t SysInstallerKitsImpl::GetAllFeatureStatus(const std::string &baseVersion,
+    std::vector<FeatureStatus> &statusInfos)
+{
+    LOG(INFO) << "GetAllFeatureStatus";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    return updateService->GetAllFeatureStatus(baseVersion, statusInfos);
+}
+
+int32_t SysInstallerKitsImpl::ClearCloudRom(const std::string &baseVersion,
+    const std::string &featureName)
+{
+    LOG(INFO) << "ClearCloudRom";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    return updateService->ClearCloudRom(baseVersion, featureName);
+}
+
 int32_t SysInstallerKitsImpl::ExitSysInstaller()
 {
     LOG(INFO) << "ExitSysInstaller";

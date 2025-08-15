@@ -19,4 +19,5 @@ import Types;
 [callback] interface OHOS.SysInstaller.ISysInstallerCallback {
     void OnUpgradeProgress([in] UpdateStatus updateStatus, [in] int percent, [in] String resultMsg);
     void OnUpgradeDealLen([in] UpdateStatus updateStatus, [in] int dealLen, [in] String resultMsg);
+    void OnUpgradeFeatureStatus([in] FeatureStatus statusInfo);
 }

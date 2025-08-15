@@ -235,7 +235,8 @@ bool CalculateSHA256(const std::string &filePath, std::string &digest)
     SHA256_Init(&sha256Context);
     constexpr int32_t bufferSize = 4096;
     char buffer[bufferSize] = {0};
-    while (readFile.read(buffer, sizeof(buffer))) {
+    while (!readFile.eof()) {
+        readFile.read(buffer, sizeof(buffer));
         SHA256_Update(&sha256Context, buffer, readFile.gcount());
     }
     uint8_t digestBuffer[SHA256_DIGEST_LENGTH] = {0};

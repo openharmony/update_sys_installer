@@ -50,6 +50,14 @@ public:
         const std::string &resultType);
     virtual int32_t VabUpdateActive();
     virtual int32_t GetMetadataResult(const std::string &action, bool &result);
+    virtual int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,
+        const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);
+    virtual int32_t UninstallCloudRom(const std::string &taskId,
+        const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);
+    virtual int32_t GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos,
+        std::vector<FeatureStatus> &statusInfos);
+    virtual int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos);
+    virtual int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName);
     virtual void ResetService(const wptr<IRemoteObject> &remote);
     sptr<ISysInstaller> GetService();
     virtual int32_t ExitSysInstaller();

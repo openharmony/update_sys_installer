@@ -93,6 +93,14 @@ public:
         const std::string &resultType, std::string &updateResult) override;
     int32_t VabUpdateActive() override;
     int32_t GetMetadataResult(const std::string &action, bool &result) override;
+    int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,
+        const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus) override;
+    int32_t UninstallCloudRom(const std::string &taskId,
+        const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus) override;
+    int32_t GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos,
+        std::vector<FeatureStatus> &statusInfos) override;
+    int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos) override;
+    int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName) override;
     int32_t ExitSysInstaller() override;
     int32_t StartAbSync() override;
     int32_t SetCpuAffinity(const std::string &taskId, uint32_t reservedCores) override;

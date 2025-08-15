@@ -206,5 +206,55 @@ int32_t SysInstallerManager::SetCpuAffinity(const std::string &taskId, unsigned 
     }
     return helper_->SetCpuAffinity(taskId, reservedCores);
 }
+
+int32_t SysInstallerManager::InstallCloudRom(const std::string &taskId,
+    InstallMode installMode, const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->InstallCloudRom(taskId, installMode, featureInfos, rebootStatus);
+}
+
+int32_t SysInstallerManager::UninstallCloudRom(const std::string &taskId,
+    const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->UninstallCloudRom(taskId, featureInfos, rebootStatus);
+}
+
+int32_t SysInstallerManager::GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos,
+    std::vector<FeatureStatus> &statusInfos)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->GetFeatureStatus(featureInfos, statusInfos);
+}
+
+int32_t SysInstallerManager::GetAllFeatureStatus(const std::string &baseVersion,
+    std::vector<FeatureStatus> &statusInfos)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->GetAllFeatureStatus(baseVersion, statusInfos);
+}
+
+int32_t SysInstallerManager::ClearCloudRom(const std::string &baseVersion,
+    const std::string &featureName)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->ClearCloudRom(baseVersion, featureName);
+}
 } // namespace SysInstaller
 } // namespace OHOS
