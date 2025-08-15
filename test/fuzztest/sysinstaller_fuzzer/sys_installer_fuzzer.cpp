@@ -40,15 +40,15 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     SysInstallerKitsImpl::GetInstance().CancelUpdateVabPackageZip(taskId);
     SysInstallerKitsImpl::GetInstance().StartVabMerge(taskId);
     SysInstallerKitsImpl::GetInstance().GetUpdateResult(taskId, taskType, resultType);
-    SysInstallerKitsImpl::GetInstance().StartUpdateVabPackageZip(taskId, pkgPath);
+    SysInstallerKitsImpl::GetInstance().StartUpdateVabPackageZip(taskId, pkgPaths);
     taskId = "fuzz_test";
     std::string pkgPath = std::string(reinterpret_cast<const char*>(data), size);
-    SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(taskId, pkgPath);
+    SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(taskId, pkgPath);
     pkgPath = "/data/updater/fuzz/updater.zip";
     const std::string location = "location";
     std::string cfgDir = std::string(reinterpret_cast<const char*>(data), size);
     SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(taskId, pkgPath, location, cfgDir);
-    SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(taskId, location, cfgDir);
+    SysInstallerKitsImpl::GetInstance().StartDeleteParaZip(taskId, location, cfgDir);
     std::string dstPath = std::string(reinterpret_cast<const char*>(data), size);
     SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(taskId, pkgPath, dstPath, 1);
     SysInstallerKitsImpl::GetInstance().AccDeleteDir(taskId, dstPath);
