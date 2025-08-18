@@ -39,7 +39,6 @@ public:
     bool SetCpuAffinity(unsigned int reservedCores);
 
 private:
-    bool WaitActionExit();
     void StartNextAction();
 
     std::shared_ptr<StatusManager> statusManager_ {};
