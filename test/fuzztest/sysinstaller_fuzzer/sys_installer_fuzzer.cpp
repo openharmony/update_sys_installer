@@ -142,6 +142,21 @@ void FuzzSysInstallerCloudRom(const uint8_t* data, size_t size)
     GetAllFeatureStatusFuzzTest(data, size);
     ClearCloudRomFuzzTest(data, size);
 }
+
+void FuzzSysInstallerCreateSplitCow(const uint8_t* data, size_t size)
+{
+    uint64_t createdSize = 0;
+    SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(
+        std::string(reinterpret_cast<const char*>(data), size), 1, 0, createdSize);
+    if (size < sizeof(uint64_t)) {
+        return;
+    }
+    std::string name = "fuzz_test";
+    SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(
+        name, *(reinterpret_cast<const uint64_t*>(data)), 0, createdSize);
+    SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(
+        name, 1, *(reinterpret_cast<const uint64_t*>(data)), createdSize);
+}
 }
 
 /* Fuzzer entry point */
@@ -150,6 +165,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     /* Run your code on data */
     OHOS::FuzzSysInstaller(data, size);
     OHOS::FuzzSysInstallerCloudRom(data, size);
+    OHOS::FuzzSysInstallerCreateSplitCow(data, size);
     return 0;
 }
 
