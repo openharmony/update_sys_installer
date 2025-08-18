@@ -143,6 +143,12 @@ int32_t SysInstallerManagerHelper::CreateVabSnapshotCowImg(const std::unordered_
     return -1;
 }
 
+int32_t SysInstallerManagerHelper::CreateVabSnapshotCowImg(const std::string &name, uint64_t size,
+    uint64_t splitSize, uint64_t &createdSize)
+{
+    return -1;
+}
+
 int32_t SysInstallerManagerHelper::ClearVabMetadataAndCow()
 {
     return -1;

@@ -175,6 +175,14 @@ int32_t SysInstallerServer::CreateVabSnapshotCowImg(const std::unordered_map<std
     return SysInstallerManager::GetInstance().CreateVabSnapshotCowImg(partitionInfo);
 }
 
+int32_t SysInstallerServer::CreateVabSnapshotCowImg(const std::string &name, uint64_t size, uint64_t splitSize,
+    uint64_t &createdSize)
+{
+    LOG(INFO) << "CreateVabSnapshotCowImg";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().CreateVabSnapshotCowImg(name, size, splitSize, createdSize);
+}
+
 int32_t SysInstallerServer::ClearVabMetadataAndCow()
 {
     LOG(INFO) << "ClearVabMetadataAndCow";
