@@ -116,7 +116,7 @@ bool WriteModuleUpdateBlock(const struct hvb_buf &pubkey, const std::string &par
         return false;
     }
     uint64_t footerOffset = DEFAULT_MODULE_HVB_INFO_SIZE - HVB_FOOTER_SIZE;
-    if (memcpy_s(buffer.get(), DEFAULT_MODULE_HVB_INFO_SIZE , pubkey.addr, pubkey.size) != EOK ||
+    if (memcpy_s(buffer.get(), DEFAULT_MODULE_HVB_INFO_SIZE, pubkey.addr, pubkey.size) != EOK ||
         memcpy_s(buffer.get() + footerOffset, HVB_FOOTER_SIZE, &footer, HVB_FOOTER_SIZE) != EOK) {
         LOG(ERROR) << "copy footer or pubkey fail";
         return false;
