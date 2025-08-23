@@ -478,14 +478,11 @@ void ModuleUpdateMain::SaveInstallerResult(const std::string &hmpPath, int resul
     const std::string &resultInfo, const Timer &timer)
 {
     LOG(INFO) << "hmpPath:" << hmpPath << " result:" << result << " resultInfo:" << resultInfo;
-    UniqueFd fd(open(MODULE_RESULT_PATH, O_APPEND | O_RDWR | O_CREAT | O_CLOEXEC));
+    UniqueFd fd(open(MODULE_RESULT_PATH, O_APPEND | O_RDWR | O_CREAT | O_CLOEXEC,
+        S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH));
     if (fd.Get() == -1) {
         LOG(ERROR) << "Failed to open file";
         return;
-    }
-    constexpr mode_t mode = 0755; // 0755 : rwx-r-x-r-x
-    if (chmod(MODULE_RESULT_PATH, mode) != 0) {
-        LOG(ERROR) << "Could not chmod " << MODULE_RESULT_PATH;
     }
     std::string writeInfo = hmpPath + ";" + std::to_string(result) + ";" +
         resultInfo + "|" + std::to_string(timer.duration().count()) + "\n";
