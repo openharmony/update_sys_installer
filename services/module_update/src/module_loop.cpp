@@ -432,7 +432,7 @@ bool CloseLoopDev(const std::string &loopPath)
 {
     char buffer[PATH_MAX] = {0};
     if (realpath(loopPath.c_str(), buffer) == nullptr) {
-        LOG(ERROR) << "realpath fail";
+        LOG(ERROR) << "realpath fail, loopPath=" << loopPath.c_str();
         return false;
     }
 
