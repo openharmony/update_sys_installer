@@ -81,7 +81,7 @@ bool GetCertDataFromImage(int fd, uint64_t imageSize, uint64_t offset, uint8_t *
 
 bool WriteModuleUpdateBlock(const struct hvb_buf &pubkey, const std::string &partition)
 {
-    if (pubkey.size + HVB_FOOTER_SIZE > DEFAULT_MODULE_HVB_INFO_SIZE) {
+    if (pubkey.size > DEFAULT_MODULE_HVB_INFO_SIZE - HVB_FOOTER_SIZE) {
         LOG(ERROR) << "the size of pubkey and footer is override";
         return false;
     }
@@ -116,7 +116,7 @@ bool WriteModuleUpdateBlock(const struct hvb_buf &pubkey, const std::string &par
         return false;
     }
     uint64_t footerOffset = DEFAULT_MODULE_HVB_INFO_SIZE - HVB_FOOTER_SIZE;
-    if (memcpy_s(buffer.get(), pubkey.size, pubkey.addr, pubkey.size) != EOK ||
+    if (memcpy_s(buffer.get(), DEFAULT_MODULE_HVB_INFO_SIZE, pubkey.addr, pubkey.size) != EOK ||
         memcpy_s(buffer.get() + footerOffset, HVB_FOOTER_SIZE, &footer, HVB_FOOTER_SIZE) != EOK) {
         LOG(ERROR) << "copy footer or pubkey fail";
         return false;

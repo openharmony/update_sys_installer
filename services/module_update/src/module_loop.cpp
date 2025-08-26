@@ -430,22 +430,22 @@ bool IsLoopDevMatchedImg(const std::string &loopPath, const std::string &imgFile
 
 bool CloseLoopDev(const std::string &loopPath)
 {
-    struct stat st;
-    if (stat(loopPath.c_str(), &st)) {
-        LOG(INFO) << "Stat error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
+    char buffer[PATH_MAX] = {0};
+    if (realpath(loopPath.c_str(), buffer) == nullptr) {
+        LOG(ERROR) << "realpath fail, loopPath=" << loopPath.c_str();
         return false;
     }
 
-    int userFd = open(loopPath.c_str(), O_RDWR);
+    int userFd = open(buffer, O_RDWR);
     if (userFd < 0) {
-        LOG(ERROR) << "Open error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
+        LOG(ERROR) << "Open error, loopPath=" << buffer << ", errno=" << errno;
         return false;
     }
 
     int ret = ioctl(userFd, LOOP_CLR_FD);
     close(userFd);
     if (ret != 0) {
-        LOG(ERROR) << "Clear error, loopPath=" << loopPath.c_str() << ", errno=" << errno;
+        LOG(ERROR) << "Clear error, loopPath=" << buffer << ", errno=" << errno;
         return false;
     }
     return true;
