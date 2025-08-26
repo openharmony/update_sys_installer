@@ -484,6 +484,10 @@ void ModuleUpdateMain::SaveInstallerResult(const std::string &hmpPath, int resul
         LOG(ERROR) << "Failed to open file";
         return;
     }
+    constexpr mode_t mode = 0755; // 0755 : rwx-r-x-r-x
+    if (chmod(MODULE_RESULT_PATH, mode) != 0) {
+        LOG(ERROR) << "Could not chmod " << MODULE_RESULT_PATH;
+    }
     std::string writeInfo = hmpPath + ";" + std::to_string(result) + ";" +
         resultInfo + "|" + std::to_string(timer.duration().count()) + "\n";
     if (CheckAndUpdateRevertResult(hmpPath, writeInfo, "revert")) {
