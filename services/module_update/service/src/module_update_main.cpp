@@ -478,8 +478,7 @@ void ModuleUpdateMain::SaveInstallerResult(const std::string &hmpPath, int resul
     const std::string &resultInfo, const Timer &timer)
 {
     LOG(INFO) << "hmpPath:" << hmpPath << " result:" << result << " resultInfo:" << resultInfo;
-    UniqueFd fd(open(MODULE_RESULT_PATH, O_APPEND | O_RDWR | O_CREAT | O_CLOEXEC,
-        S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH));
+    UniqueFd fd(open(MODULE_RESULT_PATH, O_APPEND | O_RDWR | O_CREAT | O_CLOEXEC, S_IRWXU | S_IRGRP | S_IROTH));
     if (fd.Get() == -1) {
         LOG(ERROR) << "Failed to open file";
         return;
