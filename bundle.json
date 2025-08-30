@@ -14,7 +14,8 @@
     "subsystem": "updater",
     "syscap": [],
     "features": [
-      "sys_installer_cfg_file"
+      "sys_installer_cfg_file",
+      "sys_installer_feature_ohos_cfg"
     ],
     "adapted_system_type": [
       "standard"
