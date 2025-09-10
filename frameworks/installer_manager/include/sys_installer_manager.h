@@ -22,45 +22,41 @@
 
 namespace OHOS {
 namespace SysInstaller {
-class SysInstallerManager {
+class SysInstallerManager final{
     DISALLOW_COPY_MOVE(SysInstallerManager);
 public:
     void RegisterDump(std::unique_ptr<SysInstallerManagerHelper> ptr);
     static SysInstallerManager &GetInstance();
 
-    virtual int32_t SysInstallerInit(const std::string &taskId);
-    virtual int32_t StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath);
-    virtual int32_t SetUpdateCallback(const std::string &taskId, const sptr<ISysInstallerCallback> &updateCallback);
-    virtual int32_t GetUpdateStatus(const std::string &taskId);
-    virtual int32_t StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
+    int32_t SysInstallerInit(const std::string &taskId);
+    int32_t StartUpdatePackageZip(const std::string &taskId, const std::string &pkgPath);
+    int32_t SetUpdateCallback(const std::string &taskId, const sptr<ISysInstallerCallback> &updateCallback);
+    int32_t GetUpdateStatus(const std::string &taskId);
+    int32_t StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir);
-    virtual int32_t StartDeleteParaZip(const std::string &taskId, const std::string &location,
-        const std::string &cfgDir);
-    virtual int32_t AccDecompressAndVerifyPkg(const std::string &taskId, const std::string &srcPath,
+    int32_t StartDeleteParaZip(const std::string &taskId, const std::string &location, const std::string &cfgDir);
+    int32_t AccDecompressAndVerifyPkg(const std::string &taskId, const std::string &srcPath,
         const std::string &dstPath, const uint32_t type);
-    virtual int32_t AccDeleteDir(const std::string &taskId, const std::string &dstPath);
-    virtual int32_t CancelUpdateVabPackageZip(const std::string &taskId);
-    virtual int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath);
-    virtual int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo);
-    virtual int32_t CreateVabSnapshotCowImg(const std::string &name, uint64_t size, uint64_t splitSize,
-        uint64_t &createdSize);
-    virtual int32_t StartVabMerge(const std::string &taskId);
-    virtual int32_t ClearVabMetadataAndCow();
-    virtual std::string GetUpdateResult(const std::string &taskId, const std::string &taskType,
-        const std::string &resultType);
-    virtual int32_t VabUpdateActive();
-    virtual int32_t GetMetadataResult(const std::string &action, bool &result);
-    virtual int32_t StartAbSync();
-    virtual int32_t SetCpuAffinity(const std::string &taskId, unsigned int reservedCores);
+    int32_t AccDeleteDir(const std::string &taskId, const std::string &dstPath);
+    int32_t CancelUpdateVabPackageZip(const std::string &taskId);
+    int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath);
+    int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo);
+    int32_t CreateVabSnapshotCowImg(const std::string &name, uint64_t size, uint64_t splitSize, uint64_t &createdSize);
+    int32_t StartVabMerge(const std::string &taskId);
+    int32_t ClearVabMetadataAndCow();
+    std::string GetUpdateResult(const std::string &taskId, const std::string &taskType, const std::string &resultType);
+    int32_t VabUpdateActive();
+    int32_t GetMetadataResult(const std::string &action, bool &result);
+    int32_t StartAbSync();
+    int32_t SetCpuAffinity(const std::string &taskId, unsigned int reservedCores);
 
-    virtual int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,
+    int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,
         const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);
-    virtual int32_t UninstallCloudRom(const std::string &taskId,
+    int32_t UninstallCloudRom(const std::string &taskId, 
         const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);
-    virtual int32_t GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos,
-        std::vector<FeatureStatus> &statusInfos);
-    virtual int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos);
-    virtual int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName);
+    int32_t GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos, std::vector<FeatureStatus> &statusInfos);
+    int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos);
+    int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName);
 
 protected:
     std::unique_ptr<SysInstallerManagerHelper> helper_ {};
