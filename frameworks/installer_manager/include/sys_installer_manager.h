@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace SysInstaller {
-class SysInstallerManager final{
+class SysInstallerManager final {
     DISALLOW_COPY_MOVE(SysInstallerManager);
 public:
     void RegisterDump(std::unique_ptr<SysInstallerManagerHelper> ptr);
@@ -52,7 +52,7 @@ public:
 
     int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,
         const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);
-    int32_t UninstallCloudRom(const std::string &taskId, 
+    int32_t UninstallCloudRom(const std::string &taskId,
         const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);
     int32_t GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos, std::vector<FeatureStatus> &statusInfos);
     int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos);
