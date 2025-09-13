@@ -109,28 +109,38 @@ void ClearCloudRomFuzzTest(const uint8_t* data, size_t size)
 
 void FuzzSysInstaller(const uint8_t* data, size_t size)
 {
-    std::string taskId = "fuzz_test";
+    std::string taskId = std::string(reinterpret_cast<const char*>(data), size);
+    std::vector<std::string> pkgPaths = {"/data/updater/fuzz/updater.zip"};
+    const std::string taskType = "taskType";
+    const std::string resultType = "resultType";
     SysInstallerKitsImpl::GetInstance().SysInstallerInit(taskId);
     SysInstallerKitsImpl::GetInstance().SetUpdateCallback(taskId, nullptr);
-    SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(taskId,
-        std::string(reinterpret_cast<const char*>(data), size));
-    const std::string pkgPath = "/data/updater/fuzz/updater.zip";
-    const std::string location = "location";
     SysInstallerKitsImpl::GetInstance().GetUpdateStatus(taskId);
-    SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(taskId, pkgPath,
-        location, std::string(reinterpret_cast<const char*>(data), size));
-    SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(taskId,
-        pkgPath, std::string(reinterpret_cast<const char*>(data), size), 1);
-    SysInstallerKitsImpl::GetInstance().AccDeleteDir(taskId, std::string(reinterpret_cast<const char*>(data), size));
-    SysInstallerKitsImpl::GetInstance().ClearVabMetadataAndCow();
-    SysInstallerKitsImpl::GetInstance().VabUpdateActive();
+    SysInstallerKitsImpl::GetInstance().CancelUpdateVabPackageZip(taskId);
     SysInstallerKitsImpl::GetInstance().StartVabMerge(taskId);
-    const std::string action = "needMerge";
+    SysInstallerKitsImpl::GetInstance().GetUpdateResult(taskId, taskType, resultType);
+    SysInstallerKitsImpl::GetInstance().StartUpdateVabPackageZip(taskId, pkgPaths);
+    taskId = "fuzz_test";
+    std::string pkgPath = std::string(reinterpret_cast<const char*>(data), size);
+    SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(taskId, pkgPath);
+    pkgPath = "/data/updater/fuzz/updater.zip";
+    const std::string location = "location";
+    std::string cfgDir = std::string(reinterpret_cast<const char*>(data), size);
+    SysInstallerKitsImpl::GetInstance().StartUpdateParaZip(taskId, pkgPath, location, cfgDir);
+    SysInstallerKitsImpl::GetInstance().StartDeleteParaZip(taskId, location, cfgDir);
+    std::string dstPath = std::string(reinterpret_cast<const char*>(data), size);
+    SysInstallerKitsImpl::GetInstance().AccDecompressAndVerifyPkg(taskId, pkgPath, dstPath, 1);
+    SysInstallerKitsImpl::GetInstance().AccDeleteDir(taskId, dstPath);
+    std::string action = std::string(reinterpret_cast<const char*>(data), size);
     bool result = false;
     SysInstallerKitsImpl::GetInstance().GetMetadataResult(action, result);
     uint32_t reservedCores;
     std::copy(data, data + std::min(sizeof(uint32_t), size), reinterpret_cast<uint8_t*>(&reservedCores));
     SysInstallerKitsImpl::GetInstance().SetCpuAffinity(taskId, reservedCores);
+    SysInstallerKitsImpl::GetInstance().ClearVabMetadataAndCow();
+    SysInstallerKitsImpl::GetInstance().VabUpdateActive();
+    SysInstallerKitsImpl::GetInstance().ExitSysInstaller();
+    SysInstallerKitsImpl::GetInstance().StartAbSync();
 }
 
 void FuzzSysInstallerCloudRom(const uint8_t* data, size_t size)
