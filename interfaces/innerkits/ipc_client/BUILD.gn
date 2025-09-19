@@ -136,7 +136,7 @@ ohos_shared_library("libsysinstaller_shared") {
   ]
 
   if (!is_linux && !is_mingw && !is_mac && ohos_indep_compiler_enable) {
-    external_deps += [ "hilog:libhilog_base", ]
+    external_deps += [ "hilog:libhilog_base" ]
   }
 
   innerapi_tags = [
