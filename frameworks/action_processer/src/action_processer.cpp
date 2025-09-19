@@ -144,9 +144,10 @@ void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::strin
         statusManager_->UpdateCallback(UpdateStatus::UPDATE_STATE_FAILED, 100, errStr); // 100 : action failed
         actionQue_.clear();
         LOG(ERROR) << "CompletedAction errCode:" << errCode << " str:" << errStr;
-        SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_POST_EVENT);
+        SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_POST_FAILED_EVENT);
         return;
     }
+    SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_POST_SUCCESS_EVENT);
 
     if (isSuspend_) {
         LOG(INFO) << "suspend";
