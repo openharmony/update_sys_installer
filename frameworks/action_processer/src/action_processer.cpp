@@ -147,6 +147,7 @@ void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::strin
         SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_POST_EVENT);
         return;
     }
+    SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_POST_SUCCESS_EVENT);
 
     if (isSuspend_) {
         LOG(INFO) << "suspend";
