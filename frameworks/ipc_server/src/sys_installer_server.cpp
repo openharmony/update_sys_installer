@@ -50,7 +50,7 @@ int32_t SysInstallerServer::SysInstallerInit(const std::string &taskId, bool bSt
     LOG(INFO) << "SysInstallerInit";
     if (!logInit_) {
         (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0777); // 0777 : rwxrwxrwx
-        InitUpdaterLogger("SysInstaller", SYS_LOG_FILE, SYS_STAGE_FILE, SYS_ERROR_FILE);
+        InitLogger("SysInstaller");
         logInit_ = true;
     }
     bStreamUpgrade_ = bStreamUpgrade;
