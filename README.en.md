@@ -26,11 +26,11 @@ Software architecture description
 4.  Create Pull Request
 
 
-#### Gitee Feature
+#### Gitcode Feature
 
 1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+2.  Gitcode blog [blog.gitcode.com](https://blog.gitcode.com)
+3.  Explore open source project [https://gitcode.com](https://gitcode.com)
+4.  The most valuable open source project [G-star]
+5.  The manual of Gitcode [https://docs.gitcode.com/docs/help/home/](https://docs.gitcode.com/docs/help/home/)
+6.  The most popular members  [https://gitcode.com/g-star/apply](https://gitcode.com/g-star/apply)
