@@ -99,8 +99,12 @@ bool CheckFileSuffix(const std::string &file, const std::string &suffix)
 
 std::string GetFileName(const std::string &file)
 {
-    std::size_t startPos = file.find_last_of('/') + 1;
+    std::size_t startPos = file.find_last_of('/');
+    startPos = (startPos == std::string::npos) ? 0 : startPos + 1;
     std::size_t endPos = file.find_last_of('.');
+    if (endPos == std::string::npos || endPos <= startPos) {
+        endPos = file.size();
+    }
     return file.substr(startPos, endPos - startPos);
 }
 
