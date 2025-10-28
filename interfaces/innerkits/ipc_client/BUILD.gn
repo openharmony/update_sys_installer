@@ -62,6 +62,7 @@ ohos_source_set("sys_installer_stub") {
   deps = [ ":sysinstaller_interface" ]
 
   external_deps = [
+    "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -86,6 +87,7 @@ ohos_source_set("module_update_stub") {
   deps = [ ":sysinstaller_interface" ]
 
   external_deps = [
+    "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
