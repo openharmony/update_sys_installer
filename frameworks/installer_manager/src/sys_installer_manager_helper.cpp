@@ -144,7 +144,7 @@ int32_t SysInstallerManagerHelper::CreateVabSnapshotCowImg(const std::unordered_
 }
 
 int32_t SysInstallerManagerHelper::CreateVabSnapshotCowImg(const std::string &name, uint64_t size,
-    uint64_t splitSize, uint64_t &createdSize)
+    uint64_t splitSize, uint64_t &createdSize, bool &isCreated)
 {
     return -1;
 }
