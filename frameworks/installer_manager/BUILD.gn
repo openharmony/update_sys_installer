@@ -73,7 +73,7 @@ ohos_static_library("libinstallermanager") {
     "updater:libbinchunkupdate",
     "updater:libpackageExt",
     "updater:libringbuffer",
-    "updater:libupdater",
+    "updater:libupdater_sys_installer",
     "updater:libupdaterlog",
     "updater:libupdaterpackage",
   ]
