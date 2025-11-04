@@ -38,7 +38,7 @@ interface OHOS.SysInstaller.ISysInstaller {
     void GetMetadataResult([in] String action, [out] boolean metadataResult);
     void CreateVabSnapshotCowImg([in] Map<String, unsigned long> partitionInfo);
     void CreateVabSnapshotCowImg([in] String name, [in] unsigned long size, [in] unsigned long splitSize,
-        [out] unsigned long createdSize);
+        [out] unsigned long createdSize, [out] boolean isCreated);
     void GetUpdateResult([in] String taskId, [in] String taskType, [in] String resultType, [out] String updateResult);
     void ExitSysInstaller();
     void StartAbSync();

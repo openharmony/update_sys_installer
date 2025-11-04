@@ -363,7 +363,7 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::unordered_map<s
 }
 
 int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::string &name, uint64_t size, uint64_t splitSize,
-    uint64_t &createdSize)
+    uint64_t &createdSize, bool &isCreated)
 {
     LOG(INFO) << "CreateVabSnapshotCowImg";
     auto updateService = GetService();
@@ -371,7 +371,7 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::string &name, u
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->CreateVabSnapshotCowImg(name, size, splitSize, createdSize);
+    int32_t ret = updateService->CreateVabSnapshotCowImg(name, size, splitSize, createdSize, isCreated);
     LOG(INFO) << "CreateVabSnapshotCowImg ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
