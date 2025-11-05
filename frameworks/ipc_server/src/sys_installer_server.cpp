@@ -161,6 +161,14 @@ int32_t SysInstallerServer::CancelUpdateVabPackageZip(const std::string &taskId)
     return SysInstallerManager::GetInstance().CancelUpdateVabPackageZip(taskId);
 }
 
+int32_t SysInstallerServer::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsImgsSize,
+    uint64_t& availSize)
+{
+    LOG(INFO) << "GetPartitionAvailableSize";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().GetPartitionAvailableSize(dtsImgsSize, availSize);
+}
+
 int32_t SysInstallerServer::StartVabMerge(const std::string &taskId)
 {
     LOG(INFO) << "StartVabMerge";

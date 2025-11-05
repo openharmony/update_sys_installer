@@ -86,6 +86,8 @@ public:
     int32_t AccDeleteDir(const std::string &taskId, const std::string &dstPath) override;
     int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath) override;
     int32_t CancelUpdateVabPackageZip(const std::string &taskId) override;
+    int32_t GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsImgsSize,
+        uint64_t& availSize) override;
     int32_t StartVabMerge(const std::string &taskId) override;
     int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo) override;
     int32_t CreateVabSnapshotCowImg(const std::string &name, uint64_t size, uint64_t splitSize,

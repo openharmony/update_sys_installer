@@ -134,6 +134,16 @@ int32_t SysInstallerManager::CancelUpdateVabPackageZip(const std::string &taskId
     return helper_->CancelUpdateVabPackageZip(taskId);
 }
 
+int32_t SysInstallerManager::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsImgsSize,
+   uint64_t& availSize)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->GetPartitionAvailableSize(dtsImgsSize, availSize);
+}
+
 int32_t SysInstallerManager::StartVabMerge(const std::string &taskId)
 {
     if (helper_ == nullptr) {
