@@ -156,16 +156,17 @@ void FuzzSysInstallerCloudRom(const uint8_t* data, size_t size)
 void FuzzSysInstallerCreateSplitCow(const uint8_t* data, size_t size)
 {
     uint64_t createdSize = 0;
+    bool isCreated = false;
     SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(
-        std::string(reinterpret_cast<const char*>(data), size), 1, 0, createdSize);
+        std::string(reinterpret_cast<const char*>(data), size), 1, 0, createdSize, isCreated);
     if (size < sizeof(uint64_t)) {
         return;
     }
     std::string name = "fuzz_test";
     SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(
-        name, *(reinterpret_cast<const uint64_t*>(data)), 0, createdSize);
+        name, *(reinterpret_cast<const uint64_t*>(data)), 0, createdSize, isCreated);
     SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(
-        name, 1, *(reinterpret_cast<const uint64_t*>(data)), createdSize);
+        name, 1, *(reinterpret_cast<const uint64_t*>(data)), createdSize, isCreated);
 }
 }
 

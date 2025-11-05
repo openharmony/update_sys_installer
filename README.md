@@ -19,5 +19,5 @@ base/update/sys_installer/
 
 ## 相关仓
 
-[升级子系统](https://gitee.com/openharmony/update_updater/blob/master/README_zh.md)
+[升级子系统](https://gitcode.com/openharmony/update_updater/blob/master/README_zh.md)
 

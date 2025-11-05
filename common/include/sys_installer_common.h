@@ -38,6 +38,7 @@ enum InstallerErrCode {
     SYS_PACKAGE_TRANS_FAIL = 40,
     SYS_INSTALL_FAIL = 50,
     SYS_INSTALL_PARA_FAIL = 60,
+    SYS_INSTALL_CANCEL = 70,
 };
 } // namespace SysInstaller
 } // namespace OHOS
