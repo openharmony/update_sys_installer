@@ -36,7 +36,7 @@ SysInstallerCallback::SysInstallerCallback(sptr<ISysInstallerCallbackFunc> callb
 ErrCode SysInstallerCallback::OnUpgradeProgress(UpdateStatus updateStatus, int percent,
     const std::string &resultMsg)
 {
-    LOG(INFO) << "updateStatus:" << static_cast<int>(updateStatus) << " percent:" << percent << " msg:" << resultMsg;
+    LOG(DEBUG) << "updateStatus:" << static_cast<int>(updateStatus) << " percent:" << percent << " msg:" << resultMsg;
     if (callback_ != nullptr) {
         callback_->OnUpgradeProgress(updateStatus, percent, resultMsg);
     }

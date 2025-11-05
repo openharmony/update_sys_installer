@@ -44,7 +44,7 @@ ohos_static_library("libstreamupdate") {
     "openssl:libcrypto_static",
     "updater:libbinchunkupdate",
     "updater:libringbuffer",
-    "updater:libupdater",
+    "updater:libupdater_sys_installer",
     "updater:libutils",
   ]
   part_name = "sys_installer"
