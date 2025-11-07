@@ -49,7 +49,7 @@ int32_t SysInstallerServer::SysInstallerInit(const std::string &taskId, bool bSt
     DEFINE_EXIT_GUARD();
     LOG(INFO) << "SysInstallerInit";
     if (!logInit_) {
-        (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0777); // 0777 : rwxrwxrwx
+        (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0775); // 0775 : rwxrwxr-x
         InitLogger("SysInstaller");
         logInit_ = true;
     }
