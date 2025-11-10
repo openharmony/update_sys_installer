@@ -154,6 +154,14 @@ int32_t SysInstallerServer::StartUpdateVabPackageZip(const std::string &taskId,
     return SysInstallerManager::GetInstance().StartUpdateVabPackageZip(taskId, pkgPath);
 }
 
+int32_t SysInstallerServer::StartUpdateSingularPackageZip(const std::string &taskId,
+    const std::vector<std::string> &pkgPath)
+{
+    LOG(INFO) << "StartUpdateSingularPackageZip";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().StartUpdateSingularPackageZip(taskId, pkgPath);
+}
+
 int32_t SysInstallerServer::CancelUpdateVabPackageZip(const std::string &taskId)
 {
     LOG(INFO) << "CancelUpdateVabPackageZip";
