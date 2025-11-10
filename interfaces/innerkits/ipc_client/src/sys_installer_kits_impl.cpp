@@ -345,6 +345,24 @@ int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::string &taskId
 #endif
 }
 
+int32_t SysInstallerKitsImpl::StartUpdateSingularPackageZip(const std::string &taskId,
+    const std::vector<std::string> &pkgPath)
+{
+    LOG(INFO) << "StartUpdateSingularPackageZip";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->StartUpdateSingularPackageZip(taskId, pkgPath);
+    LOG(INFO) << "StartUpdateSingularPackageZip ret:" << ret;
+#ifdef UPDATER_UT
+    return -1;
+#else
+    return ret;
+#endif
+}
+
 int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo)
 {
     LOG(INFO) << "CreateVabSnapshotCowImg";
