@@ -85,6 +85,7 @@ public:
         const std::string &dstPath, const uint32_t type) override;
     int32_t AccDeleteDir(const std::string &taskId, const std::string &dstPath) override;
     int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath) override;
+    int32_t StartUpdateSingularPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath) override;
     int32_t CancelUpdateVabPackageZip(const std::string &taskId) override;
     int32_t GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsImgsSize,
         uint64_t& availSize) override;
