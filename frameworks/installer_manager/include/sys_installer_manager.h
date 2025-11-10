@@ -40,6 +40,7 @@ public:
     int32_t AccDeleteDir(const std::string &taskId, const std::string &dstPath);
     int32_t CancelUpdateVabPackageZip(const std::string &taskId);
     int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath);
+    int32_t StartUpdateSingularPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath);
     int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo);
     int32_t CreateVabSnapshotCowImg(const std::string &name, uint64_t size, uint64_t splitSize,
         uint64_t &createdSize, bool &isCreated);
