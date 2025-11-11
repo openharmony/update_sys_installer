@@ -120,6 +120,7 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     SysInstallerKitsImpl::GetInstance().StartVabMerge(taskId);
     SysInstallerKitsImpl::GetInstance().GetUpdateResult(taskId, taskType, resultType);
     SysInstallerKitsImpl::GetInstance().StartUpdateVabPackageZip(taskId, pkgPaths);
+    SysInstallerKitsImpl::GetInstance().StartUpdateSingularPackageZip(taskId, pkgPaths);
     taskId = "fuzz_test";
     std::string pkgPath = std::string(reinterpret_cast<const char*>(data), size);
     SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(taskId, pkgPath);
