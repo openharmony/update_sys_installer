@@ -138,8 +138,8 @@ int32_t SysInstallerManagerHelper::CancelUpdateVabPackageZip(const std::string &
     return -1;
 }
 
-int32_t SysInstallerManagerHelper::GetPartitionAvailableSize(const std::map<std::string,
-    uint64_t>& dtsImgsSize, uint64_t& availSize)
+int32_t SysInstallerManagerHelper::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsCowsSize,
+    const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize)
 {
     return -1;
 }

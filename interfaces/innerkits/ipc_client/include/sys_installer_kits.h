@@ -57,8 +57,8 @@ public:
     virtual int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo) = 0;
     virtual int32_t CreateVabSnapshotCowImg(const std::string &name, uint64_t size, uint64_t splitSize,
         uint64_t &createdSize, bool &isCreated) = 0;
-    virtual int32_t GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsImgsSize,
-        uint64_t& availSize) = 0;
+    virtual int32_t GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsCowsSize,
+        const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize) = 0;
     virtual int32_t StartVabMerge(const std::string &taskId) = 0;
     virtual int32_t ClearVabMetadataAndCow() = 0;
     virtual std::string GetUpdateResult(const std::string &taskId, const std::string &taskType,
