@@ -398,8 +398,8 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::string &name, u
 #endif
 }
 
-int32_t SysInstallerKitsImpl::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsImgsSize,
-    uint64_t& availSize)
+int32_t SysInstallerKitsImpl::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsCowsSize,
+    const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize)
 {
     LOG(INFO) << "GetPartitionAvailableSize";
     auto updateService = GetService();
@@ -407,7 +407,7 @@ int32_t SysInstallerKitsImpl::GetPartitionAvailableSize(const std::map<std::stri
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->GetPartitionAvailableSize(dtsImgsSize, availSize);
+    int32_t ret = updateService->GetPartitionAvailableSize(dtsCowsSize, dtsImgsSize, availSize);
     LOG(INFO) << "GetPartitionAvailableSize ret:" << ret;
 #ifdef UPDATER_UT
     return -1;
