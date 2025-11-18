@@ -387,13 +387,13 @@ bool RemoveSpecifiedDir(const std::string &fpInfo, bool keepDir)
         }
         return true;
     }
-    if (!std::filesystem::is_directory(fpInfo)) {
+    std::error_code errorCode;
+    if (!std::filesystem::is_directory(fpInfo, errorCode)) {
         LOG(WARNING) << "The file is not a directory: " << fpInfo.c_str();
         return false;
     }
     bool ret = true;
-    for (const auto &entry : std::filesystem::directory_iterator(fpInfo)) {
-        std::error_code errorCode;
+    for (const auto &entry : std::filesystem::directory_iterator(fpInfo, errorCode)) {
         LOG(INFO) << "deleted " << entry.path().c_str() << ";";
         if (!std::filesystem::remove_all(entry.path(), errorCode)) {
             LOG(ERROR) << "Failed to deleted " << entry.path().c_str() << "; errorCode: " << errorCode.value();
