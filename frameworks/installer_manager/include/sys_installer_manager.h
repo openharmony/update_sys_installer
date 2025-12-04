@@ -61,6 +61,7 @@ public:
     int32_t GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos, std::vector<FeatureStatus> &statusInfos);
     int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos);
     int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName);
+    int32_t UpdateCloudRomVersion(const std::string &baseVersion);
 
 protected:
     std::unique_ptr<SysInstallerManagerHelper> helper_ {};

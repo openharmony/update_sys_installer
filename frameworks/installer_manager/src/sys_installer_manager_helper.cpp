@@ -268,5 +268,10 @@ int32_t SysInstallerManagerHelper::ClearCloudRom(const std::string &baseVersion,
 {
     return -1;
 }
+
+int32_t SysInstallerManagerHelper::UpdateCloudRomVersion(const std::string &baseVersion)
+{
+    return -1;
+}
 } // namespace SysInstaller
 } // namespace OHOS

@@ -287,6 +287,13 @@ int32_t SysInstallerServer::ClearCloudRom(const std::string &baseVersion,
     return SysInstallerManager::GetInstance().ClearCloudRom(baseVersion, featureName);
 }
 
+int32_t SysInstallerServer::UpdateCloudRomVersion(const std::string &baseVersion)
+{
+    LOG(INFO) << "UpdateCloudRomVersion";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().UpdateCloudRomVersion(baseVersion);
+}
+
 int32_t SysInstallerServer::ExitSysInstaller()
 {
     LOG(INFO) << "ExitSysInstaller";

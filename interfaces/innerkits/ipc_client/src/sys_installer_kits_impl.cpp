@@ -561,6 +561,17 @@ int32_t SysInstallerKitsImpl::ClearCloudRom(const std::string &baseVersion,
     return updateService->ClearCloudRom(baseVersion, featureName);
 }
 
+int32_t SysInstallerKitsImpl::UpdateCloudRomVersion(const std::string &baseVersion)
+{
+    LOG(INFO) << "UpdateCloudRomVersion";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    return updateService->UpdateCloudRomVersion(baseVersion);
+}
+
 int32_t SysInstallerKitsImpl::ExitSysInstaller()
 {
     LOG(INFO) << "ExitSysInstaller";

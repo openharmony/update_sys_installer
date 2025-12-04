@@ -106,6 +106,7 @@ public:
         std::vector<FeatureStatus> &statusInfos) override;
     int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos) override;
     int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName) override;
+    int32_t UpdateCloudRomVersion(const std::string &baseVersion) override;
     int32_t ExitSysInstaller() override;
     int32_t StartAbSync() override;
     int32_t SetCpuAffinity(const std::string &taskId, uint32_t reservedCores) override;

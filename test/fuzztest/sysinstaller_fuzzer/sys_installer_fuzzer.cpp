@@ -107,6 +107,15 @@ void ClearCloudRomFuzzTest(const uint8_t* data, size_t size)
     SysInstallerKitsImpl::GetInstance().ClearCloudRom(baseVersion, featureName);
 }
 
+void UpdateCloudRomVersionFuzzTest(const uint8_t* data, size_t size)
+{
+    if (size < 0) {
+        return;
+    }
+    std::string baseVersion = std::string(reinterpret_cast<const char*>(data), size);
+    SysInstallerKitsImpl::GetInstance().UpdateCloudRomVersion(baseVersion);
+}
+
 void FuzzSysInstaller(const uint8_t* data, size_t size)
 {
     std::string taskId = std::string(reinterpret_cast<const char*>(data), size);
@@ -152,6 +161,7 @@ void FuzzSysInstallerCloudRom(const uint8_t* data, size_t size)
     GetFeatureStatusFuzzTest(data, size);
     GetAllFeatureStatusFuzzTest(data, size);
     ClearCloudRomFuzzTest(data, size);
+    UpdateCloudRomVersionFuzzTest(data, size);
 }
 
 void FuzzSysInstallerCreateSplitCow(const uint8_t* data, size_t size)
