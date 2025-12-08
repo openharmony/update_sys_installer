@@ -51,4 +51,5 @@ interface OHOS.SysInstaller.ISysInstaller {
     void GetFeatureStatus([in] List<FeatureInfo> featureInfos, [inout] List<FeatureStatus> statusInfos);
     void GetAllFeatureStatus([in] String baseVersion, [inout] List<FeatureStatus> statusInfos);
     void ClearCloudRom([in] String baseVersion, [in] String featureName);
+    void UpdateCloudRomVersion([in] String baseVersion);
 }
