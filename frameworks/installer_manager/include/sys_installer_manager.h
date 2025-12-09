@@ -62,6 +62,7 @@ public:
     int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos);
     int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName);
     int32_t UpdateCloudRomVersion(const std::string &baseVersion);
+    int32_t ClearVabPatch();
 
 protected:
     std::unique_ptr<SysInstallerManagerHelper> helper_ {};

@@ -273,5 +273,10 @@ int32_t SysInstallerManagerHelper::UpdateCloudRomVersion(const std::string &base
 {
     return -1;
 }
+
+int32_t SysInstallerManagerHelper::ClearVabPatch()
+{
+    return -1;
+}
 } // namespace SysInstaller
 } // namespace OHOS

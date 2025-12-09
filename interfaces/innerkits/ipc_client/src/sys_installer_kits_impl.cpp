@@ -641,5 +641,22 @@ void SysInstallerKitsImpl::LoadServiceFail()
 {
     serviceCv_.notify_all();
 }
+
+int32_t SysInstallerKitsImpl::ClearVabPatch()
+{
+    LOG(INFO) << "ClearVabPatch";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->ClearVabPatch();
+    LOG(INFO) << "ClearVabPatch ret:" << ret;
+#ifdef UPDATER_UT
+    return -1;
+#else
+    return ret;
+#endif
+}
 }
 } // namespace OHOS
