@@ -79,7 +79,6 @@ ohos_static_library("module_update_static") {
     "c_utils:utils",
     "ipc:ipc_single",
     "updater:libupdaterlog_shared",
-    "updater:libutils",
   ]
 
   if (defined(global_parts_info.startup_hvb)) {
