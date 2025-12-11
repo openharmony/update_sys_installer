@@ -69,6 +69,7 @@ public:
     virtual int32_t ExitSysInstaller();
     virtual int32_t StartAbSync();
     virtual int32_t SetCpuAffinity(const std::string &taskId, unsigned int reservedCores);
+    virtual int32_t ClearVabPatch();
 
     void LoadServiceSuccess();
     void LoadServiceFail();

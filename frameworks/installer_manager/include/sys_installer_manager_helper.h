@@ -66,6 +66,7 @@ public:
     virtual int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos);
     virtual int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName);
     virtual int32_t UpdateCloudRomVersion(const std::string &baseVersion);
+    virtual int32_t ClearVabPatch();
 
 protected:
     std::map<std::string, std::shared_ptr<StatusManager>> statusManagerMap_;

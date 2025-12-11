@@ -379,5 +379,12 @@ void SysInstallerServer::OnStop()
 {
     LOG(INFO) << "OnStop";
 }
+
+int32_t SysInstallerServer::ClearVabPatch()
+{
+    LOG(INFO) << "ClearVabPatch";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().ClearVabPatch();
+}
 } // namespace SysInstaller
 } // namespace OHOS
