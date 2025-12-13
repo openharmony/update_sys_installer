@@ -69,6 +69,13 @@ void FuzzModuleUpdateOther(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
+    if (data == nullptr) {
+        return 0
+    }
+    constexpr size_t maxSize = 2048;
+    if (size > maxSize) {
+        size = maxSize;
+    }
     OHOS::FuzzModuleUpdate(data, size);
     return 0;
 }
