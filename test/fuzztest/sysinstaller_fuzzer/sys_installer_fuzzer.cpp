@@ -149,7 +149,6 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     SysInstallerKitsImpl::GetInstance().SetCpuAffinity(taskId, reservedCores);
     SysInstallerKitsImpl::GetInstance().ClearVabMetadataAndCow();
     SysInstallerKitsImpl::GetInstance().VabUpdateActive();
-    SysInstallerKitsImpl::GetInstance().ExitSysInstaller();
     SysInstallerKitsImpl::GetInstance().StartAbSync();
 }
 
