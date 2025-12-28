@@ -62,5 +62,10 @@ ErrCode SysInstallerCallback::OnUpgradeFeatureStatus(const FeatureStatus &status
     }
     return 0;
 }
+
+void SysInstallerCallback::RegisterCallback(sptr<ISysInstallerCallbackFunc> callback)
+{
+    callback_ = callback;
+}
 }
 } // namespace OHOS
