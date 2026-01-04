@@ -137,10 +137,6 @@ ohos_shared_library("libsysinstaller_shared") {
     "zlib:shared_libz",
   ]
 
-  if (!is_linux && !is_mingw && !is_mac && ohos_indep_compiler_enable) {
-    external_deps += [ "hilog:libhilog_base" ]
-  }
-
   innerapi_tags = [
     "platformsdk",
     "sasdk",
@@ -324,10 +320,6 @@ ohos_shared_library("libmodule_update_shared") {
     "updater:libupdaterlog",
     "zlib:shared_libz",
   ]
-
-  if (!is_linux && !is_mingw && !is_mac && ohos_indep_compiler_enable) {
-    external_deps += [ "hilog:libhilog_base", ]
-  }
 
   innerapi_tags = [
     "platformsdk",
