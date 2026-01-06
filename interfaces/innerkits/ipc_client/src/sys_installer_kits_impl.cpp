@@ -450,7 +450,7 @@ int32_t SysInstallerKitsImpl::ClearVabMetadataAndCow()
 #endif
 }
 
-int32_t SysInstallerKitsImpl::VabUpdateActive()
+int32_t SysInstallerKitsImpl::VabUpdateActive(VabActiveMode mode)
 {
     LOG(INFO) << "VabUpdateActive";
     auto updateService = GetService();
@@ -458,7 +458,7 @@ int32_t SysInstallerKitsImpl::VabUpdateActive()
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->VabUpdateActive();
+    int32_t ret = updateService->VabUpdateActive(mode);
     LOG(INFO) << "VabUpdateActive ret:" << ret;
 #ifdef UPDATER_UT
     return -1;

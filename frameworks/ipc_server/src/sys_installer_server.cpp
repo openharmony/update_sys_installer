@@ -214,11 +214,11 @@ int32_t SysInstallerServer::GetUpdateResult(const std::string &taskId, const std
     return 0;
 }
 
-int32_t SysInstallerServer::VabUpdateActive()
+int32_t SysInstallerServer::VabUpdateActive(VabActiveMode mode)
 {
     LOG(INFO) << "VabUpdateActive";
     DEFINE_EXIT_GUARD();
-    return SysInstallerManager::GetInstance().VabUpdateActive();
+    return SysInstallerManager::GetInstance().VabUpdateActive(mode);
 }
 
 int32_t SysInstallerServer::GetMetadataResult(const std::string &action, bool &result)

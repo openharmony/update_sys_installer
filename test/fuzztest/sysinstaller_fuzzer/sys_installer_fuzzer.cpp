@@ -148,7 +148,7 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     std::copy(data, data + std::min(sizeof(uint32_t), size), reinterpret_cast<uint8_t*>(&reservedCores));
     SysInstallerKitsImpl::GetInstance().SetCpuAffinity(taskId, reservedCores);
     SysInstallerKitsImpl::GetInstance().ClearVabMetadataAndCow();
-    SysInstallerKitsImpl::GetInstance().VabUpdateActive();
+    SysInstallerKitsImpl::GetInstance().VabUpdateActive(VabActiveMode::VAB_ACTIVE_HOTA);
     SysInstallerKitsImpl::GetInstance().StartAbSync();
 }
 
