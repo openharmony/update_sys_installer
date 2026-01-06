@@ -109,6 +109,7 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
     int32_t ret = -1;
     Timer timer;
     ON_SCOPE_EXIT(saveResult) {
+        (void)remove(MODULE_RESULT_PATH);
         ModuleUpdateMain::GetInstance().SaveInstallerResult(path, ret, std::to_string(ret), timer);
         if (updateCallback != nullptr) {
             updateCallback->OnUpgradeProgress(ret == 0 ? UpdateStatus::UPDATE_STATE_SUCCESSFUL :
