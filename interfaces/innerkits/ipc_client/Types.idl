@@ -59,7 +59,7 @@ enum CloudRomInstallStatus {
 enum VabActiveMode {
     VAB_ACTIVE_HOTA = 0,
     VAB_ACTIVE_PATCH,
-}
+};
 
 struct FeatureInfo {
     boolean isNeedReboot;
