@@ -40,7 +40,7 @@ public:
 
 private:
     bool WaitActionExit();
-    void StartNextAction();
+    void StartNextAction(InstallerErrCode errCode);
 
     std::shared_ptr<StatusManager> statusManager_ {};
     std::deque<std::unique_ptr<IAction>> actionQue_ {};
