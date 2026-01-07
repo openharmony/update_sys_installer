@@ -201,13 +201,13 @@ std::string  SysInstallerManager::GetUpdateResult(const std::string &taskId, con
     return helper_->GetUpdateResult(taskId, taskType, resultType);
 }
 
-int32_t SysInstallerManager::VabUpdateActive()
+int32_t SysInstallerManager::VabUpdateActive(VabActiveMode mode)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->VabUpdateActive();
+    return helper_->VabUpdateActive(mode);
 }
 
 int32_t SysInstallerManager::GetMetadataResult(const std::string &action, bool &result)

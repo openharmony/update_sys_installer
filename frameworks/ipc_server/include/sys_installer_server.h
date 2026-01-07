@@ -96,7 +96,7 @@ public:
     int32_t ClearVabMetadataAndCow() override;
     int32_t GetUpdateResult(const std::string &taskId, const std::string &taskType,
         const std::string &resultType, std::string &updateResult) override;
-    int32_t VabUpdateActive() override;
+    int32_t VabUpdateActive(VabActiveMode mode) override;
     int32_t GetMetadataResult(const std::string &action, bool &result) override;
     int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,
         const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus) override;

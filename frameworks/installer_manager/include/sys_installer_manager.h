@@ -49,7 +49,7 @@ public:
     int32_t StartVabMerge(const std::string &taskId);
     int32_t ClearVabMetadataAndCow();
     std::string GetUpdateResult(const std::string &taskId, const std::string &taskType, const std::string &resultType);
-    int32_t VabUpdateActive();
+    int32_t VabUpdateActive(VabActiveMode mode);
     int32_t GetMetadataResult(const std::string &action, bool &result);
     int32_t StartAbSync();
     int32_t SetCpuAffinity(const std::string &taskId, unsigned int reservedCores);

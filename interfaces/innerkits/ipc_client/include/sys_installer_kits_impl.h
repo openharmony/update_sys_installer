@@ -53,7 +53,7 @@ public:
     virtual int32_t ClearVabMetadataAndCow();
     virtual std::string GetUpdateResult(const std::string &taskId, const std::string &taskType,
         const std::string &resultType);
-    virtual int32_t VabUpdateActive();
+    virtual int32_t VabUpdateActive(VabActiveMode mode);
     virtual int32_t GetMetadataResult(const std::string &action, bool &result);
     virtual int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,
         const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);

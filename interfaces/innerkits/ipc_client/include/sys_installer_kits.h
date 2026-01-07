@@ -63,7 +63,7 @@ public:
     virtual int32_t ClearVabMetadataAndCow() = 0;
     virtual std::string GetUpdateResult(const std::string &taskId, const std::string &taskType,
         const std::string &resultType) = 0;
-    virtual int32_t VabUpdateActive() = 0;
+    virtual int32_t VabUpdateActive(VabActiveMode mode) = 0;
     virtual int32_t GetMetadataResult(const std::string &action, bool &result) = 0;
     virtual int32_t ExitSysInstaller() = 0;
     virtual int32_t StartAbSync() = 0;

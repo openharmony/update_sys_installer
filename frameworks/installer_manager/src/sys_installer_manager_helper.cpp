@@ -219,7 +219,7 @@ std::shared_ptr<ActionProcesser> SysInstallerManagerHelper::GetActionProcesser(c
     return nullptr;
 }
 
-int32_t SysInstallerManagerHelper::VabUpdateActive()
+int32_t SysInstallerManagerHelper::VabUpdateActive(VabActiveMode mode)
 {
     return -1;
 }
