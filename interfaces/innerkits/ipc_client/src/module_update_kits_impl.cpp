@@ -177,7 +177,6 @@ int32_t ModuleUpdateKitsImpl::Init()
 
 int32_t ModuleUpdateKitsImpl::InitModuleUpdate()
 {
-    InitUpdaterLogger("ModuleUpdaterClient", MODULE_UPDATE_LOG_FILE, "", "");
     LOG(INFO) << "InitModuleUpdate";
     int ret = Init();
     if (ret != 0) {
