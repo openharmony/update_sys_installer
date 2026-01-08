@@ -32,6 +32,7 @@ constexpr const char *SYS_ERROR_FILE = "/data/updater/log/sys_installer_error_co
 enum InstallerErrCode {
     SYS_UPDATE_SUCCESS = 0,
     SYS_PKG_NOT_EXIST,
+    SYS_UPDATE_RETRY_SUCCESS,
     SYS_AUTH_CHECK_FAIL = 10,
     SYS_SIGN_VERIFY_FAIL = 20,
     SYS_VERSION_VERIFY_FAIL = 30,

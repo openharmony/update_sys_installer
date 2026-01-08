@@ -126,7 +126,7 @@ void ActionProcesser::Resume()
         return curAction_->ResumeAction();
     }
 
-    StartNextAction();
+    StartNextAction(SYS_UPDATE_SUCCESS);
 }
 
 void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::string &errStr)
@@ -138,7 +138,7 @@ void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::strin
 
     LOG(INFO) << "Completed " << curAction_->GetActionName();
     curAction_.reset();
-    if (errCode != SYS_UPDATE_SUCCESS) {
+    if (errCode != SYS_UPDATE_SUCCESS && errCode != SYS_UPDATE_RETRY_SUCCESS) {
         isRunning_ = false;
         isSuspend_ = false;
         OHOS::UpdateStatus retStatus = (errCode == SYS_INSTALL_CANCEL) ? UpdateStatus::UPDATE_STATE_CANCEL :
@@ -156,16 +156,18 @@ void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::strin
         return;
     }
 
-    StartNextAction();
+    StartNextAction(errCode);
 }
 
-void ActionProcesser::StartNextAction()
+void ActionProcesser::StartNextAction(InstallerErrCode errCode)
 {
     if (actionQue_.empty()) {
-        LOG(INFO) << "Action queue empty, successful";
+        LOG(INFO) << "Action queue empty, successful, errcode is " << errCode;
         isRunning_ = false;
         isSuspend_ = false;
-        statusManager_->UpdateCallback(UpdateStatus::UPDATE_STATE_SUCCESSFUL, 100, ""); // 100 : action completed
+        statusManager_->UpdateCallback(errCode == SYS_UPDATE_RETRY_SUCCESS ?
+            UpdateStatus::UPDATE_STATE_RETRY_SUCCESSFUL : UpdateStatus::UPDATE_STATE_SUCCESSFUL,
+            100, ""); // 100 : action completed
         return;
     }
 
