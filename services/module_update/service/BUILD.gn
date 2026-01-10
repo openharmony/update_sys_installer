@@ -79,7 +79,8 @@ ohos_static_library("libmodule_update_service_static") {
     "samgr:samgr_proxy",
     "updater:libpackage_shared",
     "updater:libupdaterlog_shared",
-    "updater:libutils_fs",
+    "updater:libutils",
+    "updater:libupdaterpackage_shared",
   ]
 
   if (build_selinux) {
