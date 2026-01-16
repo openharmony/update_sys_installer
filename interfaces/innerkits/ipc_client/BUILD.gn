@@ -40,7 +40,7 @@ idl_gen_interface("sysinstaller_interface") {
   sources = [ "ISysInstaller.idl" ]
   sources_callback = [ "ISysInstallerCallback.idl" ]
   sources_common = ["Types.idl"]
-  input = [
+  inputs = [
     "ISysInstaller.idl",
     "ISysInstallerCallback.idl",
     "Types.idl"
