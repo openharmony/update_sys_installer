@@ -43,7 +43,7 @@ idl_gen_interface("sysinstaller_interface") {
   inputs = [
     "ISysInstaller.idl",
     "ISysInstallerCallback.idl",
-    "Types.idl"
+    "Types.idl",
   ]
 
   log_domainid = "0xD002E01"
