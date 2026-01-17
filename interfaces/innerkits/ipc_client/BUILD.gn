@@ -40,6 +40,11 @@ idl_gen_interface("sysinstaller_interface") {
   sources = [ "ISysInstaller.idl" ]
   sources_callback = [ "ISysInstallerCallback.idl" ]
   sources_common = ["Types.idl"]
+  inputs = [
+    "ISysInstaller.idl",
+    "ISysInstallerCallback.idl",
+    "Types.idl",
+  ]
 
   log_domainid = "0xD002E01"
   log_tag = "SysInstaller"
