@@ -78,7 +78,7 @@ ohos_shared_library("module_update_utils") {
     defines = [ "SUPPORT_HVB" ]
 
     external_deps += [
-      "hvb:libhvb_static",
+      "hvb:libhvb_static_real",
       "init:libfsmanager_static_real",
     ]
   }
