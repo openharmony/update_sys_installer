@@ -134,10 +134,10 @@ ohos_shared_library("libsysinstaller_shared") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "lz4:liblz4_static",
+    "lz4:liblz4_shared",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "updater:libupdaterlog",
+    "updater:libupdaterlog_shared",
     "updater:libutils_fs",
     "zlib:shared_libz",
   ]
