@@ -21,6 +21,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "module_ipc_helper.h"
 #include "module_update_kits.h"
 #include "module_update_kits_impl.h"
@@ -29,11 +30,12 @@ namespace OHOS {
 using namespace SysInstaller;
 void FuzzModuleUpdate(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider fdp(data, size);
     ModuleUpdateKits &moduleUpdateKits = ModuleUpdateKits::GetInstance();
-    moduleUpdateKits.InstallModulePackage(std::string(reinterpret_cast<const char*>(data), size));
-    moduleUpdateKits.UninstallModulePackage(std::string(reinterpret_cast<const char*>(data), size));
+    moduleUpdateKits.InstallModulePackage(fdp.ConsumeRandomLengthString());
+    moduleUpdateKits.UninstallModulePackage(fdp.ConsumeRandomLengthString());
     std::list<ModulePackageInfo> infos;
-    moduleUpdateKits.GetModulePackageInfo(std::string(reinterpret_cast<const char*>(data), size), infos);
+    moduleUpdateKits.GetModulePackageInfo(fdp.ConsumeRandomLengthString(), infos);
     moduleUpdateKits.ExitModuleUpdate();
 }
 
@@ -69,13 +71,6 @@ void FuzzModuleUpdateOther(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    if (data == nullptr || size == 0) {
-        return 0;
-    }
-    constexpr size_t maxSize = 2048;
-    if (size > maxSize) {
-        size = maxSize;
-    }
     OHOS::FuzzModuleUpdate(data, size);
     return 0;
 }
