@@ -1,0 +1,49 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/update/sys_installer/sys_installer_default_cfg.gni")
+import("//build/ohos.gni")
+
+sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
+
+config("exported_header_files") {
+  visibility = [":*"]
+  include_dirs = [
+    "${sys_installer_path}/services/timer/include"
+  ]
+}
+
+ohos_static_library("libsysinstaller_timer") {
+  include_dirs = [
+    "${sys_installer_path}/services/timer/include",
+  ]
+
+  public_configs = [
+    ":exported_header_files",
+  ]
+
+  sources = [
+    "src/sys_installer_timer_info.cpp",
+    "src/sys_installer_timer_manager.cpp",
+  ]
+
+  external_deps = [
+    "hilog:libhilog",
+    "updater:libupdaterlog",
+    "ability_runtime:wantagent_innerkits",
+    "time_service:time_client",
+  ]
+
+  part_name = "sys_installer"
+  subsystem_name = "updater"
+}

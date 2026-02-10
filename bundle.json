@@ -40,7 +40,9 @@
         "openssl",
         "zlib",
         "bzip2",
-        "drivers_peripheral_partitionslot"
+        "drivers_peripheral_partitionslot",
+        "time_service",
+        "ability_runtime"
       ],
       "third_party": []
     },
