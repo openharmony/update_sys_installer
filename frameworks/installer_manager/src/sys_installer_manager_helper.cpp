@@ -278,5 +278,17 @@ int32_t SysInstallerManagerHelper::ClearVabPatch()
 {
     return -1;
 }
+
+bool SysInstallerManagerHelper::IsTaskRunning()
+{
+    std::lock_guard<std::recursive_mutex> lock(processerLock_);
+    for (const auto& [taskId, actionProcesser] : actionProcesserMap_) {
+        if (actionProcesser->IsRunning()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace SysInstaller
 } // namespace OHOS

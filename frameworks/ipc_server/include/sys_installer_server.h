@@ -128,9 +128,13 @@ public:
 private:
     bool IsTaskRunning(void);
     std::string GetRunningTask(void);
+    uint64_t StartExitCheckTimer();
+
     bool logInit_ = false;
     bool bStreamUpgrade_ = false;
     std::mutex sysInstallerServerLock_;
+    uint64_t exitCheckTimerId_{0};
+    uint32_t idleCounter_{0};
 };
 } // namespace SysInstaller
 } // namespace OHOS

@@ -304,5 +304,15 @@ int32_t SysInstallerManager::ClearVabPatch()
     }
     return helper_->ClearVabPatch();
 }
+
+bool SysInstallerManager::IsTaskRunning()
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return false;
+    }
+    return helper_->IsTaskRunning();
+}
+
 } // namespace SysInstaller
 } // namespace OHOS
