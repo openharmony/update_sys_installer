@@ -316,6 +316,7 @@ int32_t SysInstallerKitsImpl::AccDeleteDir(const std::string &taskId, const std:
 
 int32_t SysInstallerKitsImpl::CancelUpdateVabPackageZip(const std::string &taskId)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "CancelUpdateVabPackageZip";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -325,11 +326,15 @@ int32_t SysInstallerKitsImpl::CancelUpdateVabPackageZip(const std::string &taskI
     int32_t ret = updateService->CancelUpdateVabPackageZip(taskId);
     LOG(INFO) << "CancelUpdateVabPackageZip ret:" << ret;
     return ret;
+#else
+    return -1;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::string &taskId,
     const std::vector<std::string> &pkgPath)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "StartUpdateVabPackageZip";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -338,16 +343,17 @@ int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::string &taskId
     }
     int32_t ret = updateService->StartUpdateVabPackageZip(taskId, pkgPath);
     LOG(INFO) << "StartUpdateVabPackageZip ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 int32_t SysInstallerKitsImpl::StartUpdateSingularPackageZip(const std::string &taskId,
     const std::vector<std::string> &pkgPath)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "StartUpdateSingularPackageZip";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -356,15 +362,16 @@ int32_t SysInstallerKitsImpl::StartUpdateSingularPackageZip(const std::string &t
     }
     int32_t ret = updateService->StartUpdateSingularPackageZip(taskId, pkgPath);
     LOG(INFO) << "StartUpdateSingularPackageZip ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "CreateVabSnapshotCowImg";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -373,16 +380,17 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::unordered_map<s
     }
     int32_t ret = updateService->CreateVabSnapshotCowImg(partitionInfo);
     LOG(INFO) << "CreateVabSnapshotCowImg ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::string &name, uint64_t size, uint64_t splitSize,
     uint64_t &createdSize, bool &isCreated)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "CreateVabSnapshotCowImg";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -391,16 +399,17 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::string &name, u
     }
     int32_t ret = updateService->CreateVabSnapshotCowImg(name, size, splitSize, createdSize, isCreated);
     LOG(INFO) << "CreateVabSnapshotCowImg ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 int32_t SysInstallerKitsImpl::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsCowsSize,
     const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "GetPartitionAvailableSize";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -409,15 +418,16 @@ int32_t SysInstallerKitsImpl::GetPartitionAvailableSize(const std::map<std::stri
     }
     int32_t ret = updateService->GetPartitionAvailableSize(dtsCowsSize, dtsImgsSize, availSize);
     LOG(INFO) << "GetPartitionAvailableSize ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 int32_t SysInstallerKitsImpl::StartVabMerge(const std::string &taskId)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "StartVabMerge";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -426,15 +436,16 @@ int32_t SysInstallerKitsImpl::StartVabMerge(const std::string &taskId)
     }
     int32_t ret = updateService->StartVabMerge(taskId);
     LOG(INFO) << "StartVabMerge ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 int32_t SysInstallerKitsImpl::ClearVabMetadataAndCow()
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "ClearVabMetadataAndCow";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -443,15 +454,16 @@ int32_t SysInstallerKitsImpl::ClearVabMetadataAndCow()
     }
     int32_t ret = updateService->ClearVabMetadataAndCow();
     LOG(INFO) << "ClearVabMetadataAndCow ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 int32_t SysInstallerKitsImpl::VabUpdateActive(VabActiveMode mode)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "VabUpdateActive";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -460,15 +472,16 @@ int32_t SysInstallerKitsImpl::VabUpdateActive(VabActiveMode mode)
     }
     int32_t ret = updateService->VabUpdateActive(mode);
     LOG(INFO) << "VabUpdateActive ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 int32_t SysInstallerKitsImpl::GetMetadataResult(const std::string &action, bool &result)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "GetMetadataResult";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -477,16 +490,17 @@ int32_t SysInstallerKitsImpl::GetMetadataResult(const std::string &action, bool 
     }
     int32_t ret = updateService->GetMetadataResult(action, result);
     LOG(INFO) << "GetMetadataResult ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 std::string SysInstallerKitsImpl::GetUpdateResult(const std::string &taskId, const std::string &taskType,
     const std::string &resultType)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "GetUpdateResult";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -499,11 +513,15 @@ std::string SysInstallerKitsImpl::GetUpdateResult(const std::string &taskId, con
         return std::string("");
     }
     return updateResult;
+#else
+    return "";
+#endif
 }
 
 int32_t SysInstallerKitsImpl::InstallCloudRom(const std::string &taskId,
     InstallMode installMode, const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "InstallCloudRom";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -511,11 +529,15 @@ int32_t SysInstallerKitsImpl::InstallCloudRom(const std::string &taskId,
         return -1;
     }
     return updateService->InstallCloudRom(taskId, installMode, featureInfos, rebootStatus);
+#else
+    return -1;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::UninstallCloudRom(const std::string &taskId,
     const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "UninstallCloudRom";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -523,11 +545,15 @@ int32_t SysInstallerKitsImpl::UninstallCloudRom(const std::string &taskId,
         return -1;
     }
     return updateService->UninstallCloudRom(taskId, featureInfos, rebootStatus);
+#else
+    return -1;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos,
     std::vector<FeatureStatus> &statusInfos)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "GetFeatureStatus";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -535,11 +561,15 @@ int32_t SysInstallerKitsImpl::GetFeatureStatus(const std::vector<FeatureInfo> &f
         return -1;
     }
     return updateService->GetFeatureStatus(featureInfos, statusInfos);
+#else
+    return -1;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::GetAllFeatureStatus(const std::string &baseVersion,
     std::vector<FeatureStatus> &statusInfos)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "GetAllFeatureStatus";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -547,11 +577,15 @@ int32_t SysInstallerKitsImpl::GetAllFeatureStatus(const std::string &baseVersion
         return -1;
     }
     return updateService->GetAllFeatureStatus(baseVersion, statusInfos);
+#else
+    return -1;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::ClearCloudRom(const std::string &baseVersion,
     const std::string &featureName)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "ClearCloudRom";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -559,10 +593,14 @@ int32_t SysInstallerKitsImpl::ClearCloudRom(const std::string &baseVersion,
         return -1;
     }
     return updateService->ClearCloudRom(baseVersion, featureName);
+#else
+    return -1;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::UpdateCloudRomVersion(const std::string &baseVersion)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "UpdateCloudRomVersion";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -570,10 +608,14 @@ int32_t SysInstallerKitsImpl::UpdateCloudRomVersion(const std::string &baseVersi
         return -1;
     }
     return updateService->UpdateCloudRomVersion(baseVersion);
+#else
+    return -1;
+#endif
 }
 
 int32_t SysInstallerKitsImpl::ExitSysInstaller()
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "ExitSysInstaller";
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
@@ -594,15 +636,16 @@ int32_t SysInstallerKitsImpl::ExitSysInstaller()
     }
     int32_t ret = updateService->ExitSysInstaller();
     LOG(INFO) << "ExitSysInstaller ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 int32_t SysInstallerKitsImpl::StartAbSync()
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "StartAbSync";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -611,15 +654,16 @@ int32_t SysInstallerKitsImpl::StartAbSync()
     }
     int32_t ret = updateService->StartAbSync();
     LOG(INFO) << "StartAbSync ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 
 int32_t SysInstallerKitsImpl::SetCpuAffinity(const std::string &taskId, unsigned int reservedCores)
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "SetCpuAffinity taskId:" << taskId << ", reservedCores:" << reservedCores;
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -630,6 +674,9 @@ int32_t SysInstallerKitsImpl::SetCpuAffinity(const std::string &taskId, unsigned
     int32_t ret = updateService->SetCpuAffinity(taskId, reservedCpus);
     LOG(INFO) << "SetCpuAffinity ret:" << ret;
     return ret;
+#else
+    return -1;
+#endif
 }
 
 void SysInstallerKitsImpl::LoadServiceSuccess()
@@ -644,6 +691,7 @@ void SysInstallerKitsImpl::LoadServiceFail()
 
 int32_t SysInstallerKitsImpl::ClearVabPatch()
 {
+#ifndef UPDATER_UT
     LOG(INFO) << "ClearVabPatch";
     auto updateService = GetService();
     if (updateService == nullptr) {
@@ -652,10 +700,10 @@ int32_t SysInstallerKitsImpl::ClearVabPatch()
     }
     int32_t ret = updateService->ClearVabPatch();
     LOG(INFO) << "ClearVabPatch ret:" << ret;
-#ifdef UPDATER_UT
-    return -1;
-#else
+
     return ret;
+#else
+    return -1;
 #endif
 }
 }
