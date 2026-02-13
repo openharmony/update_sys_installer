@@ -120,7 +120,10 @@ void SysInstallerTimerManager::UnRegisterTimer(uint64_t timerId)
         LOG(ERROR) << "Unregister timer failed, coreTimer is nullptr";
         return;
     }
-    coreTimer->DestroyTimer(timerId);
+    if (!coreTimer->DestroyTimer(timerId)) {
+        LOG(ERROR) << "Destroy timer failed, timerId: " << timerId;
+        return;
+    }
 }
 
 } // namespace SysInstaller

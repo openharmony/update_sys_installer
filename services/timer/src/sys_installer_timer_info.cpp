@@ -55,7 +55,7 @@ void SysInstallerTimerInfo::SetWantAgent(std::shared_ptr<OHOS::AbilityRuntime::W
 
 void SysInstallerTimerInfo::OnTrigger()
 {
-    if (callback_) {
+    if (callback_ != nullptr) {
         callback_();
     }
 }
