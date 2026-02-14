@@ -28,6 +28,7 @@ group("unittest") {
     deps = [
       "test/unittest/ipc_test:sys_installer_unittest",
       "test/unittest/stream_update:stream_update_unittest",
+      "test/unittest/timer_test:sys_installer_ut_timer",
     ]
   }
 }
