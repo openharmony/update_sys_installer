@@ -130,7 +130,6 @@ private:
     std::string GetRunningTask(void);
     uint64_t StartExitCheckTimer();
 
-    bool logInit_ = false;
     bool bStreamUpgrade_ = false;
     std::mutex sysInstallerServerLock_;
     uint64_t exitCheckTimerId_{0};

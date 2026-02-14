@@ -52,12 +52,6 @@ int32_t SysInstallerServer::SysInstallerInit(const std::string &taskId, bool bSt
     std::lock_guard<std::mutex> lock(sysInstallerServerLock_);
     DEFINE_EXIT_GUARD();
     LOG(INFO) << "SysInstallerInit";
-    if (!logInit_) {
-        (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0775); // 0775 : rwxrwxr-x
-        InitLogger("SysInstaller", true);
-        logInit_ = true;
-        exitCheckTimerId_ = StartExitCheckTimer();
-    }
     bStreamUpgrade_ = bStreamUpgrade;
     if (bStreamUpgrade_) {
         StreamInstallerManager::GetInstance().SysInstallerInit();
@@ -372,7 +366,10 @@ int32_t SysInstallerServer::CallbackExit([[maybe_unused]] uint32_t code, [[maybe
 
 void SysInstallerServer::OnStart()
 {
+    (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0775); // 0775 : rwxrwxr-x
+    InitLogger("SysInstaller", true);
     LOG(INFO) << "OnStart";
+    exitCheckTimerId_ = StartExitCheckTimer();
     bool res = Publish(this);
     if (!res) {
         LOG(ERROR) << "OnStart failed";
