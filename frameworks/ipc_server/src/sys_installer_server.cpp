@@ -366,15 +366,17 @@ int32_t SysInstallerServer::CallbackExit([[maybe_unused]] uint32_t code, [[maybe
 
 void SysInstallerServer::OnStart()
 {
+    const bool res = Publish(this);
     (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0775); // 0775 : rwxrwxr-x
     InitLogger("SysInstaller", true);
-    LOG(INFO) << "OnStart";
-    exitCheckTimerId_ = StartExitCheckTimer();
-    bool res = Publish(this);
     if (!res) {
         LOG(ERROR) << "OnStart failed";
+        return;
     }
-
+    LOG(INFO) << "OnStart";
+    if (exitCheckTimerId_ == 0) {
+        exitCheckTimerId_ = StartExitCheckTimer();
+    }
     return;
 }
 
