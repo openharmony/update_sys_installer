@@ -50,6 +50,7 @@ ohos_unittest("sys_installer_ut_timer") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "cJSON:cjson",
+    "c_utils:utils",
     "hilog:libhilog",
     "updater:libupdaterlog",
     "ability_runtime:wantagent_innerkits",
