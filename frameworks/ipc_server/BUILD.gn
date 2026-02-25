@@ -40,6 +40,7 @@ sys_installer_gen("sys_installer") {
     "${sys_installer_path}/frameworks/status_manager:libstatusmanager",
     "${sys_installer_path}/interfaces/innerkits/ipc_client:sys_installer_stub",
     "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstaller_shared",
+    "${sys_installer_path}/services/timer:libsysinstaller_timer",
   ]
 
   external_deps = [

@@ -20,6 +20,7 @@
 #include "log/log.h"
 #include "securec.h"
 #include "system_ability_definition.h"
+#include "sys_installer_timer_manager.h"
 #include "utils.h"
 #include "buffer_info_parcel.h"
 
@@ -28,6 +29,9 @@ namespace SysInstaller {
 REGISTER_SYSTEM_ABILITY_BY_ID(SysInstallerServer, SYS_INSTALLER_DISTRIBUTED_SERVICE_ID, false)
 
 using namespace Updater;
+
+constexpr uint64_t EXIT_CHECK_INTERVAL_MS = 20 * 60 * 1000;
+constexpr uint32_t EXIT_CHECK_IDLE_COUNT_THRESHOLD = 3;
 
 void __attribute__((weak)) InitSysLogger(const std::string &tag)
 {
@@ -48,11 +52,6 @@ int32_t SysInstallerServer::SysInstallerInit(const std::string &taskId, bool bSt
     std::lock_guard<std::mutex> lock(sysInstallerServerLock_);
     DEFINE_EXIT_GUARD();
     LOG(INFO) << "SysInstallerInit";
-    if (!logInit_) {
-        (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0775); // 0775 : rwxrwxr-x
-        InitLogger("SysInstaller", true);
-        logInit_ = true;
-    }
     bStreamUpgrade_ = bStreamUpgrade;
     if (bStreamUpgrade_) {
         StreamInstallerManager::GetInstance().SysInstallerInit();
@@ -230,7 +229,7 @@ int32_t SysInstallerServer::GetMetadataResult(const std::string &action, bool &r
 
 bool SysInstallerServer::IsTaskRunning(void)
 {
-    return !SysInstallerExitGuard::GetRunningSet().empty();
+    return !SysInstallerExitGuard::GetRunningSet().empty() || SysInstallerManager::GetInstance().IsTaskRunning();
 }
 
 std::string SysInstallerServer::GetRunningTask(void)
@@ -296,6 +295,7 @@ int32_t SysInstallerServer::UpdateCloudRomVersion(const std::string &baseVersion
 
 int32_t SysInstallerServer::ExitSysInstaller()
 {
+    std::lock_guard<std::mutex> lock(sysInstallerServerLock_);
     LOG(INFO) << "ExitSysInstaller";
     if (IsTaskRunning()) {
         LOG(ERROR) << "SysInstaller running, can't exit, running info " << GetRunningTask();
@@ -366,17 +366,26 @@ int32_t SysInstallerServer::CallbackExit([[maybe_unused]] uint32_t code, [[maybe
 
 void SysInstallerServer::OnStart()
 {
-    LOG(INFO) << "OnStart";
-    bool res = Publish(this);
+    const bool res = Publish(this);
+    (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0775); // 0775 : rwxrwxr-x
+    InitLogger("SysInstaller", true);
     if (!res) {
         LOG(ERROR) << "OnStart failed";
+        return;
     }
-
+    LOG(INFO) << "OnStart";
+    if (exitCheckTimerId_ == 0) {
+        exitCheckTimerId_ = StartExitCheckTimer();
+    }
     return;
 }
 
 void SysInstallerServer::OnStop()
 {
+    if (exitCheckTimerId_ != 0) {
+        SysInstallerTimerManager::UnRegisterTimer(exitCheckTimerId_);
+        exitCheckTimerId_ = 0;
+    }
     LOG(INFO) << "OnStop";
 }
 
@@ -385,6 +394,33 @@ int32_t SysInstallerServer::ClearVabPatch()
     LOG(INFO) << "ClearVabPatch";
     DEFINE_EXIT_GUARD();
     return SysInstallerManager::GetInstance().ClearVabPatch();
+}
+
+uint64_t SysInstallerServer::StartExitCheckTimer()
+{
+    const uint64_t startAtMs = GetSystemBootTime();
+    TimerCallback cb = [this, startAtMs]() {
+        const uint64_t nowMs = GetSystemBootTime();
+        const uint64_t elapsedSeconds = (nowMs - startAtMs) / 1000;
+        if (IsTaskRunning()) {
+            idleCounter_ = 0;
+        } else {
+            ++idleCounter_;
+        }
+        LOG(INFO) << "exit check, elapsed " << elapsedSeconds << "s, idle count " << idleCounter_;
+        if (idleCounter_ >= EXIT_CHECK_IDLE_COUNT_THRESHOLD) {
+            ExitSysInstaller();
+        }
+    };
+    const uint64_t checkIntervalMs = EXIT_CHECK_INTERVAL_MS;
+    uint64_t timerId = SysInstallerTimerManager::RegisterRepeatTimer(checkIntervalMs, checkIntervalMs, cb);
+    if (timerId == 0) {
+        LOG(ERROR) << "Register exit check timer failed";
+        return 0;
+    }
+    LOG(INFO) << "Register exit check timer success. timerId: " << timerId <<
+        ", start after boot: " << startAtMs << "ms, check interval: " << checkIntervalMs << "ms";
+    return timerId;
 }
 } // namespace SysInstaller
 } // namespace OHOS
