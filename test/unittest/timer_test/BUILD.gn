@@ -1,0 +1,77 @@
+# Copyright (c) 2026 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/update/sys_installer/sys_installer_default_cfg.gni")
+import("//build/test.gni")
+
+sys_installer_path = rebase_path("${sys_installer_absolutely_path}", ".")
+module_output_path = "sys_installer/sys_installer"
+
+config("utest_config") {
+  visibility = [ ":*" ]
+
+  cflags = [
+    "-fprofile-arcs",
+    "-Wno-implicit-fallthrough",
+    "-Wno-unused-function",
+    "-fno-access-control",
+  ]
+
+  cflags_cc = [
+    "-Wno-implicit-fallthrough",
+  ]
+
+  ldflags = [
+    "--coverage",
+  ]
+}
+
+ohos_unittest("sys_installer_ut_timer") {
+  testonly = true
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${sys_installer_path}/services/timer/include",
+  ]
+
+  deps = []
+
+  external_deps = [
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "updater:libupdaterlog",
+    "ability_runtime:wantagent_innerkits",
+    "time_service:time_client",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [
+    "timer_info_test.cpp",
+    "timer_manager_test.cpp",
+    "${sys_installer_path}/services/timer/src/sys_installer_timer_info.cpp",
+    "${sys_installer_path}/services/timer/src/sys_installer_timer_manager.cpp",
+  ]
+
+  public_configs = [ ":utest_config" ]
+  subsystem_name = "updater"
+  part_name = "sys_installer"
+}
