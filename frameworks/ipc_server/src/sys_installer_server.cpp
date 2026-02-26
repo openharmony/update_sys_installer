@@ -33,7 +33,10 @@ using namespace Updater;
 
 constexpr uint64_t EXIT_CHECK_INTERVAL_MS = 20 * 60 * 1000;
 constexpr uint32_t EXIT_CHECK_IDLE_COUNT_THRESHOLD = 3;
+
+#ifdef UPDATER_BUILD_VARIANT_ROOT
 constexpr const char* PARAM_CHECK_INTERVAL = "update.sysinstaller.check_interval";
+#endif
 
 static int GetCheckIntervalMs()
 {
