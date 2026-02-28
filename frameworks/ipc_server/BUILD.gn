@@ -43,6 +43,10 @@ sys_installer_gen("sys_installer") {
     "${sys_installer_path}/services/timer:libsysinstaller_timer",
   ]
 
+  if (build_variant == "root") {
+    defines += [ "UPDATER_BUILD_VARIANT_ROOT" ]
+  }
+
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "bounds_checking_function:libsec_static",

@@ -18,6 +18,7 @@
 #include "accesstoken_kit.h"
 #include "iservice_registry.h"
 #include "log/log.h"
+#include "parameter.h"
 #include "securec.h"
 #include "system_ability_definition.h"
 #include "sys_installer_timer_manager.h"
@@ -32,6 +33,35 @@ using namespace Updater;
 
 constexpr uint64_t EXIT_CHECK_INTERVAL_MS = 20 * 60 * 1000;
 constexpr uint32_t EXIT_CHECK_IDLE_COUNT_THRESHOLD = 3;
+
+#ifdef UPDATER_BUILD_VARIANT_ROOT
+constexpr const char* PARAM_CHECK_INTERVAL = "update.sysinstaller.check_interval";
+#endif
+
+static int GetCheckIntervalMs()
+{
+#ifdef UPDATER_BUILD_VARIANT_ROOT
+    // interval parameter in seconds
+    char checkIntervalBuf[Utils::PARAM_SIZE + 1] = {0};
+    if (GetParameter(PARAM_CHECK_INTERVAL, "", checkIntervalBuf, sizeof(checkIntervalBuf) - 1) <= 0) {
+        LOG(ERROR) << "failed to get " << PARAM_CHECK_INTERVAL;
+        return EXIT_CHECK_INTERVAL_MS;
+    }
+    int checkInterval = Utils::String2Int<int>(checkIntervalBuf, Utils::N_DEC);
+    if (checkInterval <= 0) {
+        LOG(ERROR) << "invalid " << PARAM_CHECK_INTERVAL << ": " << checkIntervalBuf;
+        return EXIT_CHECK_INTERVAL_MS;
+    }
+    const int checkIntervalMs = checkInterval * 1000;
+    if (checkIntervalMs > EXIT_CHECK_INTERVAL_MS) {
+        LOG(ERROR) << "too large " << PARAM_CHECK_INTERVAL << ": " << checkIntervalMs << "ms";
+        return EXIT_CHECK_INTERVAL_MS;
+    }
+    return checkIntervalMs;
+#else
+    return EXIT_CHECK_INTERVAL_MS;
+#endif
+}
 
 void __attribute__((weak)) InitSysLogger(const std::string &tag)
 {
@@ -366,18 +396,17 @@ int32_t SysInstallerServer::CallbackExit([[maybe_unused]] uint32_t code, [[maybe
 
 void SysInstallerServer::OnStart()
 {
-    const bool res = Publish(this);
     (void)Utils::MkdirRecursive(SYS_LOG_DIR, 0775); // 0775 : rwxrwxr-x
     InitLogger("SysInstaller", true);
-    if (!res) {
-        LOG(ERROR) << "OnStart failed";
-        return;
-    }
     LOG(INFO) << "OnStart";
     if (exitCheckTimerId_ == 0) {
         exitCheckTimerId_ = StartExitCheckTimer();
     }
-    return;
+    const bool res = Publish(this);
+    if (!res) {
+        LOG(ERROR) << "OnStart failed";
+        return;
+    }
 }
 
 void SysInstallerServer::OnStop()
@@ -412,7 +441,7 @@ uint64_t SysInstallerServer::StartExitCheckTimer()
             ExitSysInstaller();
         }
     };
-    const uint64_t checkIntervalMs = EXIT_CHECK_INTERVAL_MS;
+    const uint64_t checkIntervalMs = GetCheckIntervalMs();
     uint64_t timerId = SysInstallerTimerManager::RegisterRepeatTimer(checkIntervalMs, checkIntervalMs, cb);
     if (timerId == 0) {
         LOG(ERROR) << "Register exit check timer failed";
