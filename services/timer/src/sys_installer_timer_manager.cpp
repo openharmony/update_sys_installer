@@ -36,14 +36,13 @@ uint64_t StartCoreTimer(uint64_t triggerTime, uint64_t intervalMs, const TimerCa
     std::shared_ptr<SysInstallerTimerInfo> timerInfo = std::make_shared<SysInstallerTimerInfo>(callback);
     timerInfo->SetRepeat(repeat);
     if (repeat) {
-        timerInfo->SetType(timerInfo->TIMER_TYPE_REALTIME);
         timerInfo->SetInterval(intervalMs);
-    } else {
-        const uint32_t timerType = static_cast<uint32_t>(timerInfo->TIMER_TYPE_EXACT) |
-            static_cast<uint32_t>(timerInfo->TIMER_TYPE_WAKEUP) |
-            static_cast<uint32_t>(timerInfo->TIMER_TYPE_REALTIME);
-        timerInfo->SetType(static_cast<int32_t>(timerType));
     }
+    const uint32_t timerType = static_cast<uint32_t>(timerInfo->TIMER_TYPE_EXACT) |
+        static_cast<uint32_t>(timerInfo->TIMER_TYPE_WAKEUP) |
+        static_cast<uint32_t>(timerInfo->TIMER_TYPE_REALTIME);
+    timerInfo->SetType(static_cast<int32_t>(timerType));
+
     OHOS::sptr<TimeServiceClient> coreTimer = TimeServiceClient::GetInstance();
     if (coreTimer == nullptr) {
         LOG(ERROR) << "coreTimer is nullptr";
