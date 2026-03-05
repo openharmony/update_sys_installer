@@ -661,18 +661,17 @@ int32_t SysInstallerKitsImpl::StartAbSync()
 #endif
 }
 
-int32_t SysInstallerKitsImpl::SetCpuAffinity(const std::string &taskId, unsigned int reservedCores)
+int32_t SysInstallerKitsImpl::SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode)
 {
 #ifndef UPDATER_UT
-    LOG(INFO) << "SetCpuAffinity taskId:" << taskId << ", reservedCores:" << reservedCores;
+    LOG(INFO) << "SetUpdateVabMode taskId:" << taskId << ", UpdateVabMode:" << static_cast<int>(mode);
     auto updateService = GetService();
     if (updateService == nullptr) {
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    uint32_t reservedCpus = reservedCores;
-    int32_t ret = updateService->SetCpuAffinity(taskId, reservedCpus);
-    LOG(INFO) << "SetCpuAffinity ret:" << ret;
+    int32_t ret = updateService->SetUpdateVabMode(taskId, mode);
+    LOG(INFO) << "SetUpdateVabMode ret:" << ret;
     return ret;
 #else
     return -1;

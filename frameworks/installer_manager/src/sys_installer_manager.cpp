@@ -228,13 +228,13 @@ int32_t SysInstallerManager::StartAbSync()
     return helper_->StartAbSync();
 }
 
-int32_t SysInstallerManager::SetCpuAffinity(const std::string &taskId, unsigned int reservedCores)
+int32_t SysInstallerManager::SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->SetCpuAffinity(taskId, reservedCores);
+    return helper_->SetUpdateVabMode(taskId, mode);
 }
 
 int32_t SysInstallerManager::InstallCloudRom(const std::string &taskId,

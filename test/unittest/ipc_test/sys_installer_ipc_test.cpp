@@ -197,7 +197,7 @@ HWTEST_F(SysInstallerIpcUnitTest, SysInstallerKitsImplTest, TestSize.Level1)
     ASSERT_EQ(ret, -1);
     ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("ipc_ut_test", "");
     ASSERT_EQ(ret, -1);
-    ret = SysInstallerKitsImpl::GetInstance().SetCpuAffinity("ipc_ut_test", 0);
+    ret = SysInstallerKitsImpl::GetInstance().SetUpdateVabMode("ipc_ut_test", UpdateVabMode::BACKGROUND_UPDATE_MODE);
     ASSERT_EQ(ret, -1);
 }
 } // SysInstaller

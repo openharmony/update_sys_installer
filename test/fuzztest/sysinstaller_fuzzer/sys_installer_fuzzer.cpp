@@ -144,9 +144,9 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     std::string action = std::string(reinterpret_cast<const char*>(data), size);
     bool result = false;
     SysInstallerKitsImpl::GetInstance().GetMetadataResult(action, result);
-    uint32_t reservedCores;
-    std::copy(data, data + std::min(sizeof(uint32_t), size), reinterpret_cast<uint8_t*>(&reservedCores));
-    SysInstallerKitsImpl::GetInstance().SetCpuAffinity(taskId, reservedCores);
+    UpdateVabMode mode;
+    std::copy(data, data + std::min(sizeof(uint32_t), size), reinterpret_cast<uint8_t*>(&mode));
+    SysInstallerKitsImpl::GetInstance().SetUpdateVabMode(taskId, mode);
     SysInstallerKitsImpl::GetInstance().ClearVabMetadataAndCow();
     SysInstallerKitsImpl::GetInstance().VabUpdateActive(VabActiveMode::VAB_ACTIVE_HOTA);
     SysInstallerKitsImpl::GetInstance().StartAbSync();
