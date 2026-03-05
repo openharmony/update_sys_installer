@@ -96,8 +96,9 @@ bool WriteModuleUpdateBlock(const struct hvb_buf &pubkey, const std::string &par
         LOG(ERROR) << "open partition fail, error = " << errno;
         return false;
     }
+    fdsan_exchange_owner_tag(fd, 0, MODULE_UPDATE_FDSAN_TAG);
     ON_SCOPE_EXIT(clear) {
-        close(fd);
+        fdsan_close_with_tag(fd, MODULE_UPDATE_FDSAN_TAG);
     };
     // generate footer for module_update partition
     uint64_t blockSize = GetBlockDeviceSize(fd);

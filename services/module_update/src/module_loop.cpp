@@ -420,11 +420,12 @@ bool IsLoopDevMatchedImg(const std::string &loopPath, const std::string &imgFile
         return false;
     }
 
+    fdsan_exchange_owner_tag(fd, 0, MODULE_UPDATE_FDSAN_TAG);
     if (ioctl(fd, LOOP_GET_STATUS64, &info) < 0) {
-        close(fd);
+        fdsan_close_with_tag(fd, MODULE_UPDATE_FDSAN_TAG);
         return false;
     }
-    close(fd);
+    fdsan_close_with_tag(fd, MODULE_UPDATE_FDSAN_TAG);
     return (imgFilePath == std::string(reinterpret_cast<char *>(info.lo_file_name)));
 }
 
@@ -442,8 +443,9 @@ bool CloseLoopDev(const std::string &loopPath)
         return false;
     }
 
+    fdsan_exchange_owner_tag(userFd, 0, MODULE_UPDATE_FDSAN_TAG);
     int ret = ioctl(userFd, LOOP_CLR_FD);
-    close(userFd);
+    fdsan_close_with_tag(userFd, MODULE_UPDATE_FDSAN_TAG);
     if (ret != 0) {
         LOG(ERROR) << "Clear error, loopPath=" << buffer << ", errno=" << errno;
         return false;
