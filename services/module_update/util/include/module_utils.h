@@ -25,6 +25,7 @@
 
 namespace OHOS {
 namespace SysInstaller {
+constexpr uint64_t MODULE_UPDATE_FDSAN_TAG = (static_cast<uint64_t>(0xD002E01) << 32) | 1;
 bool CreateDirIfNeeded(const std::string &fpInfo, mode_t mode);
 bool CheckPathExists(const std::string &path);
 bool CheckFileSuffix(const std::string &file, const std::string &suffix);
