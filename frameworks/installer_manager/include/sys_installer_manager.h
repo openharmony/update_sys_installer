@@ -52,7 +52,7 @@ public:
     int32_t VabUpdateActive(VabActiveMode mode);
     int32_t GetMetadataResult(const std::string &action, bool &result);
     int32_t StartAbSync();
-    int32_t SetCpuAffinity(const std::string &taskId, unsigned int reservedCores);
+    int32_t SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode);
 
     int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,
         const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);

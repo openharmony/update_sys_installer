@@ -41,6 +41,12 @@ enum InstallerErrCode {
     SYS_INSTALL_PARA_FAIL = 60,
     SYS_INSTALL_CANCEL = 70,
 };
+
+enum InstallerVabMode {
+    SYS_BACKGROUND_UPDATE_MODE = 0,
+    SYS_FOREGROUND_UPDATE_MODE,
+    SYS_ALLCORES_UPDATE_MODE,
+};
 } // namespace SysInstaller
 } // namespace OHOS
 #endif // SYS_INSTALLER_COMMON_H

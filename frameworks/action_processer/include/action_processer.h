@@ -36,7 +36,7 @@ public:
     void Suspend();
     void Resume();
     void CompletedAction(InstallerErrCode errCode, const std::string &errStr);
-    bool SetCpuAffinity(unsigned int reservedCores);
+    bool SetUpdateVabMode(UpdateVabMode mode);
 
 private:
     bool WaitActionExit();

@@ -62,6 +62,12 @@ enum VabActiveMode {
     VAB_ACTIVE_PATCH,
 };
 
+enum UpdateVabMode {
+    BACKGROUND_UPDATE_MODE = 0,
+    FOREGROUND_UPDATE_MODE,
+    ALLCORES_UPDATE_MODE,
+};
+
 struct FeatureInfo {
     boolean isNeedReboot;
     String featureName;

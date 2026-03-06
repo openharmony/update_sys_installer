@@ -349,11 +349,11 @@ int32_t SysInstallerServer::StartAbSync()
     return SysInstallerManager::GetInstance().StartAbSync();
 }
 
-int32_t SysInstallerServer::SetCpuAffinity(const std::string &taskId, uint32_t reservedCores)
+int32_t SysInstallerServer::SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode)
 {
-    LOG(INFO) << "SetCpuAffinity reservedCores:" << reservedCores;
+    LOG(INFO) << "SetUpdateVabMode UpdateVabMode:" << static_cast<int>(mode);
     DEFINE_EXIT_GUARD();
-    return SysInstallerManager::GetInstance().SetCpuAffinity(taskId, reservedCores);
+    return SysInstallerManager::GetInstance().SetUpdateVabMode(taskId, mode);
 }
 
 bool SysInstallerServer::IsPermissionGranted(void)

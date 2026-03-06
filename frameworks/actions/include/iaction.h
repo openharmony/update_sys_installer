@@ -45,7 +45,7 @@ public:
     {
         return "";
     }
-    virtual bool SetCpuAffinityAction(unsigned int reservedCores)
+    virtual bool SetUpdateVabModeAction(InstallerVabMode mode)
     {
         return false;
     }

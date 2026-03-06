@@ -67,7 +67,7 @@ public:
     virtual int32_t GetMetadataResult(const std::string &action, bool &result) = 0;
     virtual int32_t ExitSysInstaller() = 0;
     virtual int32_t StartAbSync() = 0;
-    virtual int32_t SetCpuAffinity(const std::string &taskId, unsigned int reservedCores) = 0;
+    virtual int32_t SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode) = 0;
     virtual int32_t ClearVabPatch() = 0;
 };
 } // namespace SysInstaller

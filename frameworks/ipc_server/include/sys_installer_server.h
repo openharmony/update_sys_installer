@@ -109,7 +109,7 @@ public:
     int32_t UpdateCloudRomVersion(const std::string &baseVersion) override;
     int32_t ExitSysInstaller() override;
     int32_t StartAbSync() override;
-    int32_t SetCpuAffinity(const std::string &taskId, uint32_t reservedCores) override;
+    int32_t SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode) override;
     int32_t ClearVabPatch() override;
 
     bool CheckCallingPerm(void);

@@ -177,16 +177,26 @@ void ActionProcesser::StartNextAction(InstallerErrCode errCode)
     curAction_->PerformAction();
 }
 
-bool ActionProcesser::SetCpuAffinity(unsigned int reservedCores)
+bool ActionProcesser::SetUpdateVabMode(UpdateVabMode mode)
 {
     if (!isRunning_ || curAction_ == nullptr) {
         LOG(WARNING) << "ActionProcesser not running or action empty";
         return false;
     }
-    LOG(INFO) << "SetCpuAffinity " << curAction_->GetActionName();
-    bool ret = curAction_->SetCpuAffinityAction(reservedCores);
+    LOG(INFO) << "SetUpdateVabMode " << curAction_->GetActionName();
+    std::unordered_map<OHOS::UpdateVabMode, InstallerVabMode> updateModeMap = {
+        {OHOS::UpdateVabMode::BACKGROUND_UPDATE_MODE, SYS_BACKGROUND_UPDATE_MODE},
+        {OHOS::UpdateVabMode::FOREGROUND_UPDATE_MODE, SYS_FOREGROUND_UPDATE_MODE},
+        {OHOS::UpdateVabMode::ALLCORES_UPDATE_MODE, SYS_ALLCORES_UPDATE_MODE}
+    };
+
+    InstallerVabMode installMode = SYS_BACKGROUND_UPDATE_MODE;
+    if (auto it = updateModeMap.find(mode); it != updateModeMap.end()) {
+        installMode = it->second;
+    }
+    bool ret = curAction_->SetUpdateVabModeAction(installMode);
     if (!ret) {
-        LOG(WARNING) << "SetCpuAffinity action filed";
+        LOG(WARNING) << "SetUpdateVabMode action failed";
         return false;
     }
     return ret;
