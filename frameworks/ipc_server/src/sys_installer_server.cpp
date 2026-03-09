@@ -38,7 +38,7 @@ constexpr uint32_t EXIT_CHECK_IDLE_COUNT_THRESHOLD = 3;
 constexpr const char* PARAM_CHECK_INTERVAL = "update.sysinstaller.check_interval";
 #endif
 
-static int GetCheckIntervalMs()
+static uint64_t GetCheckIntervalMs()
 {
 #ifdef UPDATER_BUILD_VARIANT_ROOT
     // interval parameter in seconds
@@ -52,7 +52,7 @@ static int GetCheckIntervalMs()
         LOG(ERROR) << "invalid " << PARAM_CHECK_INTERVAL << ": " << checkIntervalBuf;
         return EXIT_CHECK_INTERVAL_MS;
     }
-    const int checkIntervalMs = checkInterval * 1000;
+    const uint64_t checkIntervalMs = static_cast<uint64_t>(checkInterval) * 1000;
     if (checkIntervalMs > EXIT_CHECK_INTERVAL_MS) {
         LOG(ERROR) << "too large " << PARAM_CHECK_INTERVAL << ": " << checkIntervalMs << "ms";
         return EXIT_CHECK_INTERVAL_MS;
