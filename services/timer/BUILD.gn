@@ -42,6 +42,7 @@ ohos_static_library("libsysinstaller_timer") {
     "updater:libupdaterlog",
     "ability_runtime:wantagent_innerkits",
     "time_service:time_client",
+    "ipc:ipc_single",
   ]
 
   part_name = "sys_installer"

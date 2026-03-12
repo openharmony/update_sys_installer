@@ -55,6 +55,7 @@ ohos_unittest("sys_installer_ut_timer") {
     "updater:libupdaterlog",
     "ability_runtime:wantagent_innerkits",
     "time_service:time_client",
+    "ipc:ipc_single",
   ]
 
   cflags = [
