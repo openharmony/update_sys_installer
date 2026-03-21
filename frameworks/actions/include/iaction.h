@@ -45,9 +45,9 @@ public:
     {
         return "";
     }
-    virtual bool SetUpdateVabModeAction(InstallerVabMode mode)
+    virtual bool SetUpdateModeAction(InstallerMode mode)
     {
-        return false;
+        return true;
     }
 
 protected:
