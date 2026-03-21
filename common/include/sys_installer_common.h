@@ -42,7 +42,7 @@ enum InstallerErrCode {
     SYS_INSTALL_CANCEL = 70,
 };
 
-enum InstallerVabMode {
+enum InstallerMode {
     SYS_BACKGROUND_UPDATE_MODE = 0,
     SYS_FOREGROUND_UPDATE_MODE,
     SYS_ALLCORES_UPDATE_MODE,

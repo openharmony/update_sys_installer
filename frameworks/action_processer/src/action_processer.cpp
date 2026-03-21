@@ -174,29 +174,30 @@ void ActionProcesser::StartNextAction(InstallerErrCode errCode)
     curAction_ = std::move(actionQue_.front());
     LOG(INFO) << "StartNextAction " << curAction_->GetActionName();
     actionQue_.pop_front();
+    curAction_->SetUpdateModeAction(installMode_);
     curAction_->PerformAction();
 }
 
-bool ActionProcesser::SetUpdateVabMode(UpdateVabMode mode)
+bool ActionProcesser::SetUpdateMode(UpdateVabMode mode)
 {
     if (!isRunning_ || curAction_ == nullptr) {
         LOG(WARNING) << "ActionProcesser not running or action empty";
         return false;
     }
-    LOG(INFO) << "SetUpdateVabMode " << curAction_->GetActionName();
-    std::unordered_map<OHOS::UpdateVabMode, InstallerVabMode> updateModeMap = {
+    LOG(INFO) << "SetUpdateMode " << curAction_->GetActionName();
+    std::unordered_map<OHOS::UpdateVabMode, InstallerMode> updateModeMap = {
         {OHOS::UpdateVabMode::BACKGROUND_UPDATE_MODE, SYS_BACKGROUND_UPDATE_MODE},
         {OHOS::UpdateVabMode::FOREGROUND_UPDATE_MODE, SYS_FOREGROUND_UPDATE_MODE},
         {OHOS::UpdateVabMode::ALLCORES_UPDATE_MODE, SYS_ALLCORES_UPDATE_MODE}
     };
 
-    InstallerVabMode installMode = SYS_BACKGROUND_UPDATE_MODE;
+    installMode_ = SYS_BACKGROUND_UPDATE_MODE;
     if (auto it = updateModeMap.find(mode); it != updateModeMap.end()) {
-        installMode = it->second;
+        installMode_ = it->second;
     }
-    bool ret = curAction_->SetUpdateVabModeAction(installMode);
+    bool ret = curAction_->SetUpdateModeAction(installMode_);
     if (!ret) {
-        LOG(WARNING) << "SetUpdateVabMode action failed";
+        LOG(WARNING) << "SetUpdateMode action failed";
         return false;
     }
     return ret;

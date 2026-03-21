@@ -36,7 +36,7 @@ public:
     void Suspend();
     void Resume();
     void CompletedAction(InstallerErrCode errCode, const std::string &errStr);
-    bool SetUpdateVabMode(UpdateVabMode mode);
+    bool SetUpdateMode(UpdateVabMode mode);
 
 private:
     bool WaitActionExit();
@@ -47,6 +47,7 @@ private:
     std::unique_ptr<IAction> curAction_ {};
     bool isRunning_ = false;
     bool isSuspend_ = false;
+    InstallerMode installMode_ {SYS_BACKGROUND_UPDATE_MODE};
 };
 } // SysInstaller
 } // namespace OHOS
