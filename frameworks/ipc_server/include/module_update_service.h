@@ -15,6 +15,7 @@
 #ifndef SYS_INSTALLER_MODULE_UPDATE_SERVICE_H
 #define SYS_INSTALLER_MODULE_UPDATE_SERVICE_H
 
+#include <mutex>
 #include "module_update_stub.h"
 #include "system_ability.h"
 
@@ -43,6 +44,9 @@ protected:
 #endif
     void OnStart(const SystemAbilityOnDemandReason &startReason) override;
     void OnStop(const SystemAbilityOnDemandReason &stopReason) override;
+
+private:
+    std::recursive_mutex taskLock_;
 };
 } // namespace SysInstaller
 } // namespace OHOS
