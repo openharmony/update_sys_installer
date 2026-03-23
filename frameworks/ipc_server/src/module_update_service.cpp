@@ -59,6 +59,7 @@ ModuleUpdateService::~ModuleUpdateService()
 
 int32_t ModuleUpdateService::InstallModulePackage(const std::string &pkgPath)
 {
+    std::lock_guard<std::recursive_mutex> lock(taskLock_);
     LOG(INFO) << "InstallModulePackage " << pkgPath;
     std::string realPath;
     if (!CheckFileSuffix(pkgPath, HMP_PACKAGE_SUFFIX) || !PathToRealPath(pkgPath, realPath)) {
@@ -70,6 +71,7 @@ int32_t ModuleUpdateService::InstallModulePackage(const std::string &pkgPath)
 
 int32_t ModuleUpdateService::UninstallModulePackage(const std::string &hmpName)
 {
+    std::lock_guard<std::recursive_mutex> lock(taskLock_);
     LOG(INFO) << "UninstallModulePackage " << hmpName;
     return ModuleUpdateMain::GetInstance().UninstallModulePackage(hmpName);
 }
@@ -77,6 +79,7 @@ int32_t ModuleUpdateService::UninstallModulePackage(const std::string &hmpName)
 int32_t ModuleUpdateService::GetModulePackageInfo(const std::string &hmpName,
     std::list<ModulePackageInfo> &modulePackageInfos)
 {
+    std::lock_guard<std::recursive_mutex> lock(taskLock_);
     LOG(INFO) << "GetModulePackageInfo " << hmpName;
     return ModuleUpdateMain::GetInstance().GetModulePackageInfo(hmpName, modulePackageInfos);
 }
@@ -84,6 +87,7 @@ int32_t ModuleUpdateService::GetModulePackageInfo(const std::string &hmpName,
 
 int32_t ModuleUpdateService::ExitModuleUpdate()
 {
+    std::lock_guard<std::recursive_mutex> lock(taskLock_);
     LOG(INFO) << "ExitModuleUpdate";
     ModuleUpdateMain::GetInstance().ExitModuleUpdate();
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -99,6 +103,7 @@ int32_t ModuleUpdateService::ExitModuleUpdate()
 
 std::vector<HmpVersionInfo> ModuleUpdateService::GetHmpVersionInfo()
 {
+    std::lock_guard<std::recursive_mutex> lock(taskLock_);
     LOG(INFO) << "GetHmpVersionInfo";
     return ModuleUpdateMain::GetInstance().GetHmpVersionInfo();
 }
@@ -106,6 +111,7 @@ std::vector<HmpVersionInfo> ModuleUpdateService::GetHmpVersionInfo()
 int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
     const sptr<ISysInstallerCallback> &updateCallback)
 {
+    std::lock_guard<std::recursive_mutex> lock(taskLock_);
     int32_t ret = -1;
     Timer timer;
     ON_SCOPE_EXIT(saveResult) {
@@ -135,6 +141,7 @@ int32_t ModuleUpdateService::StartUpdateHmpPackage(const std::string &path,
 
 std::vector<HmpUpdateInfo> ModuleUpdateService::GetHmpUpdateResult()
 {
+    std::lock_guard<std::recursive_mutex> lock(taskLock_);
     LOG(INFO) << "GetHmpUpdateResult";
     std::vector<HmpUpdateInfo> updateInfo {};
     std::ifstream ifs { MODULE_RESULT_PATH };
@@ -201,6 +208,7 @@ void ModuleUpdateService::OnStart(const SystemAbilityOnDemandReason &startReason
             return;
         }
         moduleUpdate.Start();
+        ExitModuleUpdate();
     }
     LOG(INFO) << "OnStart done";
 }
