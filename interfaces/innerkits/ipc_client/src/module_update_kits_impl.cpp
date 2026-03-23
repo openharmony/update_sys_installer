@@ -60,7 +60,6 @@ void ModuleUpdateKitsImpl::ResetService(const wptr<IRemoteObject>& remote)
 
 sptr<IModuleUpdate> ModuleUpdateKitsImpl::GetService()
 {
-    std::lock_guard<std::mutex> lock(moduleUpdateLock_);
     if (moduleUpdate_ != nullptr) {
         return moduleUpdate_;
     }
@@ -100,6 +99,7 @@ void ModuleUpdateKitsImpl::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject
 
 int32_t ModuleUpdateKitsImpl::InstallModulePackage(const std::string &pkgPath)
 {
+    std::lock_guard<std::mutex> lock(moduleUpdateLock_);
     LOG(INFO) << "InstallModulePackage " << pkgPath;
     auto moduleUpdate = GetService();
     if (moduleUpdate == nullptr) {
@@ -111,6 +111,7 @@ int32_t ModuleUpdateKitsImpl::InstallModulePackage(const std::string &pkgPath)
 
 int32_t ModuleUpdateKitsImpl::UninstallModulePackage(const std::string &hmpName)
 {
+    std::lock_guard<std::mutex> lock(moduleUpdateLock_);
     LOG(INFO) << "UninstallModulePackage " << hmpName;
     auto moduleUpdate = GetService();
     if (moduleUpdate == nullptr) {
@@ -123,6 +124,7 @@ int32_t ModuleUpdateKitsImpl::UninstallModulePackage(const std::string &hmpName)
 int32_t ModuleUpdateKitsImpl::GetModulePackageInfo(const std::string &hmpName,
     std::list<ModulePackageInfo> &modulePackageInfos)
 {
+    std::lock_guard<std::mutex> lock(moduleUpdateLock_);
     LOG(INFO) << "GetModulePackageInfo";
     auto moduleUpdate = GetService();
     if (moduleUpdate == nullptr) {
@@ -134,6 +136,7 @@ int32_t ModuleUpdateKitsImpl::GetModulePackageInfo(const std::string &hmpName,
 
 int32_t ModuleUpdateKitsImpl::ExitModuleUpdate()
 {
+    std::lock_guard<std::mutex> lock(moduleUpdateLock_);
     LOG(INFO) << "ExitModuleUpdate, g_request = " << g_request;
     auto moduleUpdate = GetService();
     if (moduleUpdate == nullptr) {
@@ -185,6 +188,7 @@ int32_t ModuleUpdateKitsImpl::InitModuleUpdate()
         return ret;
     }
 
+    std::lock_guard<std::mutex> lock(moduleUpdateLock_);
     auto updateService = GetService();
     if (updateService == nullptr) {
         LOG(ERROR) << "Get updateService failed";
@@ -196,6 +200,7 @@ int32_t ModuleUpdateKitsImpl::InitModuleUpdate()
 
 std::vector<HmpVersionInfo> ModuleUpdateKitsImpl::GetHmpVersionInfo()
 {
+    std::lock_guard<std::mutex> lock(moduleUpdateLock_);
     LOG(INFO) << "GetHmpVersionInfo";
     std::vector<HmpVersionInfo> versionInfo {};
     auto moduleUpdate = GetService();
@@ -216,6 +221,7 @@ int32_t ModuleUpdateKitsImpl::StartUpdateHmpPackage(const std::string &path,
         return ModuleErrorCode::ERR_SERVICE_PARA_ERROR;
     }
 
+    std::lock_guard<std::mutex> lock(moduleUpdateLock_);
     auto moduleUpdate = GetService();
     if (moduleUpdate == nullptr) {
         LOG(ERROR) << "Get moduleUpdate failed";
@@ -231,6 +237,7 @@ int32_t ModuleUpdateKitsImpl::StartUpdateHmpPackage(const std::string &path,
 
 std::vector<HmpUpdateInfo> ModuleUpdateKitsImpl::GetHmpUpdateResult()
 {
+    std::lock_guard<std::mutex> lock(moduleUpdateLock_);
     LOG(INFO) << "GetHmpUpdateResult";
     std::vector<HmpUpdateInfo> updateInfo {};
     auto moduleUpdate = GetService();
