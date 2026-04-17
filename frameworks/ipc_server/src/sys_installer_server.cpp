@@ -425,6 +425,14 @@ int32_t SysInstallerServer::ClearVabPatch()
     return SysInstallerManager::GetInstance().ClearVabPatch();
 }
 
+int32_t SysInstallerServer::GetPartitionStashSize(const std::string &taskId,
+    const std::vector<std::string> &pkgPaths, uint64_t &stashSize)
+{
+    LOG(INFO) << "GetPartitionStashSize";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().GetPartitionStashSize(taskId, pkgPaths, stashSize);
+}
+
 uint64_t SysInstallerServer::StartExitCheckTimer()
 {
     const uint64_t startAtMs = GetSystemBootTime();

@@ -63,6 +63,8 @@ public:
     int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName);
     int32_t UpdateCloudRomVersion(const std::string &baseVersion);
     int32_t ClearVabPatch();
+    int32_t GetPartitionStashSize(const std::string &taskId, const std::vector<std::string> &pkgPaths,
+        uint64_t &stashSize);
     bool IsTaskRunning();
 
 protected:

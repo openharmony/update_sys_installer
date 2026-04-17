@@ -279,6 +279,12 @@ int32_t SysInstallerManagerHelper::ClearVabPatch()
     return -1;
 }
 
+int32_t SysInstallerManagerHelper::GetPartitionStashSize(const std::string &taskId,
+    const std::vector<std::string> &pkgPaths, uint64_t &stashSize)
+{
+    return -1;
+}
+
 bool SysInstallerManagerHelper::IsTaskRunning()
 {
     std::lock_guard<std::recursive_mutex> lock(processerLock_);
