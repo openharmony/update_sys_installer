@@ -53,4 +53,5 @@ interface OHOS.SysInstaller.ISysInstaller {
     void ClearCloudRom([in] String baseVersion, [in] String featureName);
     void UpdateCloudRomVersion([in] String baseVersion);
     void ClearVabPatch();
+    void GetPartitionStashSize([in] String taskId, [in] List<String> pkgPaths, [out] unsigned long stashSize);
 }

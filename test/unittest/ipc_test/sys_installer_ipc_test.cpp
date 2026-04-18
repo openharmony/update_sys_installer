@@ -89,7 +89,9 @@ HWTEST_F(SysInstallerIpcUnitTest, SetCallBackTest001, TestSize.Level1)
 HWTEST_F(SysInstallerIpcUnitTest, GetStatusTest001, TestSize.Level1)
 {
     cout << " GetStatusTest001 start " << std::endl;
-    auto ret = SysInstallerKitsImpl::GetInstance().GetUpdateStatus("ipc_ut_test");
+    std::string uniqueTaskId = "ipc_ut_test_status";
+    SysInstallerKitsImpl::GetInstance().SysInstallerInit(uniqueTaskId);
+    auto ret = SysInstallerKitsImpl::GetInstance().GetUpdateStatus(uniqueTaskId);
     ASSERT_EQ(ret, 0);
 }
 
@@ -198,6 +200,35 @@ HWTEST_F(SysInstallerIpcUnitTest, SysInstallerKitsImplTest, TestSize.Level1)
     ret = SysInstallerKitsImpl::GetInstance().AccDeleteDir("ipc_ut_test", "");
     ASSERT_EQ(ret, -1);
     ret = SysInstallerKitsImpl::GetInstance().SetUpdateVabMode("ipc_ut_test", UpdateVabMode::BACKGROUND_UPDATE_MODE);
+    ASSERT_EQ(ret, -1);
+}
+
+// GetPartitionStashSize test when service is unavailable
+HWTEST_F(SysInstallerIpcUnitTest, GetPartitionStashSizeWhenServiceUnavailable, TestSize.Level1)
+{
+    cout << " GetPartitionStashSizeWhenServiceUnavailable start " << std::endl;
+    wptr<IRemoteObject> remote;
+    SysInstallerKitsImpl::GetInstance().ResetService(remote);
+    std::string taskId = "test_task_stash";
+    std::vector<std::string> pkgPaths = {"/data/updater/package.zip"};
+    uint64_t stashSize = 0;
+    auto ret = SysInstallerKitsImpl::GetInstance().GetPartitionStashSize(taskId, pkgPaths, stashSize);
+    ASSERT_EQ(ret, -1);
+}
+
+// GetPartitionStashSize test with valid parameters but service unavailable
+HWTEST_F(SysInstallerIpcUnitTest, GetPartitionStashSizeValidParamsServiceUnavailable, TestSize.Level1)
+{
+    cout << " GetPartitionStashSizeValidParamsServiceUnavailable start " << std::endl;
+    wptr<IRemoteObject> remote;
+    SysInstallerKitsImpl::GetInstance().ResetService(remote);
+    std::string taskId = "valid_task_id_for_stash_test";
+    std::vector<std::string> pkgPaths = {
+        "/data/updater/package1.zip",
+        "/data/updater/package2.zip"
+    };
+    uint64_t stashSize = 100;
+    auto ret = SysInstallerKitsImpl::GetInstance().GetPartitionStashSize(taskId, pkgPaths, stashSize);
     ASSERT_EQ(ret, -1);
 }
 } // SysInstaller

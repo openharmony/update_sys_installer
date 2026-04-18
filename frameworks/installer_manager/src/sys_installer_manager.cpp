@@ -305,6 +305,16 @@ int32_t SysInstallerManager::ClearVabPatch()
     return helper_->ClearVabPatch();
 }
 
+int32_t SysInstallerManager::GetPartitionStashSize(const std::string &taskId,
+    const std::vector<std::string> &pkgPaths, uint64_t &stashSize)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->GetPartitionStashSize(taskId, pkgPaths, stashSize);
+}
+
 bool SysInstallerManager::IsTaskRunning()
 {
     if (helper_ == nullptr) {

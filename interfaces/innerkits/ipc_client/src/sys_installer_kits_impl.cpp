@@ -342,7 +342,7 @@ int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::string &taskId
         return -1;
     }
     int32_t ret = updateService->StartUpdateVabPackageZip(taskId, pkgPath);
-    LOG(INFO) << "StartUpdateVabPackageZip ret:" << ret;
+    LOG(INFO) << "StartUpdateVabPackageZip ret: " << ret;
 
     return ret;
 #else
@@ -699,6 +699,25 @@ int32_t SysInstallerKitsImpl::ClearVabPatch()
     }
     int32_t ret = updateService->ClearVabPatch();
     LOG(INFO) << "ClearVabPatch ret:" << ret;
+
+    return ret;
+#else
+    return -1;
+#endif
+}
+
+int32_t SysInstallerKitsImpl::GetPartitionStashSize(const std::string &taskId,
+    const std::vector<std::string> &pkgPaths, uint64_t &stashSize)
+{
+#ifndef UPDATER_UT
+    LOG(INFO) << "GetPartitionStashSize";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->GetPartitionStashSize(taskId, pkgPaths, stashSize);
+    LOG(INFO) << "GetPartitionStashSize ret:" << ret;
 
     return ret;
 #else
