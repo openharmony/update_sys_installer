@@ -75,9 +75,6 @@ ohos_static_library("module_update_static") {
 
   deps = [ "${sys_installer_path}/services/module_update:module_update_utils" ]
 
-  public_deps =
-      [ "${sys_installer_path}/services/module_update:module_update_utils" ]
-
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "c_utils:utils",
