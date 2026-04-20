@@ -255,6 +255,7 @@ ohos_executable("module_update_client") {
     "ipc:ipc_core",
     "samgr:samgr_proxy",
     "updater:libupdaterlog",
+    "zlib:shared_libz"
   ]
   install_enable = false
   part_name = "sys_installer"
@@ -277,8 +278,6 @@ ohos_static_library("module_update_client_static") {
   deps = [ ":sysinstaller_interface" ]
 
   public_configs = [ ":exported_header_files" ]
-
-  public_external_deps = [ "zlib:shared_libz" ]
 
   external_deps = [
     "bounds_checking_function:libsec_static",
@@ -312,8 +311,6 @@ ohos_shared_library("libmodule_update_shared") {
   deps = [ ":sysinstaller_interface" ]
 
   public_configs = [ ":exported_header_files" ]
-
-  public_external_deps = [ "zlib:shared_libz" ]
 
   external_deps = [
     "bounds_checking_function:libsec_shared",

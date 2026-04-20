@@ -81,6 +81,8 @@ ohos_static_library("libmodule_update_service_static") {
     "updater:libupdaterlog_shared",
     "updater:libutils",
     "updater:libupdaterpackage_shared",
+    "zlib:shared_libz",
+    "cJSON:cjson"
   ]
 
   if (build_selinux) {
