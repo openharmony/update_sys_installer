@@ -46,6 +46,7 @@ ohos_fuzztest("ImoduleUpdateFuzzTest") {
     "samgr:samgr_proxy",
     "updater:libupdaterlog",
     "updater:libutils",
+    "zlib:shared_libz",
   ]
 
   cflags = [

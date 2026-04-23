@@ -36,11 +36,6 @@ ohos_shared_library("module_update_utils") {
 
   public_configs = [ ":utils_exported_header" ]
 
-  public_external_deps = [
-    "cJSON:cjson",
-    "zlib:shared_libz",
-  ]
-
   deps = []
 
   external_deps = [
@@ -60,6 +55,7 @@ ohos_shared_library("module_update_utils") {
     "updater:libupdaterlog_shared",
     "updater:libupdaterpackage_shared",
     "updater:libutils",
+    "zlib:shared_libz",
   ]
   if (ohos_indep_compiler_enable) {
     external_deps += [
