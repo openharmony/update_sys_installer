@@ -212,6 +212,7 @@ HWTEST_F(SysInstallerIpcUnitTest, GetPartitionStashSizeWhenServiceUnavailable, T
     std::string taskId = "test_task_stash";
     std::vector<std::string> pkgPaths = {"/data/updater/package.zip"};
     uint64_t stashSize = 0;
+    // ret 0: success, -1: error
     auto ret = SysInstallerKitsImpl::GetInstance().GetPartitionStashSize(taskId, pkgPaths, stashSize);
     ASSERT_EQ(ret, -1);
 }
@@ -228,6 +229,7 @@ HWTEST_F(SysInstallerIpcUnitTest, GetPartitionStashSizeValidParamsServiceUnavail
         "/data/updater/package2.zip"
     };
     uint64_t stashSize = 100;
+    // ret 0: success, -1: error
     auto ret = SysInstallerKitsImpl::GetInstance().GetPartitionStashSize(taskId, pkgPaths, stashSize);
     ASSERT_EQ(ret, -1);
 }
