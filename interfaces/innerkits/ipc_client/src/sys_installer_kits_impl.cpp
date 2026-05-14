@@ -351,7 +351,7 @@ int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::string &taskId
 }
 
 int32_t SysInstallerKitsImpl::StartUpdateSingularPackageZip(const std::string &taskId,
-    const std::vector<std::string> &pkgPath)
+    const std::string &pkgPath, const std::string &type)
 {
 #ifndef UPDATER_UT
     LOG(INFO) << "StartUpdateSingularPackageZip";
@@ -360,9 +360,9 @@ int32_t SysInstallerKitsImpl::StartUpdateSingularPackageZip(const std::string &t
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->StartUpdateSingularPackageZip(taskId, pkgPath);
+    int32_t ret = updateService->StartUpdateSingularPackageZip(taskId, pkgPath, type);
     LOG(INFO) << "StartUpdateSingularPackageZip ret:" << ret;
-
+ 
     return ret;
 #else
     return -1;

@@ -33,6 +33,7 @@ interface OHOS.SysInstaller.ISysInstaller {
     void CancelUpdateVabPackageZip([in] String taskId);
     [oneway] void StartUpdateVabPackageZip([in] String taskId, [in] List<String> pkgPath);
     void StartUpdateSingularPackageZip([in] String taskId, [in] List<String> pkgPath);
+    void StartUpdateSingularPackageZip([in] String taskId, [in] String pkgPath, [in] String type);
     [oneway] void StartVabMerge([in] String taskId);
     void ClearVabMetadataAndCow();
     void VabUpdateActive([in] VabActiveMode mode);
