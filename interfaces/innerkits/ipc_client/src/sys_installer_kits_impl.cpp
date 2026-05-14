@@ -362,7 +362,7 @@ int32_t SysInstallerKitsImpl::StartUpdateSingularPackageZip(const std::string &t
     }
     int32_t ret = updateService->StartUpdateSingularPackageZip(taskId, pkgPath, type);
     LOG(INFO) << "StartUpdateSingularPackageZip ret:" << ret;
- 
+
     return ret;
 #else
     return -1;
