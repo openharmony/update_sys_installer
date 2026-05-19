@@ -41,6 +41,7 @@ ohos_static_library("libsysinstaller_timer") {
     "hilog:libhilog",
     "updater:libupdaterlog",
     "ability_runtime:wantagent_innerkits",
+    "ability_base:configuration",
     "time_service:time_client",
     "ipc:ipc_single",
   ]
