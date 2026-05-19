@@ -42,7 +42,8 @@
         "bzip2",
         "drivers_peripheral_partitionslot",
         "time_service",
-        "ability_runtime"
+        "ability_runtime",
+        "ability_base"
       ],
       "third_party": []
     },
