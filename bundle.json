@@ -51,12 +51,7 @@
       "sub_component": [
         "//base/update/sys_installer/frameworks/ipc_server:sys_installer",
         "//base/update/sys_installer/frameworks/ipc_server/etc:sys_installer_etc",
-        "//base/update/sys_installer/frameworks/ipc_server/sa_profile:sys_installer_sa_profile",
-        "//base/update/sys_installer/frameworks/ipc_server/sa_profile:module_update_sa_profile",
-        "//base/update/sys_installer/interfaces/innerkits/ipc_client:module_update",
-        "//base/update/sys_installer/interfaces/innerkits/ipc_client:module_update_client",
-        "//base/update/sys_installer/services/module_update/service:module_update_service",
-        "//base/update/sys_installer/services/module_update/src:check_module_update"
+        "//base/update/sys_installer/frameworks/ipc_server/sa_profile:sys_installer_sa_profile"
       ],
       "inner_kits": [
         {
@@ -84,36 +79,6 @@
           }
         },
         {
-          "name": "//base/update/sys_installer/interfaces/innerkits/ipc_client:libmodule_update_shared",
-          "header": {
-            "header_files": [],
-            "header_base": [
-               "//base/update/sys_installer/interfaces/innerkits/inner_api/include",
-               "//base/update/sys_installer/interfaces/innerkits/ipc_client/include",
-               "//base/update/sys_installer/interfaces/innerkits",
-               "//base/update/sys_installer/common/include"
-            ]
-          }
-        },
-        {
-          "name": "//base/update/sys_installer/interfaces/innerkits/ipc_client:module_update",
-          "header": {
-            "header_files": [],
-            "header_base": [
-              "//base/update/sys_installer/interfaces/innerkits/inner_api/include"
-            ]
-          }
-        },
-        {
-          "name": "//base/update/sys_installer/services/module_update/src:check_module_update_static",
-          "header": {
-            "header_files": [],
-            "header_base": [
-              "//base/update/sys_installer/services/module_update/include"
-            ]
-          }
-        },
-        {
           "name": "//base/update/sys_installer/frameworks/installer_manager:libinstallermanager",
           "header": {
             "header_files": [],
@@ -128,25 +93,6 @@
             "header_files": [],
             "header_base": [
                "//base/update/sys_installer/frameworks/ipc_server/include"
-            ]
-          }
-        },
-        {
-          "name": "//base/update/sys_installer/services/module_update:module_update_utils",
-          "header": {
-            "header_files": [],
-            "header_base": [
-               "//base/update/sys_installer/services/module_update/utils/include"
-            ]
-          }
-        },
-        {
-          "name": "//base/update/sys_installer/services/module_update/service:libmodule_update_service_static",
-          "header": {
-            "header_files": [],
-            "header_base": [
-               "//base/update/sys_installer/services/module_update/service/include",
-               "//base/update/sys_installer/services/module_update/utils/include"
             ]
           }
         },
