@@ -139,7 +139,8 @@ int32_t SysInstallerManagerHelper::CancelUpdateVabPackageZip(const std::string &
 }
 
 int32_t SysInstallerManagerHelper::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsCowsSize,
-    const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize)
+    const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize,
+    bool isTrcPtbChanged, PartitionType partitionType)
 {
     return -1;
 }
@@ -155,8 +156,8 @@ int32_t SysInstallerManagerHelper::CreateVabSnapshotCowImg(const std::unordered_
     return -1;
 }
 
-int32_t SysInstallerManagerHelper::CreateVabSnapshotCowImg(const std::string &name, uint64_t size,
-    uint64_t splitSize, uint64_t &createdSize, bool &isCreated)
+int32_t SysInstallerManagerHelper::CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo,
+    uint64_t &createdSize, bool &isCreated)
 {
     return -1;
 }

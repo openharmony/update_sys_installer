@@ -387,7 +387,7 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::unordered_map<s
 #endif
 }
 
-int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::string &name, uint64_t size, uint64_t splitSize,
+int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo,
     uint64_t &createdSize, bool &isCreated)
 {
 #ifndef UPDATER_UT
@@ -397,7 +397,7 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::string &name, u
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->CreateVabSnapshotCowImg(name, size, splitSize, createdSize, isCreated);
+    int32_t ret = updateService->CreateVabSnapshotCowImg(vabCowInfo, createdSize, isCreated);
     LOG(INFO) << "CreateVabSnapshotCowImg ret:" << ret;
 
     return ret;
@@ -407,7 +407,8 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::string &name, u
 }
 
 int32_t SysInstallerKitsImpl::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsCowsSize,
-    const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize)
+    const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize,
+    bool isTrcPtbChanged, PartitionType partitionType)
 {
 #ifndef UPDATER_UT
     LOG(INFO) << "GetPartitionAvailableSize";
@@ -416,7 +417,8 @@ int32_t SysInstallerKitsImpl::GetPartitionAvailableSize(const std::map<std::stri
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->GetPartitionAvailableSize(dtsCowsSize, dtsImgsSize, availSize);
+    int32_t ret = updateService->GetPartitionAvailableSize(dtsCowsSize, dtsImgsSize, availSize,
+        isTrcPtbChanged, partitionType);
     LOG(INFO) << "GetPartitionAvailableSize ret:" << ret;
 
     return ret;

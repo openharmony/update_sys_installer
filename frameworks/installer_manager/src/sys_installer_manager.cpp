@@ -145,13 +145,14 @@ int32_t SysInstallerManager::CancelUpdateVabPackageZip(const std::string &taskId
 }
 
 int32_t SysInstallerManager::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsCowsSize,
-    const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize)
+    const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize,
+    bool isTrcPtbChanged, PartitionType partitionType)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->GetPartitionAvailableSize(dtsCowsSize, dtsImgsSize, availSize);
+    return helper_->GetPartitionAvailableSize(dtsCowsSize, dtsImgsSize, availSize, isTrcPtbChanged, partitionType);
 }
 
 int32_t SysInstallerManager::StartVabMerge(const std::string &taskId)
@@ -172,14 +173,14 @@ int32_t SysInstallerManager::CreateVabSnapshotCowImg(const std::unordered_map<st
     return helper_->CreateVabSnapshotCowImg(partitionInfo);
 }
 
-int32_t SysInstallerManager::CreateVabSnapshotCowImg(const std::string &name, uint64_t size, uint64_t splitSize,
+int32_t SysInstallerManager::CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo,
     uint64_t &createdSize, bool &isCreated)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->CreateVabSnapshotCowImg(name, size, splitSize, createdSize, isCreated);
+    return helper_->CreateVabSnapshotCowImg(vabCowInfo, createdSize, isCreated);
 }
 
 int32_t SysInstallerManager::ClearVabMetadataAndCow()
