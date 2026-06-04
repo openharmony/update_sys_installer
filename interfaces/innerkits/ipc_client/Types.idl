@@ -68,6 +68,12 @@ enum UpdateVabMode {
     ALLCORES_UPDATE_MODE,
 };
 
+enum PartitionType {
+    None = 0,
+    Y,
+    N,
+};
+
 struct FeatureInfo {
     boolean isNeedReboot;
     String featureName;
@@ -87,4 +93,12 @@ struct FeatureStatus {
     CloudRomInstallStatus status;
     ErrorInfo errorInfo;
     unsigned int featureType;
+};
+
+struct VabCowInfo {
+    String name;
+    unsigned long size;
+    unsigned long splitSize;
+    boolean isTrcPtableChanged;
+    boolean isPkgPtableChanged;
 };
