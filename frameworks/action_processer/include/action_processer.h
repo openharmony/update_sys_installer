@@ -18,6 +18,7 @@
 
 #include <deque>
 #include <map>
+#include <atomic>
 #include "iaction.h"
 #include "macros_updater.h"
 #include "status_manager.h"
@@ -45,8 +46,8 @@ private:
     std::shared_ptr<StatusManager> statusManager_ {};
     std::deque<std::unique_ptr<IAction>> actionQue_ {};
     std::unique_ptr<IAction> curAction_ {};
-    bool isRunning_ = false;
-    bool isSuspend_ = false;
+    std::atomic<bool> isRunning_ = false;
+    std::atomic<bool> isSuspend_ = false;
     InstallerMode installMode_ {SYS_BACKGROUND_UPDATE_MODE};
 };
 } // SysInstaller
