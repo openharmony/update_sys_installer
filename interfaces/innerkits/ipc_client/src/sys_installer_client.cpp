@@ -43,8 +43,7 @@ public:
     ~ProcessCallback() = default;
     void OnUpgradeProgress(UpdateStatus updateStatus, int percent, const std::string &resultMsg) override
     {
-        printf("ProgressCallback progress %d percent %d msg %s\n",
-            updateStatus, percent, resultMsg.c_str());
+        printf("ProgressCallback progress %d percent %d msg %s\n", updateStatus, percent, resultMsg.c_str());
     }
     void OnUpgradeDealLen(UpdateStatus updateStatus, int dealLen, const std::string &resultMsg) override
     {
