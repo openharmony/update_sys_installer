@@ -19,7 +19,7 @@ module_update_service_gen("module_update_service") {
   deps = [ "${sys_installer_path}/services/module_update/service:libmodule_update_service_static" ]
   
   if (ohos_indep_compiler_enable) {
-    external_deps = [ "init:libbegetutil", ]
+    external_deps = [ "init:libbegetutil" ]
   }
 
   part_name = "sys_installer"
