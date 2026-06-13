@@ -38,9 +38,8 @@ interface OHOS.SysInstaller.ISysInstaller {
     void VabUpdateActive([in] VabActiveMode mode);
     void GetMetadataResult([in] String action, [out] boolean metadataResult);
     void GetPartitionAvailableSize([in] OrderedMap<String, unsigned long> dtsCowsSize,
-        [in] OrderedMap<String, unsigned long> dtsImgsSize, [out] unsigned long availSize,
-        [in] boolean isTrcPtbChanged, [in] PartitionType partitionType);
-    void CreateVabSnapshotCowImg([in] Map<String, unsigned long> partitionInfo);
+        [in] OrderedMap<String, unsigned long> dtsImgsSize, [in] PartitionInfo partitionInfo,
+        [out] unsigned long availSize);
     void CreateVabSnapshotCowImg([in] VabCowInfo cowInfo, [out] unsigned long createdSize, [out] boolean isCreated);
     void GetUpdateResult([in] String taskId, [in] String taskType, [in] String resultType, [out] String updateResult);
     void ExitSysInstaller();

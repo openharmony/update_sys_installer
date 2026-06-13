@@ -88,11 +88,10 @@ public:
     int32_t StartUpdateSingularPackageZip(const std::string &taskId,
         const std::string &pkgPath, const std::string &type) override;
     int32_t CancelUpdateVabPackageZip(const std::string &taskId) override;
-    int32_t GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsCowsSize,
-        const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize,
-        bool isTrcPtbChanged, PartitionType partitionType) override;
+    int32_t GetPartitionAvailableSize(const std::map<std::string, uint64_t> &dtsCowsSize,
+        const std::map<std::string, uint64_t> &dtsImgsSize, const PartitionInfo &partitionInfo,
+         uint64_t &availSize) override;
     int32_t StartVabMerge(const std::string &taskId) override;
-    int32_t CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo) override;
     int32_t CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo, uint64_t &createdSize, bool &isCreated) override;
     int32_t ClearVabMetadataAndCow() override;
     int32_t GetUpdateResult(const std::string &taskId, const std::string &taskType,

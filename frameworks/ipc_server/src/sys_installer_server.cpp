@@ -198,14 +198,13 @@ int32_t SysInstallerServer::CancelUpdateVabPackageZip(const std::string &taskId)
     return SysInstallerManager::GetInstance().CancelUpdateVabPackageZip(taskId);
 }
 
-int32_t SysInstallerServer::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsCowsSize,
-    const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize,
-    bool isTrcPtbChanged, PartitionType partitionType)
+int32_t SysInstallerServer::GetPartitionAvailableSize(const std::map<std::string, uint64_t> &dtsCowsSize,
+    const std::map<std::string, uint64_t> &dtsImgsSize, const PartitionInfo &partitionInfo, uint64_t &availSize)
 {
     LOG(INFO) << "GetPartitionAvailableSize";
     DEFINE_EXIT_GUARD();
-    return SysInstallerManager::GetInstance().GetPartitionAvailableSize(dtsCowsSize, dtsImgsSize, availSize,
-        isTrcPtbChanged, partitionType);
+    return SysInstallerManager::GetInstance().GetPartitionAvailableSize(dtsCowsSize, dtsImgsSize, partitionInfo,
+        availSize);
 }
 
 int32_t SysInstallerServer::StartVabMerge(const std::string &taskId)
@@ -215,19 +214,11 @@ int32_t SysInstallerServer::StartVabMerge(const std::string &taskId)
     return SysInstallerManager::GetInstance().StartVabMerge(taskId);
 }
 
-int32_t SysInstallerServer::CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo)
+int32_t SysInstallerServer::CreateVabSnapshotCowImg(const VabCowInfo &cowInfo, uint64_t &createdSize, bool &isCreated)
 {
     LOG(INFO) << "CreateVabSnapshotCowImg";
     DEFINE_EXIT_GUARD();
-    return SysInstallerManager::GetInstance().CreateVabSnapshotCowImg(partitionInfo);
-}
-
-int32_t SysInstallerServer::CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo,
-    uint64_t &createdSize, bool &isCreated)
-{
-    LOG(INFO) << "CreateVabSnapshotCowImg";
-    DEFINE_EXIT_GUARD();
-    return SysInstallerManager::GetInstance().CreateVabSnapshotCowImg(vabCowInfo, createdSize, isCreated);
+    return SysInstallerManager::GetInstance().CreateVabSnapshotCowImg(cowInfo, createdSize, isCreated);
 }
 
 int32_t SysInstallerServer::ClearVabMetadataAndCow()

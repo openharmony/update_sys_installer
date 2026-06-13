@@ -369,24 +369,6 @@ int32_t SysInstallerKitsImpl::StartUpdateSingularPackageZip(const std::string &t
 #endif
 }
 
-int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const std::unordered_map<std::string, uint64_t> &partitionInfo)
-{
-#ifndef UPDATER_UT
-    LOG(INFO) << "CreateVabSnapshotCowImg";
-    auto updateService = GetService();
-    if (updateService == nullptr) {
-        LOG(ERROR) << "Get updateService failed";
-        return -1;
-    }
-    int32_t ret = updateService->CreateVabSnapshotCowImg(partitionInfo);
-    LOG(INFO) << "CreateVabSnapshotCowImg ret:" << ret;
-
-    return ret;
-#else
-    return -1;
-#endif
-}
-
 int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo,
     uint64_t &createdSize, bool &isCreated)
 {
@@ -406,9 +388,8 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const VabCowInfo &vabCowIn
 #endif
 }
 
-int32_t SysInstallerKitsImpl::GetPartitionAvailableSize(const std::map<std::string, uint64_t>& dtsCowsSize,
-    const std::map<std::string, uint64_t>& dtsImgsSize, uint64_t& availSize,
-    bool isTrcPtbChanged, PartitionType partitionType)
+int32_t SysInstallerKitsImpl::GetPartitionAvailableSize(const std::map<std::string, uint64_t> &dtsCowsSize,
+    const std::map<std::string, uint64_t> &dtsImgsSize, const PartitionInfo &partitionInfo, uint64_t &availSize)
 {
 #ifndef UPDATER_UT
     LOG(INFO) << "GetPartitionAvailableSize";
@@ -417,8 +398,7 @@ int32_t SysInstallerKitsImpl::GetPartitionAvailableSize(const std::map<std::stri
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->GetPartitionAvailableSize(dtsCowsSize, dtsImgsSize, availSize,
-        isTrcPtbChanged, partitionType);
+    int32_t ret = updateService->GetPartitionAvailableSize(dtsCowsSize, dtsImgsSize, partitionInfo, availSize);
     LOG(INFO) << "GetPartitionAvailableSize ret:" << ret;
 
     return ret;

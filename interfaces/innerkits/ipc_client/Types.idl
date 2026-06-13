@@ -99,6 +99,11 @@ struct VabCowInfo {
     String name;
     unsigned long size;
     unsigned long splitSize;
-    boolean isTrcPtableChanged;
-    boolean isPkgPtableChanged;
+    PartitionType pkgPartition;
+    PartitionType trcPartition;
+};
+
+struct PartitionInfo {
+    PartitionType pkgPartition;
+    PartitionType trcPartition;
 };
