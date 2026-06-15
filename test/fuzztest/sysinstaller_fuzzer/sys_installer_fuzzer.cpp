@@ -168,16 +168,18 @@ void FuzzSysInstallerCreateSplitCow(const uint8_t* data, size_t size)
 {
     uint64_t createdSize = 0;
     bool isCreated = false;
-    SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(
-        std::string(reinterpret_cast<const char*>(data), size), 1, 0, createdSize, isCreated);
+    VabCowInfo cowInfo1 = { .name = std::string(reinterpret_cast<const char*>(data), size),
+        .size = 1, .splitSize = 0, .pkgPartition = PartitionType::N, .trcPartition = PartitionType::N };
+    SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(cowInfo1, createdSize, isCreated);
     if (size < sizeof(uint64_t)) {
         return;
     }
-    std::string name = "fuzz_test";
-    SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(
-        name, *(reinterpret_cast<const uint64_t*>(data)), 0, createdSize, isCreated);
-    SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(
-        name, 1, *(reinterpret_cast<const uint64_t*>(data)), createdSize, isCreated);
+    VabCowInfo cowInfo2 = { .name = "fuzz_test", .size = *(reinterpret_cast<const uint64_t*>(data)),
+        .splitSize = 0, .pkgPartition = PartitionType::N, .trcPartition = PartitionType::N };
+    SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(cowInfo2, createdSize, isCreated);
+    VabCowInfo cowInfo3 = { .name = "fuzz_test", .size = 1, .splitSize = *(reinterpret_cast<const uint64_t*>(data)),
+        .pkgPartition = PartitionType::N, .trcPartition = PartitionType::N };
+    SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(cowInfo3, createdSize, isCreated);
 }
 }
 

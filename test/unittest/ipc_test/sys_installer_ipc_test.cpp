@@ -233,5 +233,134 @@ HWTEST_F(SysInstallerIpcUnitTest, GetPartitionStashSizeValidParamsServiceUnavail
     auto ret = SysInstallerKitsImpl::GetInstance().GetPartitionStashSize(taskId, pkgPaths, stashSize);
     ASSERT_EQ(ret, -1);
 }
+
+// CreateVabSnapshotCowImg test when service is unavailable
+HWTEST_F(SysInstallerIpcUnitTest, CreateVabSnapshotCowImgWhenServiceUnavailable, TestSize.Level1)
+{
+    cout << " CreateVabSnapshotCowImgWhenServiceUnavailable start " << std::endl;
+    wptr<IRemoteObject> remote;
+    SysInstallerKitsImpl::GetInstance().ResetService(remote);
+    VabCowInfo vabCowInfo;
+    vabCowInfo.name = "test_partition";
+    vabCowInfo.size = 1024;
+    vabCowInfo.splitSize = 512;
+    vabCowInfo.pkgPartition = PartitionType::Y;
+    vabCowInfo.trcPartition = PartitionType::N;
+    uint64_t createdSize = 0;
+    bool isCreated = false;
+    auto ret = SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(vabCowInfo, createdSize, isCreated);
+    ASSERT_EQ(ret, -1);
+}
+
+// CreateVabSnapshotCowImg test with different PartitionType values
+HWTEST_F(SysInstallerIpcUnitTest, CreateVabSnapshotCowImgWithDifferentPartitionType, TestSize.Level1)
+{
+    cout << " CreateVabSnapshotCowImgWithDifferentPartitionType start " << std::endl;
+    wptr<IRemoteObject> remote;
+    SysInstallerKitsImpl::GetInstance().ResetService(remote);
+    uint64_t createdSize = 0;
+    bool isCreated = false;
+
+    // Test with PartitionType::None
+    VabCowInfo vabCowInfo1;
+    vabCowInfo1.name = "test_none";
+    vabCowInfo1.size = 1024;
+    vabCowInfo1.splitSize = 0;
+    vabCowInfo1.pkgPartition = PartitionType::None;
+    vabCowInfo1.trcPartition = PartitionType::None;
+    auto ret = SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(vabCowInfo1, createdSize, isCreated);
+    ASSERT_EQ(ret, -1);
+
+    // Test with PartitionType::Y
+    VabCowInfo vabCowInfo2;
+    vabCowInfo2.name = "test_y";
+    vabCowInfo2.size = 2048;
+    vabCowInfo2.splitSize = 1024;
+    vabCowInfo2.pkgPartition = PartitionType::Y;
+    vabCowInfo2.trcPartition = PartitionType::Y;
+    ret = SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(vabCowInfo2, createdSize, isCreated);
+    ASSERT_EQ(ret, -1);
+
+    // Test with PartitionType::N
+    VabCowInfo vabCowInfo3;
+    vabCowInfo3.name = "test_n";
+    vabCowInfo3.size = 4096;
+    vabCowInfo3.splitSize = 2048;
+    vabCowInfo3.pkgPartition = PartitionType::N;
+    vabCowInfo3.trcPartition = PartitionType::N;
+    ret = SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(vabCowInfo3, createdSize, isCreated);
+    ASSERT_EQ(ret, -1);
+}
+
+// GetPartitionAvailableSize test when service is unavailable
+HWTEST_F(SysInstallerIpcUnitTest, GetPartitionAvailableSizeWhenServiceUnavailable, TestSize.Level1)
+{
+    cout << " GetPartitionAvailableSizeWhenServiceUnavailable start " << std::endl;
+    wptr<IRemoteObject> remote;
+    SysInstallerKitsImpl::GetInstance().ResetService(remote);
+    std::map<std::string, uint64_t> dtsCowsSize;
+    dtsCowsSize["partition_a"] = 1024;
+    std::map<std::string, uint64_t> dtsImgsSize;
+    dtsImgsSize["partition_b"] = 2048;
+    PartitionInfo partitionInfo;
+    partitionInfo.pkgPartition = PartitionType::Y;
+    partitionInfo.trcPartition = PartitionType::N;
+    uint64_t availSize = 0;
+    auto ret = SysInstallerKitsImpl::GetInstance().GetPartitionAvailableSize(
+        dtsCowsSize, dtsImgsSize, partitionInfo, availSize);
+    ASSERT_EQ(ret, -1);
+}
+
+// GetPartitionAvailableSize test with different PartitionType values
+HWTEST_F(SysInstallerIpcUnitTest, GetPartitionAvailableSizeWithDifferentPartitionType, TestSize.Level1)
+{
+    cout << " GetPartitionAvailableSizeWithDifferentPartitionType start " << std::endl;
+    wptr<IRemoteObject> remote;
+    SysInstallerKitsImpl::GetInstance().ResetService(remote);
+    std::map<std::string, uint64_t> dtsCowsSize;
+    dtsCowsSize["partition_a"] = 1024;
+    std::map<std::string, uint64_t> dtsImgsSize;
+    dtsImgsSize["partition_b"] = 2048;
+    uint64_t availSize = 0;
+
+    // Test with PartitionType::None
+    PartitionInfo partitionInfo1;
+    partitionInfo1.pkgPartition = PartitionType::None;
+    partitionInfo1.trcPartition = PartitionType::None;
+    auto ret = SysInstallerKitsImpl::GetInstance().GetPartitionAvailableSize(
+        dtsCowsSize, dtsImgsSize, partitionInfo1, availSize);
+    ASSERT_EQ(ret, -1);
+
+    // Test with PartitionType::Y
+    PartitionInfo partitionInfo2;
+    partitionInfo2.pkgPartition = PartitionType::Y;
+    partitionInfo2.trcPartition = PartitionType::Y;
+    ret = SysInstallerKitsImpl::GetInstance().GetPartitionAvailableSize(
+        dtsCowsSize, dtsImgsSize, partitionInfo2, availSize);
+    ASSERT_EQ(ret, -1);
+
+    // Test with PartitionType::N
+    PartitionInfo partitionInfo3;
+    partitionInfo3.pkgPartition = PartitionType::N;
+    partitionInfo3.trcPartition = PartitionType::N;
+    ret = SysInstallerKitsImpl::GetInstance().GetPartitionAvailableSize(
+        dtsCowsSize, dtsImgsSize, partitionInfo3, availSize);
+    ASSERT_EQ(ret, -1);
+
+    // Test with mixed PartitionType values
+    PartitionInfo partitionInfo4;
+    partitionInfo4.pkgPartition = PartitionType::Y;
+    partitionInfo4.trcPartition = PartitionType::N;
+    ret = SysInstallerKitsImpl::GetInstance().GetPartitionAvailableSize(
+        dtsCowsSize, dtsImgsSize, partitionInfo4, availSize);
+    ASSERT_EQ(ret, -1);
+
+    PartitionInfo partitionInfo5;
+    partitionInfo5.pkgPartition = PartitionType::N;
+    partitionInfo5.trcPartition = PartitionType::Y;
+    ret = SysInstallerKitsImpl::GetInstance().GetPartitionAvailableSize(
+        dtsCowsSize, dtsImgsSize, partitionInfo5, availSize);
+    ASSERT_EQ(ret, -1);
+}
 } // SysInstaller
 } // OHOS
