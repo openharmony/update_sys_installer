@@ -56,6 +56,9 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
         Hpackage::PkgManager::ReleasePackageInstance(pkgManager);
         return UPDATE_ERROR;
     }
+    if (SetUpdateSuffixParam() != UPDATE_SUCCESS) {
+        return UPDATE_ERROR;
+    }
     UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, upParams, HOTA_UPDATE);
     if (updateRet != UPDATE_SUCCESS) {
         LOG(INFO) << "Install package failed!";
