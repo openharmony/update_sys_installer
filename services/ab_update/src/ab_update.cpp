@@ -57,7 +57,6 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
         return UPDATE_ERROR;
     }
     if (SetUpdateSuffixParam() != UPDATE_SUCCESS) {
-        LOG(ERROR) << "SetUpdateSuffixParam failed";
         return UPDATE_ERROR;
     }
     UpdaterStatus updateRet = DoInstallUpdaterPackage(pkgManager, upParams, HOTA_UPDATE);
