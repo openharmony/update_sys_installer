@@ -42,7 +42,7 @@ public:
     int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath);
     int32_t StartUpdateSingularPackageZip(const std::string &taskId,
         const std::string &pkgPath, const std::string &type);
-    int32_t CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo, uint64_t &createdSize, bool &isCreated);
+    int32_t CreateVabSnapshotCowImg(const VabCowInfo &cowInfo, uint64_t &createdSize, bool &isCreated);
     int32_t GetPartitionAvailableSize(const std::map<std::string, uint64_t> &dtsCowsSize,
         const std::map<std::string, uint64_t> &dtsImgsSize, const PartitionInfo &partitionInfo, uint64_t &availSize);
     int32_t StartVabMerge(const std::string &taskId);
@@ -55,8 +55,8 @@ public:
 
     int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,
         const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);
-    int32_t UninstallCloudRom(const std::string &taskId,
-        const std::vector<FeatureInfo> &featureInfos, RebootStatus rebootStatus);
+    int32_t UninstallCloudRom(const std::string &taskId, const std::vector<FeatureInfo> &featureInfos,
+        RebootStatus rebootStatus);
     int32_t GetFeatureStatus(const std::vector<FeatureInfo> &featureInfos, std::vector<FeatureStatus> &statusInfos);
     int32_t GetAllFeatureStatus(const std::string &baseVersion, std::vector<FeatureStatus> &statusInfos);
     int32_t ClearCloudRom(const std::string &baseVersion, const std::string &featureName);

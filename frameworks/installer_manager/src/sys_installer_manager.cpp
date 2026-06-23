@@ -163,14 +163,14 @@ int32_t SysInstallerManager::StartVabMerge(const std::string &taskId)
     return helper_->StartVabMerge(taskId);
 }
 
-int32_t SysInstallerManager::CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo,
-    uint64_t &createdSize, bool &isCreated)
+int32_t SysInstallerManager::CreateVabSnapshotCowImg(const VabCowInfo &cowInfo, uint64_t &createdSize,
+    bool &isCreated)
 {
     if (helper_ == nullptr) {
         LOG(ERROR) << "helper_ null";
         return -1;
     }
-    return helper_->CreateVabSnapshotCowImg(vabCowInfo, createdSize, isCreated);
+    return helper_->CreateVabSnapshotCowImg(cowInfo, createdSize, isCreated);
 }
 
 int32_t SysInstallerManager::ClearVabMetadataAndCow()
