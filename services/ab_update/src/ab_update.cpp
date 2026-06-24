@@ -21,6 +21,7 @@
 #include "scope_guard.h"
 #include "utils.h"
 #include "updater/updater_const.h"
+#include "slot_info/slot_info.h"
 
 namespace OHOS {
 namespace SysInstaller {
@@ -47,9 +48,7 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
     upParams.updatePackage = {pkgPath};
     upParams.initialProgress = statusManager_->GetUpdateProgress();
     upParams.currentPercentage = 1 - upParams.initialProgress;
-    upParams.callbackProgress = [this](float value) {
-        this->SetProgress(value);
-        };
+    upParams.callbackProgress = [this](float value) { this->SetProgress(value); };
     if ((pkgPath.find(PATCH_PACKAGE_NAME) != std::string::npos) &&
         (SetUpdateSlotParam(upParams, true) != UPDATE_SUCCESS)) {
         LOG(ERROR) << "set slot param failed";
@@ -80,6 +79,8 @@ UpdaterStatus ABUpdate::StartABUpdate(const std::string &pkgPath)
     if (!DeleteUpdaterPath(GetWorkPath()) || !DeleteUpdaterPath(std::string(UPDATER_PATH))) {
         LOG(WARNING) << "Delete Work Path fail.";
     }
+    SetActiveSlot();
+
     return updateRet;
 }
 
