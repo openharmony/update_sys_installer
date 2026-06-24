@@ -21,6 +21,7 @@
 #include "scope_guard.h"
 #include "utils.h"
 #include "updater/updater_const.h"
+#include "slot_info/slot_info.h"
 
 namespace OHOS {
 namespace SysInstaller {
