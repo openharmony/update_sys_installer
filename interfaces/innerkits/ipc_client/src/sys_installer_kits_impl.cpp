@@ -369,8 +369,8 @@ int32_t SysInstallerKitsImpl::StartUpdateSingularPackageZip(const std::string &t
 #endif
 }
 
-int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo,
-    uint64_t &createdSize, bool &isCreated)
+int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const VabCowInfo &cowInfo, uint64_t &createdSize,
+    bool &isCreated)
 {
 #ifndef UPDATER_UT
     LOG(INFO) << "CreateVabSnapshotCowImg";
@@ -379,7 +379,7 @@ int32_t SysInstallerKitsImpl::CreateVabSnapshotCowImg(const VabCowInfo &vabCowIn
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
-    int32_t ret = updateService->CreateVabSnapshotCowImg(vabCowInfo, createdSize, isCreated);
+    int32_t ret = updateService->CreateVabSnapshotCowImg(cowInfo, createdSize, isCreated);
     LOG(INFO) << "CreateVabSnapshotCowImg ret:" << ret;
 
     return ret;
@@ -652,6 +652,7 @@ int32_t SysInstallerKitsImpl::SetUpdateVabMode(const std::string &taskId, Update
         LOG(ERROR) << "Get updateService failed";
         return -1;
     }
+
     int32_t ret = updateService->SetUpdateVabMode(taskId, mode);
     LOG(INFO) << "SetUpdateVabMode ret:" << ret;
     return ret;

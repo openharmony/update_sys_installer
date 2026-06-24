@@ -54,7 +54,7 @@ public:
     virtual int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath) = 0;
     virtual int32_t StartUpdateSingularPackageZip(const std::string &taskId,
         const std::string &pkgPath, const std::string &type) = 0;
-    virtual int32_t CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo, uint64_t &createdSize, bool &isCreated) = 0;
+    virtual int32_t CreateVabSnapshotCowImg(const VabCowInfo &cowInfo, uint64_t &createdSize, bool &isCreated) = 0;
     virtual int32_t GetPartitionAvailableSize(const std::map<std::string, uint64_t> &dtsCowsSize,
         const std::map<std::string, uint64_t> &dtsImgsSize, const PartitionInfo &partitionInfo,
         uint64_t &availSize) = 0;

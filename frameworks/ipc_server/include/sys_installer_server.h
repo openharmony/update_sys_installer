@@ -92,7 +92,7 @@ public:
         const std::map<std::string, uint64_t> &dtsImgsSize, const PartitionInfo &partitionInfo,
          uint64_t &availSize) override;
     int32_t StartVabMerge(const std::string &taskId) override;
-    int32_t CreateVabSnapshotCowImg(const VabCowInfo &vabCowInfo, uint64_t &createdSize, bool &isCreated) override;
+    int32_t CreateVabSnapshotCowImg(const VabCowInfo &cowInfo, uint64_t &createdSize, bool &isCreated) override;
     int32_t ClearVabMetadataAndCow() override;
     int32_t GetUpdateResult(const std::string &taskId, const std::string &taskType,
         const std::string &resultType, std::string &updateResult) override;
