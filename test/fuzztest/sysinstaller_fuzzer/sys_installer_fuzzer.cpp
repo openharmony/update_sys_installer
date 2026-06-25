@@ -169,7 +169,7 @@ void FuzzSysInstallerCreateSplitCow(const uint8_t* data, size_t size)
     bool isCreated = false;
     FuzzedDataProvider fdp(data, size);
     std::string testName = fdp.ConsumeRandomLengthString();
-    uint64_t testSize = fdp.ConsumeIntegral<uint64_t>()
+    uint64_t testSize = fdp.ConsumeIntegral<uint64_t>();
     VabCowInfo cowInfo1 = { .name = testName,
         .size = 1, .splitSize = 0, .pkgPartition = PartitionType::N, .trcPartition = PartitionType::N };
     SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(cowInfo1, createdSize, isCreated);
