@@ -21,6 +21,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "isys_installer.h"
 #include "isys_installer_callback_func.h"
 #include "sys_installer_kits_impl.h"
@@ -37,14 +38,11 @@ constexpr int DATA_FEATURE_CLEAR_LEN = 2;
 FeatureInfo ParseFeatureInfo(const uint8_t* data, size_t size)
 {
     FeatureInfo featureInfo {};
-
+    FuzzedDataProvider fdp(data, size);
     size_t len = size / DATA_FEATURE_MIN_LEN;
-    size_t offset = 0;
-    std::string featureName = std::string(reinterpret_cast<const char*>(data + offset), len);
-    offset += len;
-    std::string version = std::string(reinterpret_cast<const char*>(data + offset), len);
-    offset += len;
-    std::string path = std::string(reinterpret_cast<const char*>(data + offset), size - offset);
+    std::string featureName = fdp.ConsumeRandomLengthString(len);
+    std::string version = fdp.ConsumeRandomLengthString(len);
+    std::string path = fdp.ConsumeRandomLengthString(len);
     return {(data[DATA_IDX_NEED_REBOOT] & 1) == 0, featureName, version, path};
 }
 
@@ -97,12 +95,13 @@ void ClearCloudRomFuzzTest(const uint8_t* data, size_t size)
     }
     std::string baseVersion = "";
     std::string featureName = "";
+    FuzzedDataProvider fdp(data, size);
     if ((data[0] & 1) == 0) {
-        baseVersion = std::string(reinterpret_cast<const char*>(data), size);
+        baseVersion = fdp.ConsumeRandomLengthString();
     } else {
         size_t len = size / DATA_FEATURE_CLEAR_LEN;
-        baseVersion = std::string(reinterpret_cast<const char*>(data), len);
-        featureName = std::string(reinterpret_cast<const char*>(data + len), size - len);
+        baseVersion = fdp.ConsumeRandomLengthString(len);
+        featureName = fdp.ConsumeRandomLengthString(len);
     }
     SysInstallerKitsImpl::GetInstance().ClearCloudRom(baseVersion, featureName);
 }
@@ -168,16 +167,19 @@ void FuzzSysInstallerCreateSplitCow(const uint8_t* data, size_t size)
 {
     uint64_t createdSize = 0;
     bool isCreated = false;
-    VabCowInfo cowInfo1 = { .name = std::string(reinterpret_cast<const char*>(data), size),
+    FuzzedDataProvider fdp(data, size);
+    std::string testName = fdp.ConsumeRandomLengthString();
+    uint64_t testSize = fdp.ConsumeIntegral<uint64_t>()
+    VabCowInfo cowInfo1 = { .name = testName,
         .size = 1, .splitSize = 0, .pkgPartition = PartitionType::N, .trcPartition = PartitionType::N };
     SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(cowInfo1, createdSize, isCreated);
     if (size < sizeof(uint64_t)) {
         return;
     }
-    VabCowInfo cowInfo2 = { .name = "fuzz_test", .size = *(reinterpret_cast<const uint64_t*>(data)),
+    VabCowInfo cowInfo2 = { .name = "fuzz_test", .size = testSize,
         .splitSize = 0, .pkgPartition = PartitionType::N, .trcPartition = PartitionType::N };
     SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(cowInfo2, createdSize, isCreated);
-    VabCowInfo cowInfo3 = { .name = "fuzz_test", .size = 1, .splitSize = *(reinterpret_cast<const uint64_t*>(data)),
+    VabCowInfo cowInfo3 = { .name = "fuzz_test", .size = 1, .splitSize = testSize,
         .pkgPartition = PartitionType::N, .trcPartition = PartitionType::N };
     SysInstallerKitsImpl::GetInstance().CreateVabSnapshotCowImg(cowInfo3, createdSize, isCreated);
 }
