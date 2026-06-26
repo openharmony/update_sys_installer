@@ -133,6 +133,12 @@ int32_t SysInstallerManagerHelper::StartUpdateSingularPackageZip(const std::stri
     return -1;
 }
 
+int32_t SysInstallerManagerHelper::StartUpdateABPackageZip(const std::string &taskId,
+    const std::vector<std::string> &pkgPath)
+{
+    return -1;
+}
+
 int32_t SysInstallerManagerHelper::CancelUpdateVabPackageZip(const std::string &taskId)
 {
     return -1;

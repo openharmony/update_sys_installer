@@ -152,6 +152,14 @@ int32_t SysInstallerServer::StartUpdateParaZip(const std::string &taskId, const 
     return SysInstallerManager::GetInstance().StartUpdateParaZip(taskId, pkgPath, location, cfgDir);
 }
 
+int32_t SysInstallerServer::StartUpdateABPackageZip(const std::string &taskId,
+        const std::vector<std::string> &pkgPath)
+{
+    LOG(INFO) << "StartUpdateABPackageZip";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().StartUpdateABPackageZip(taskId, pkgPath);
+}
+
 int32_t SysInstallerServer::StartDeleteParaZip(const std::string &taskId, const std::string &location,
     const std::string &cfgDir)
 {

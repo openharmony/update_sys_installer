@@ -331,6 +331,26 @@ int32_t SysInstallerKitsImpl::CancelUpdateVabPackageZip(const std::string &taskI
 #endif
 }
 
+int32_t SysInstallerKitsImpl::StartUpdateABPackageZip(const std::string &taskId,
+    const std::vector<std::string> &pkgPath)
+{
+#ifndef UPDATER_UT
+    LOG(INFO) << "StartUpdateABPackageZip";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->StartUpdateABPackageZip(taskId, pkgPath);
+    LOG(INFO) << "StartUpdateABPackageZip ret: " << ret;
+
+    return ret;
+#else
+    return -1;
+#endif
+}
+
+
 int32_t SysInstallerKitsImpl::StartUpdateVabPackageZip(const std::string &taskId,
     const std::vector<std::string> &pkgPath)
 {

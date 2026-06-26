@@ -135,6 +135,16 @@ int32_t SysInstallerManager::StartUpdateSingularPackageZip(const std::string &ta
     return helper_->StartUpdateSingularPackageZip(taskId, pkgPath, type);
 }
 
+int32_t SysInstallerManager::StartUpdateABPackageZip(const std::string &taskId,
+    const std::vector<std::string> &pkgPath)
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->StartUpdateABPackageZip(taskId, pkgPath);
+}
+
 int32_t SysInstallerManager::CancelUpdateVabPackageZip(const std::string &taskId)
 {
     if (helper_ == nullptr) {

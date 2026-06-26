@@ -68,6 +68,8 @@ public:
     virtual int32_t StartAbSync() = 0;
     virtual int32_t SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode) = 0;
     virtual int32_t ClearVabPatch() = 0;
+    virtual int32_t StartUpdateABPackageZip(const std::string &taskId,
+        const std::vector<std::string> &pkgPath) = 0;
     virtual int32_t GetPartitionStashSize(const std::string &taskId, const std::vector<std::string> &pkgPaths,
         uint64_t &stashSize) = 0;
 };

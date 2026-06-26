@@ -43,6 +43,7 @@ public:
     virtual int32_t AccDeleteDir(const std::string &taskId, const std::string &dstPath);
     virtual int32_t CancelUpdateVabPackageZip(const std::string &taskId);
     virtual int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath);
+    virtual int32_t StartUpdateABPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath);
     virtual int32_t StartUpdateSingularPackageZip(const std::string &taskId,
         const std::string &pkgPath, const std::string &type);
     virtual int32_t CreateVabSnapshotCowImg(const VabCowInfo &cowInfo, uint64_t &createdSize, bool &isCreated);

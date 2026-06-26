@@ -87,6 +87,7 @@ public:
     int32_t StartUpdateVabPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath) override;
     int32_t StartUpdateSingularPackageZip(const std::string &taskId,
         const std::string &pkgPath, const std::string &type) override;
+    int32_t StartUpdateABPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath) override;
     int32_t CancelUpdateVabPackageZip(const std::string &taskId) override;
     int32_t GetPartitionAvailableSize(const std::map<std::string, uint64_t> &dtsCowsSize,
         const std::map<std::string, uint64_t> &dtsImgsSize, const PartitionInfo &partitionInfo,

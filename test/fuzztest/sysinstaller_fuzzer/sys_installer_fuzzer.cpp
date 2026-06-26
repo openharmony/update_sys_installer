@@ -134,6 +134,7 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     taskId = "fuzz_test";
     std::string pkgPath = std::string(reinterpret_cast<const char*>(data), size);
     SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(taskId, pkgPath);
+    SysInstallerKitsImpl::GetInstance().StartUpdateABPackageZip(taskId, pkgPath);
     pkgPath = "/data/updater/fuzz/updater.zip";
     const std::string location = "location";
     std::string cfgDir = std::string(reinterpret_cast<const char*>(data), size);

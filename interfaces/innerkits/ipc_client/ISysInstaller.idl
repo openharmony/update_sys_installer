@@ -45,6 +45,7 @@ interface OHOS.SysInstaller.ISysInstaller {
     void ExitSysInstaller();
     void StartAbSync();
     void SetUpdateVabMode([in] String taskId, [in] UpdateVabMode mode);
+    void StartUpdateABPackageZip([in] String taskId, [in] List<String> pkgPath);
     
     void InstallCloudRom([in] String taskId, [in] InstallMode installMode, [in] List<FeatureInfo> featureInfos, [in] RebootStatus rebootStatus);
     void UninstallCloudRom([in] String taskId, [in] List<FeatureInfo> featureInfos, [in] RebootStatus rebootStatus);

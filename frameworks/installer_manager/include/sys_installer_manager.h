@@ -34,6 +34,7 @@ public:
     int32_t GetUpdateStatus(const std::string &taskId);
     int32_t StartUpdateParaZip(const std::string &taskId, const std::string &pkgPath,
         const std::string &location, const std::string &cfgDir);
+    int32_t StartUpdateABPackageZip(const std::string &taskId, const std::vector<std::string> &pkgPath);
     int32_t StartDeleteParaZip(const std::string &taskId, const std::string &location, const std::string &cfgDir);
     int32_t AccDecompressAndVerifyPkg(const std::string &taskId, const std::string &srcPath,
         const std::string &dstPath, const uint32_t type);
