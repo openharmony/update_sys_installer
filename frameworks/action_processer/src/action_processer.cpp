@@ -115,7 +115,7 @@ void ActionProcesser::Suspend()
 
 void ActionProcesser::Resume()
 {
-    if (isSuspend_) {
+    if (!isSuspend_) {
         LOG(WARNING) << "ActionProcesser is running";
         return;
     }
