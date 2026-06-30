@@ -153,7 +153,7 @@ int32_t SysInstallerServer::StartUpdateParaZip(const std::string &taskId, const 
 }
 
 int32_t SysInstallerServer::StartUpdateABPackageZip(const std::string &taskId,
-        const std::vector<std::string> &pkgPath)
+    const std::vector<std::string> &pkgPath)
 {
     LOG(INFO) << "StartUpdateABPackageZip";
     DEFINE_EXIT_GUARD();
