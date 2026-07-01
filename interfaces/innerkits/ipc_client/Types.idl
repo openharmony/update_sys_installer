@@ -26,6 +26,12 @@ enum UpdateStatus {
     UPDATE_STATE_MAX,
 };
 
+enum CreateCowErrCode {
+    CREATE_COW_SUCCESS = 0,
+    CREATE_COW_FAIL = -1,
+    CREATE_COW_BUSY = -3,
+};
+
 enum InstallMode {
     FEATURE_INSTALL = 0,
     REGULAR_OTA,
