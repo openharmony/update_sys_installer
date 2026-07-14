@@ -73,7 +73,7 @@ ohos_source_set("sys_installer_stub") {
     "samgr:samgr_proxy",
     "bounds_checking_function:libsec_shared",
   ]
-
+  branch_protector_ret = "pac_ret"
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
@@ -98,7 +98,7 @@ ohos_source_set("module_update_stub") {
     "samgr:samgr_proxy",
     "bounds_checking_function:libsec_shared",
   ]
-
+  branch_protector_ret = "pac_ret"
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
@@ -146,7 +146,7 @@ ohos_shared_library("libsysinstaller_shared") {
     "platformsdk",
     "sasdk",
   ]
-
+  branch_protector_ret = "pac_ret"
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
@@ -187,7 +187,7 @@ ohos_static_library("libsysinstallerkits") {
     "updater:libupdaterlog",
     "updater:libutils",
   ]
-
+  branch_protector_ret = "pac_ret"
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
@@ -212,6 +212,7 @@ ohos_executable("sys_installer_client") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+  branch_protector_ret = "pac_ret"
   install_enable = true
   part_name = "sys_installer"
   subsystem_name = "updater"
@@ -257,6 +258,7 @@ ohos_executable("module_update_client") {
     "updater:libupdaterlog",
     "zlib:shared_libz"
   ]
+  branch_protector_ret = "pac_ret"
   install_enable = false
   part_name = "sys_installer"
   subsystem_name = "updater"
@@ -289,7 +291,7 @@ ohos_static_library("module_update_client_static") {
     "updater:libupdaterlog",
     "zlib:shared_libz",
   ]
-
+  branch_protector_ret = "pac_ret"
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
@@ -327,7 +329,7 @@ ohos_shared_library("libmodule_update_shared") {
     "platformsdk",
     "sasdk",
   ]
-
+  branch_protector_ret = "pac_ret"
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
