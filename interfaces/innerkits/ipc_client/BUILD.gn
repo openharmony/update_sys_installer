@@ -177,7 +177,7 @@ ohos_static_library("libsysinstallerkits") {
   deps = [ ":sysinstaller_interface" ]
 
   external_deps = [
-    "bounds_checking_function:libsec_shared",
+    "bounds_checking_function:libsec_static",
     "c_utils:utils",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -204,7 +204,7 @@ ohos_executable("sys_installer_client") {
     "${sys_installer_path}/interfaces/innerkits/ipc_client:libsysinstallerkits",
   ]
   external_deps = [
-    "bounds_checking_function:libsec_shared",
+    "bounds_checking_function:libsec_static",
     "c_utils:utils",
     "hilog:libhilog",
     "init:libbegetutil",
@@ -280,7 +280,7 @@ ohos_static_library("module_update_client_static") {
   public_configs = [ ":exported_header_files" ]
 
   external_deps = [
-    "bounds_checking_function:libsec_shared",
+    "bounds_checking_function:libsec_static",
     "c_utils:utils",
     "hilog:libhilog",
     "init:libbegetutil",
