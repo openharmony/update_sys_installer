@@ -45,7 +45,7 @@ ohos_static_library("libsysinstaller_timer") {
     "time_service:time_client",
     "ipc:ipc_single",
   ]
-
+  branch_protector_ret = "pac_ret"
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
