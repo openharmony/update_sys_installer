@@ -42,6 +42,7 @@ ohos_shared_library("zipalign_build") {
   output_values = get_target_outputs(":zipalign")
   include_dirs = output_values
   deps = [ ":zipalign" ]
+  branch_protector_ret = "pac_ret"
   part_name = "sys_installer"
   subsystem_name = "updater"
 }
