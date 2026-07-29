@@ -107,6 +107,7 @@ struct VabCowInfo {
     unsigned long splitSize;
     PartitionType pkgPartition;
     PartitionType trcPartition;
+    boolean isImgRemove;
 };
 
 struct PartitionInfo {
