@@ -350,6 +350,13 @@ int32_t SysInstallerServer::StartAbSync()
     return SysInstallerManager::GetInstance().StartAbSync();
 }
 
+int32_t SysInstallerServer::SetAiMergeState()
+{
+    LOG(INFO) << "SetAiMergeState";
+    DEFINE_EXIT_GUARD();
+    return SysInstallerManager::GetInstance().SetAiMergeState();
+}
+
 int32_t SysInstallerServer::SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode)
 {
     LOG(INFO) << "SetUpdateVabMode UpdateVabMode:" << static_cast<int>(mode);

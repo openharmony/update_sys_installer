@@ -663,6 +663,24 @@ int32_t SysInstallerKitsImpl::StartAbSync()
 #endif
 }
 
+int32_t SysInstallerKitsImpl::SetAiMergeState()
+{
+#ifndef UPDATER_UT
+    LOG(INFO) << "SetAiMergeState";
+    auto updateService = GetService();
+    if (updateService == nullptr) {
+        LOG(ERROR) << "Get updateService failed";
+        return -1;
+    }
+    int32_t ret = updateService->SetAiMergeState();
+    LOG(INFO) << "SetAiMergeState ret:" << ret;
+ 
+    return ret;
+#else
+    return -1;
+#endif
+}
+
 int32_t SysInstallerKitsImpl::SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode)
 {
 #ifndef UPDATER_UT

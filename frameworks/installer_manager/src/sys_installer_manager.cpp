@@ -229,6 +229,15 @@ int32_t SysInstallerManager::StartAbSync()
     return helper_->StartAbSync();
 }
 
+int32_t SysInstallerManager::SetAiMergeState()
+{
+    if (helper_ == nullptr) {
+        LOG(ERROR) << "helper_ null";
+        return -1;
+    }
+    return helper_->SetAiMergeState();
+}
+
 int32_t SysInstallerManager::SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode)
 {
     if (helper_ == nullptr) {

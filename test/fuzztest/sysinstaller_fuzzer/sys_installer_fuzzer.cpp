@@ -151,6 +151,7 @@ void FuzzSysInstaller(const uint8_t* data, size_t size)
     SysInstallerKitsImpl::GetInstance().ClearVabMetadataAndCow();
     SysInstallerKitsImpl::GetInstance().VabUpdateActive(VabActiveMode::VAB_ACTIVE_HOTA);
     SysInstallerKitsImpl::GetInstance().StartAbSync();
+    SysInstallerKitsImpl::GetInstance().SetAiMergeState();
 }
 
 void FuzzSysInstallerCloudRom(const uint8_t* data, size_t size)
