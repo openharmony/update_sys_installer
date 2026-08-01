@@ -234,6 +234,11 @@ int32_t SysInstallerManagerHelper::StartAbSync()
     return -1;
 }
 
+int32_t SysInstallerManagerHelper::SetAiMergeState()
+{
+    return -1;
+}
+
 int32_t SysInstallerManagerHelper::SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode)
 {
     return -1;

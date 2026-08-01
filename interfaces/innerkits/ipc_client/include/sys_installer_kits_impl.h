@@ -68,6 +68,7 @@ public:
     sptr<ISysInstaller> GetService();
     virtual int32_t ExitSysInstaller();
     virtual int32_t StartAbSync();
+    virtual int32_t SetAiMergeState();
     virtual int32_t SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode);
     virtual int32_t ClearVabPatch();
     virtual int32_t GetPartitionStashSize(const std::string &taskId, const std::vector<std::string> &pkgPaths,

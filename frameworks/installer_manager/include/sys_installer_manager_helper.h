@@ -55,6 +55,7 @@ public:
     virtual int32_t VabUpdateActive(VabActiveMode mode);
     virtual int32_t GetMetadataResult(const std::string &action, bool &result);
     virtual int32_t StartAbSync();
+    virtual int32_t SetAiMergeState();
     virtual int32_t SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode);
 
     virtual int32_t InstallCloudRom(const std::string &taskId, InstallMode installMode,

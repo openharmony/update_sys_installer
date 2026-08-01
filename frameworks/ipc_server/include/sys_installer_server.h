@@ -110,6 +110,7 @@ public:
     int32_t UpdateCloudRomVersion(const std::string &baseVersion) override;
     int32_t ExitSysInstaller() override;
     int32_t StartAbSync() override;
+    int32_t SetAiMergeState() override;
     int32_t SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode) override;
     int32_t ClearVabPatch() override;
     int32_t GetPartitionStashSize(const std::string &taskId, const std::vector<std::string> &pkgPaths,

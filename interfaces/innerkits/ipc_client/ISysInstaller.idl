@@ -44,6 +44,7 @@ interface OHOS.SysInstaller.ISysInstaller {
     void GetUpdateResult([in] String taskId, [in] String taskType, [in] String resultType, [out] String updateResult);
     void ExitSysInstaller();
     void StartAbSync();
+    void SetAiMergeState();
     void SetUpdateVabMode([in] String taskId, [in] UpdateVabMode mode);
     void StartUpdateABPackageZip([in] String taskId, [in] List<String> pkgPath);
     

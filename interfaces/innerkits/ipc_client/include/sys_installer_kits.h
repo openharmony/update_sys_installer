@@ -66,6 +66,7 @@ public:
     virtual int32_t GetMetadataResult(const std::string &action, bool &result) = 0;
     virtual int32_t ExitSysInstaller() = 0;
     virtual int32_t StartAbSync() = 0;
+    virtual int32_t SetAiMergeState() = 0;
     virtual int32_t SetUpdateVabMode(const std::string &taskId, UpdateVabMode mode) = 0;
     virtual int32_t ClearVabPatch() = 0;
     virtual int32_t StartUpdateABPackageZip(const std::string &taskId,
