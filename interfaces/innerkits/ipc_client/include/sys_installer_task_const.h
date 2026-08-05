@@ -31,6 +31,8 @@ struct MetadataActionConst {
     static constexpr const char *ACTIVE_ROLL_BACK = "activeRollBack";
     static constexpr const char *ACTIVE_SUCCESS = "activeSuccess";
     static constexpr const char *NORMAL_BOOT = "normalBoot";
+    static constexpr const char *ACTIVE_WAIT_REBOOT = "activeWaitReboot";
+    static constexpr const char *WAIT_ACTIVE = "waitActive";
 };
 } // namespace SysInstaller
 } // namespace OHOS
