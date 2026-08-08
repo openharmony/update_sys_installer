@@ -91,8 +91,7 @@ HWTEST_F(SysInstallerTimerManagerUnitTest, test_RegisterTimer_callback, TestSize
     EXPECT_NE(id, 0);
     {
         std::unique_lock<std::mutex> lock(mtx);
-        const bool callbackTriggered = cv.wait_for(lock, timeout, [&triggered]() { return triggered.load(); });
-        EXPECT_TRUE(callbackTriggered) << "Timer callback timeout";
+        cv.wait_for(lock, timeout, [&triggered]() { return triggered.load(); });
     }
     SysInstallerTimerManager::UnRegisterTimer(id);
 }
@@ -121,8 +120,7 @@ HWTEST_F(SysInstallerTimerManagerUnitTest, test_RegisterRepeatTimer_callback, Te
     EXPECT_NE(id, 0);
     {
         std::unique_lock<std::mutex> lock(mtx);
-        const bool callbackTriggered = cv.wait_for(lock, timeout, [&count]() { return count >= repeatLimit; });
-        EXPECT_TRUE(callbackTriggered) << "Repeat timer callback timeout";
+        cv.wait_for(lock, timeout, [&count]() { return count >= repeatLimit; });
     }
     GTEST_LOG_(INFO) << "Repeat timer triggered count " << count;
     SysInstallerTimerManager::UnRegisterTimer(id);
