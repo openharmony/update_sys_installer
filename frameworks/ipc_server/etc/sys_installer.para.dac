@@ -13,3 +13,4 @@
 
 persist.moduleupdate.bms. = update:update:0775
 update.llm.merge_state = root:root:0775:0775
+updater.vab_update_boot = root:root:0775:0775
