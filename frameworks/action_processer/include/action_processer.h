@@ -18,6 +18,7 @@
 
 #include <deque>
 #include <map>
+#include <mutex>
 #include <atomic>
 #include "iaction.h"
 #include "macros_updater.h"
@@ -34,20 +35,17 @@ public:
     void AddAction(std::unique_ptr<IAction> action);
     void Start();
     bool Stop();
-    void Suspend();
-    void Resume();
-    void CompletedAction(InstallerErrCode errCode, const std::string &errStr);
     bool SetUpdateMode(UpdateVabMode mode);
 
 private:
-    bool WaitActionExit();
+    void CompletedAction(InstallerErrCode errCode, const std::string &errStr);
     void StartNextAction(InstallerErrCode errCode);
 
+    std::recursive_mutex mutex_;
     std::shared_ptr<StatusManager> statusManager_ {};
     std::deque<std::unique_ptr<IAction>> actionQue_ {};
     std::unique_ptr<IAction> curAction_ {};
     std::atomic<bool> isRunning_ = false;
-    std::atomic<bool> isSuspend_ = false;
     InstallerMode installMode_ {SYS_BACKGROUND_UPDATE_MODE};
 };
 } // SysInstaller
