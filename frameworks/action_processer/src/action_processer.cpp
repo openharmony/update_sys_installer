@@ -15,6 +15,7 @@
 
 #include "action_processer.h"
 #include <chrono>
+#include <mutex>
 #include <thread>
 #include "sys_installer_manager.h"
 #include "log/log.h"
@@ -24,28 +25,12 @@ namespace SysInstaller {
 using namespace Updater;
 bool ActionProcesser::IsRunning()
 {
-    return isRunning_ || isSuspend_;
-}
-
-bool ActionProcesser::WaitActionExit()
-{
-    using namespace std::chrono_literals;
-    const unsigned int WAIT_MAX_SECOND = 4;
-    unsigned int count = 0;
-    while (IsRunning() && (count < WAIT_MAX_SECOND)) {
-        std::this_thread::sleep_for(1s);
-        count++;
-    }
-    if (count == WAIT_MAX_SECOND) {
-        LOG(ERROR) << "wait action exit failed for " << WAIT_MAX_SECOND << "s";
-        return false;
-    }
-    LOG(INFO) << "action exit after " << count << "s";
-    return true;
+    return isRunning_;
 }
 
 void ActionProcesser::AddAction(std::unique_ptr<IAction> action)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (isRunning_ || action == nullptr) {
         LOG(ERROR) << "action running or action empty";
         return;
@@ -61,13 +46,13 @@ void ActionProcesser::AddAction(std::unique_ptr<IAction> action)
 
 void ActionProcesser::Start()
 {
+    std::unique_lock<std::recursive_mutex> lock(mutex_);
     if (isRunning_ || actionQue_.empty()) {
         LOG(WARNING) << "Action running or queue empty";
         return;
     }
 
     isRunning_ = true;
-    isSuspend_ = false;
     statusManager_->UpdateCallback(UpdateStatus::UPDATE_STATE_ONGOING, 0, "");
     curAction_ = std::move(actionQue_.front());
     actionQue_.pop_front();
@@ -75,12 +60,14 @@ void ActionProcesser::Start()
         LOG(WARNING) << "curAction_ nullptr";
         return;
     }
+    lock.unlock();
     LOG(INFO) << "Start " << curAction_->GetActionName();
     curAction_->PerformAction();
 }
 
 bool ActionProcesser::Stop()
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     if (!isRunning_) {
         LOG(WARNING) << "Action not running";
         return false;
@@ -90,47 +77,18 @@ bool ActionProcesser::Stop()
         LOG(INFO) << "Stop " << curAction_->GetActionName();
         ret = curAction_->TerminateAction();
     }
-    if (!ret || !WaitActionExit()) {
+    if (!ret) {
         LOG(INFO) << "Stop action failed, directly returned";
         return false;
     }
     isRunning_ = false;
-    isSuspend_ = false;
-    curAction_.reset();
     actionQue_.clear();
     return ret;
 }
 
-void ActionProcesser::Suspend()
-{
-    if (!isRunning_ || curAction_ == nullptr) {
-        LOG(WARNING) << "ActionProcesser not running or action empty";
-        return;
-    }
-
-    LOG(INFO) << "Suspend " << curAction_->GetActionName();
-    isSuspend_ = true;
-    curAction_->SuspendAction();
-}
-
-void ActionProcesser::Resume()
-{
-    if (!isSuspend_) {
-        LOG(WARNING) << "ActionProcesser is running";
-        return;
-    }
-
-    isSuspend_ = false;
-    if (curAction_ != nullptr) {
-        LOG(INFO) << "Resume " << curAction_->GetActionName();
-        return curAction_->ResumeAction();
-    }
-
-    StartNextAction(SYS_UPDATE_SUCCESS);
-}
-
 void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::string &errStr)
 {
+    std::unique_lock<std::recursive_mutex> lock(mutex_);
     if (curAction_ == nullptr) {
         LOG(ERROR) << "curAction_ null error ";
         return;
@@ -140,7 +98,6 @@ void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::strin
     curAction_.reset();
     if (errCode != SYS_UPDATE_SUCCESS && errCode != SYS_UPDATE_RETRY_SUCCESS) {
         isRunning_ = false;
-        isSuspend_ = false;
         OHOS::UpdateStatus retStatus = (errCode == SYS_INSTALL_CANCEL) ? UpdateStatus::UPDATE_STATE_CANCEL :
             UpdateStatus::UPDATE_STATE_FAILED;
         statusManager_->UpdateCallback(retStatus, 100, errStr); // 100 : action failed
@@ -150,21 +107,17 @@ void ActionProcesser::CompletedAction(InstallerErrCode errCode, const std::strin
         return;
     }
     SysInstallerManagerInit::GetInstance().InvokeEvent(SYS_POST_SUCCESS_EVENT);
-
-    if (isSuspend_) {
-        LOG(INFO) << "suspend";
-        return;
-    }
+    lock.unlock();
 
     StartNextAction(errCode);
 }
 
 void ActionProcesser::StartNextAction(InstallerErrCode errCode)
 {
+    std::unique_lock<std::recursive_mutex> lock(mutex_);
     if (actionQue_.empty()) {
         LOG(INFO) << "Action queue empty, successful, errcode is " << errCode;
         isRunning_ = false;
-        isSuspend_ = false;
         statusManager_->UpdateCallback(errCode == SYS_UPDATE_RETRY_SUCCESS ?
             UpdateStatus::UPDATE_STATE_RETRY_SUCCESSFUL : UpdateStatus::UPDATE_STATE_SUCCESSFUL,
             100, ""); // 100 : action completed
@@ -175,26 +128,28 @@ void ActionProcesser::StartNextAction(InstallerErrCode errCode)
     LOG(INFO) << "StartNextAction " << curAction_->GetActionName();
     actionQue_.pop_front();
     curAction_->SetUpdateModeAction(installMode_);
+    lock.unlock();
     curAction_->PerformAction();
 }
 
 bool ActionProcesser::SetUpdateMode(UpdateVabMode mode)
 {
-    if (!isRunning_ || curAction_ == nullptr) {
-        LOG(WARNING) << "ActionProcesser not running or action empty";
-        return false;
-    }
-    LOG(INFO) << "SetUpdateMode " << curAction_->GetActionName();
+    installMode_ = SYS_BACKGROUND_UPDATE_MODE;
     std::unordered_map<OHOS::UpdateVabMode, InstallerMode> updateModeMap = {
         {OHOS::UpdateVabMode::BACKGROUND_UPDATE_MODE, SYS_BACKGROUND_UPDATE_MODE},
         {OHOS::UpdateVabMode::FOREGROUND_UPDATE_MODE, SYS_FOREGROUND_UPDATE_MODE},
         {OHOS::UpdateVabMode::ALLCORES_UPDATE_MODE, SYS_ALLCORES_UPDATE_MODE}
     };
 
-    installMode_ = SYS_BACKGROUND_UPDATE_MODE;
     if (auto it = updateModeMap.find(mode); it != updateModeMap.end()) {
         installMode_ = it->second;
     }
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    if (!isRunning_ || curAction_ == nullptr) {
+        LOG(WARNING) << "ActionProcesser not running or action empty";
+        return false;
+    }
+    LOG(INFO) << "SetUpdateMode " << curAction_->GetActionName();
     bool ret = curAction_->SetUpdateModeAction(installMode_);
     if (!ret) {
         LOG(WARNING) << "SetUpdateMode action failed";
