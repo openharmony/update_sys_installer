@@ -43,6 +43,7 @@ ohos_static_library("libabupdate") {
     "updater:libringbuffer",
     "updater:libupdater_sys_installer",
     "updater:libutils",
+    "bounds_checking_function:libsec_shared",
   ]
   branch_protector_ret = "pac_ret"
   part_name = "sys_installer"
