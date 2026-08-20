@@ -39,6 +39,7 @@ ohos_static_library("libactionprocesser") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "updater:libupdaterlog",
+    "bounds_checking_function:libsec_shared",
   ]
   branch_protector_ret = "pac_ret"
   subsystem_name = "updater"
