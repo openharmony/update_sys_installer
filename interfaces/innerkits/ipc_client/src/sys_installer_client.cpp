@@ -16,6 +16,7 @@
 #include "sys_installer_callback.h"
 #include "sys_installer_kits_impl.h"
 #include "isys_installer_callback_func.h"
+#include "parse_installer_cmd_int.h"
 
 using namespace OHOS;
 using namespace std;
@@ -61,6 +62,12 @@ int main(int argc, char **argv)
 
     std::string taskId = argv[2];
 
+    int32_t cmd = 0;
+    if (!ParseInstallerCmdInt(argv[1], cmd)) {
+        printf("invalid argv[1] command: overflow/partial/empty/junk\n");
+        return -1;
+    }
+
     int32_t ret = SysInstallerKitsImpl::GetInstance().SysInstallerInit(taskId);
     printf("SysInstallerInit ret:%d taskId %s\n", ret, taskId.c_str());
 
@@ -71,8 +78,8 @@ int main(int argc, char **argv)
     }
     SysInstallerKitsImpl::GetInstance().SetUpdateCallback(taskId, callback);
     std::string updateResult;
-    printf("argv[1]:%d\n", atoi(argv[1]));
-    switch (atoi(argv[1])) {
+    printf("argv[1]:%d\n", cmd);
+    switch (cmd) {
         case SysInstallerInterfaceCode::UPDATE_PACKAGE:
             ret = SysInstallerKitsImpl::GetInstance().StartUpdatePackageZip(taskId, "/data/ota_package/update.zip");
             break;
